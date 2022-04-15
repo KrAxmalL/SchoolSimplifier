@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ua.edu.ukma.school_simplifier.models.security.User;
+import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,9 +30,12 @@ import java.util.stream.Collectors;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final JWTManager jwtManager;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+    @Autowired
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, JWTManager jwtManager) {
         this.authenticationManager = authenticationManager;
+        this.jwtManager = jwtManager;
     }
 
     @Override
@@ -76,6 +81,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("Authentication failed!!!");
+        log.info(failed.getMessage());
         super.unsuccessfulAuthentication(request, response, failed);
     }
 }

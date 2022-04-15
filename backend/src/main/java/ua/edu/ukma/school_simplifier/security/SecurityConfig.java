@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ua.edu.ukma.school_simplifier.security.filter.CustomAuthenticationFilter;
 import ua.edu.ukma.school_simplifier.security.filter.CustomAuthorizationFilter;
+import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter authenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        CustomAuthorizationFilter authorizationFilter = new CustomAuthorizationFilter();
+        JWTManager jwtManager = jwtManager();
+
+        CustomAuthenticationFilter authenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), jwtManager);
+        CustomAuthorizationFilter authorizationFilter = new CustomAuthorizationFilter(jwtManager);
 
         authenticationFilter.setFilterProcessesUrl("/api/login");
         http.csrf().disable();
@@ -48,5 +51,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public JWTManager jwtManager() {
+        return new JWTManager();
     }
 }
