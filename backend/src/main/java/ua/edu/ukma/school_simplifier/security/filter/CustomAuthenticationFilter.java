@@ -54,20 +54,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         User user = (User) authResult.getPrincipal();
+        String issuer = request.getRequestURL().toString();
         log.info("Password in successfull auth: {}", user.getPassword());
-        Algorithm algorithm = Algorithm.HMAC256("secret".getBytes(StandardCharsets.UTF_8));
-        String accessToken = JWT.create()
-                                .withSubject(user.getUsername())
-                                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                                .withIssuer(request.getRequestURL().toString())
-                                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-                                .sign(algorithm);
 
-        String refreshToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
-                .withIssuer(request.getRequestURL().toString())
-                .sign(algorithm);
+        String accessToken = jwtManager.getAccessToken(user, issuer);
+        String refreshToken = jwtManager.getRefreshToken(user, issuer);
 
         /*response.setHeader("access_token", accessToken);
         response.setHeader("refresh_token", refreshToken);*/
