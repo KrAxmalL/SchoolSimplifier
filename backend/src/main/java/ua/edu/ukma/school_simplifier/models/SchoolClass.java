@@ -10,12 +10,16 @@ import java.util.List;
 
 @Entity
 @Table(name = "school_class")
-@AttributeOverride(name = "id", column = @Column(name = "school_class_id"))
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class SchoolClass extends AbstractModel {
+public class SchoolClass {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "school_class_id")
+    private Long id;
 
     @OneToOne(mappedBy = "schoolClass")
     private Teacher formTeacher;

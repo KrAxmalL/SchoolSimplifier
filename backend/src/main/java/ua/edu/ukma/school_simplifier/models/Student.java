@@ -10,7 +10,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "student")
-@PrimaryKeyJoinColumn(name = "student_id")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

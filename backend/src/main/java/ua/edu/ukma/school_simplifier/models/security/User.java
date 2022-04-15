@@ -1,20 +1,21 @@
 package ua.edu.ukma.school_simplifier.models.security;
 
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ua.edu.ukma.school_simplifier.models.AbstractModel;
 
 import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
-@Table(name = "userdata")
-@Inheritance(strategy = InheritanceType.JOINED)
-@AttributeOverride(name = "id", column = @Column(name = "user_id"))
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends AbstractModel implements UserDetails {
+public abstract class User implements UserDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "user_id")
+    private Long id;
 
     @Column(name = "email")
     private String email;
@@ -28,6 +29,14 @@ public class User extends AbstractModel implements UserDetails {
                joinColumns = {@JoinColumn(name = "user_id")},
                inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Collection<Role> roles;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @Override
     public String getUsername() {

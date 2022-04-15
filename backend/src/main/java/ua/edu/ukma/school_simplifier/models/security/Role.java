@@ -2,16 +2,19 @@ package ua.edu.ukma.school_simplifier.models.security;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import ua.edu.ukma.school_simplifier.models.AbstractModel;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "role")
-@AttributeOverride(name = "id", column = @Column(name = "role_id"))
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role extends AbstractModel implements GrantedAuthority {
+public class Role implements GrantedAuthority {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "role_id")
+    private Long id;
 
     @Column(name = "role_name")
     private String roleName;
