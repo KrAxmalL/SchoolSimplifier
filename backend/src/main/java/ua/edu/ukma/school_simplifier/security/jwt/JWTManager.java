@@ -16,8 +16,11 @@ import java.util.stream.Collectors;
 @Component
 public class JWTManager {
 
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10 * 60 * 1000;
+    //private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10 * 60 * 1000;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10;
     private static final long REFRESH_TOKEN_EXPIRATION_TIME_MILLIS = 30 * 60 * 1000;
+
+    private static final String CLAIM = "roles";
 
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
@@ -33,7 +36,7 @@ public class JWTManager {
                   .withSubject(user.getUsername())
                   .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME_MILLIS))
                   .withIssuer(issuer)
-                  .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                  .withClaim(CLAIM, user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                   .sign(algorithm);
     }
 

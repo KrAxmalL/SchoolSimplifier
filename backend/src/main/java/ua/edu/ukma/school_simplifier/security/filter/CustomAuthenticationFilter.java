@@ -3,6 +3,7 @@ package ua.edu.ukma.school_simplifier.security.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,8 +20,10 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,39 +35,47 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     private final AuthenticationManager authenticationManager;
     private final JWTManager jwtManager;
 
-    @Autowired
+    private final ObjectMapper mapper;
+
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager, JWTManager jwtManager) {
         this.authenticationManager = authenticationManager;
         this.jwtManager = jwtManager;
+
+        mapper = new ObjectMapper();
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-       String email = request.getParameter("email");
-       String password = request.getParameter("password");
+       try {
+           final ObjectNode body = mapper.readValue(request.getReader(), ObjectNode.class);
+           final String email = body.get("email").asText();
+           final String password = body.get("password").asText();
 
-       log.info("Email is: {}", email);
-       log.info("Password is: {}", password);
+           log.info("Email is: {}", email);
+           log.info("Password is: {}", password);
 
-       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-       return authenticationManager.authenticate(authenticationToken);
-       //todo: replace with json
+           UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+           return authenticationManager.authenticate(authenticationToken);
+
+       } catch (IOException e) {
+           e.printStackTrace();
+           return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("", ""));
+       }
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         User user = (User) authResult.getPrincipal();
         String issuer = request.getRequestURL().toString();
         log.info("Password in successfull auth: {}", user.getPassword());
+        user.getAuthorities().forEach(role -> log.info("Roles: {}", role.toString()));
 
         String accessToken = jwtManager.getAccessToken(user, issuer);
         String refreshToken = jwtManager.getRefreshToken(user, issuer);
 
-        /*response.setHeader("access_token", accessToken);
-        response.setHeader("refresh_token", refreshToken);*/
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", accessToken);
-        tokens.put("refresh_token", refreshToken);
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", refreshToken);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getWriter(), tokens);
     }
