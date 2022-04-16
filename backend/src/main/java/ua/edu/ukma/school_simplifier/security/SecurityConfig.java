@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import ua.edu.ukma.school_simplifier.security.filter.CustomAuthenticationFilter;
 import ua.edu.ukma.school_simplifier.security.filter.CustomAuthorizationFilter;
 import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
+import ua.edu.ukma.school_simplifier.services.JwtTokenService;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+    private final JwtTokenService jwtTokenService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
@@ -36,12 +38,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        JWTManager jwtManager = jwtManager();
-
-        CustomAuthenticationFilter authenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), jwtManager);
+        CustomAuthenticationFilter authenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), jwtTokenService);
         authenticationFilter.setFilterProcessesUrl("/api/login");
 
-        CustomAuthorizationFilter authorizationFilter = new CustomAuthorizationFilter(jwtManager);
+        CustomAuthorizationFilter authorizationFilter = new CustomAuthorizationFilter(jwtTokenService);
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
@@ -64,10 +64,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public JWTManager jwtManager() {
-        return new JWTManager();
     }
 }

@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
+import ua.edu.ukma.school_simplifier.services.JwtTokenService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,10 +31,12 @@ import static java.util.Arrays.stream;
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JWTManager jwtManager;
+    private final JwtTokenService jwtTokenService;
 
-    public CustomAuthorizationFilter(JWTManager jwtManager) {
-        this.jwtManager = jwtManager;
+    @Autowired
+    public CustomAuthorizationFilter(JwtTokenService jwtTokenService) {
+        super();
+        this.jwtTokenService = jwtTokenService;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 try {
                     String token = authorizationHeader.substring("Bearer ".length());
-                    DecodedJWT decodedJWT = jwtManager.verifyToken(token);
+                    DecodedJWT decodedJWT = jwtTokenService.verifyToken(token);
                     String username = decodedJWT.getSubject();
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();

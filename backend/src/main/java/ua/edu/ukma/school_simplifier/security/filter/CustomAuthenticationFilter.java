@@ -15,6 +15,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ua.edu.ukma.school_simplifier.models.security.User;
 import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
+import ua.edu.ukma.school_simplifier.services.JwtTokenService;
+import ua.edu.ukma.school_simplifier.utils.Pair;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -33,13 +35,13 @@ import java.util.stream.Collectors;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final JWTManager jwtManager;
+    private final JwtTokenService jwtTokenService;
 
     private final ObjectMapper mapper;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, JWTManager jwtManager) {
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, JwtTokenService jwtTokenService) {
         this.authenticationManager = authenticationManager;
-        this.jwtManager = jwtManager;
+        this.jwtTokenService = jwtTokenService;
 
         mapper = new ObjectMapper();
     }
@@ -70,14 +72,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         log.info("Password in successfull auth: {}", user.getPassword());
         user.getAuthorities().forEach(role -> log.info("Roles: {}", role.toString()));
 
-        String accessToken = jwtManager.getAccessToken(user, issuer);
-        String refreshToken = jwtManager.getRefreshToken(user, issuer);
+        Pair<String ,String> tokensString = jwtTokenService.getNewTokens(user, issuer);
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        Map<String, String> tokensMap = new HashMap<>();
+        tokensMap.put("accessToken", tokensString.getFirst());
+        tokensMap.put("refreshToken", tokensString.getSecond());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getWriter(), tokens);
+        new ObjectMapper().writeValue(response.getWriter(), tokensMap);
     }
 
     @Override
