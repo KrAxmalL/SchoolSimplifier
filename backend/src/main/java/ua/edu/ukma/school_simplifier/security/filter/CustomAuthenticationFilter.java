@@ -25,10 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,8 +55,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
            return authenticationManager.authenticate(authenticationToken);
-
        } catch (IOException e) {
+           //todo: add proper handling
            e.printStackTrace();
            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("", ""));
        }

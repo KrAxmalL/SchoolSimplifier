@@ -12,4 +12,8 @@ public interface JwtTokenService {
     Pair<String, String> getRefreshedTokens(String refreshToken);
 
     DecodedJWT verifyToken(String token);
+
+    boolean tokenExpired(String token);
+
+    boolean tokenExpired(DecodedJWT token);
 }

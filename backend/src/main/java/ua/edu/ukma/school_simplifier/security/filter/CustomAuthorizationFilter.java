@@ -33,15 +33,20 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
 
+    private final List<String> ignoredPaths;
+
     @Autowired
     public CustomAuthorizationFilter(JwtTokenService jwtTokenService) {
         super();
         this.jwtTokenService = jwtTokenService;
+
+        this.ignoredPaths = List.of("/api/login", "/api/token/refresh");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/token/refresh")) {
+        final String path = request.getServletPath();
+        if(ignoredPaths.contains(path)) {
             filterChain.doFilter(request, response);
         }
         else {
