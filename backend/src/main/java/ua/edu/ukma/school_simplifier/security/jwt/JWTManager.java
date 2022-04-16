@@ -18,7 +18,7 @@ public class JWTManager {
 
     //private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10 * 60 * 1000;
     private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10;
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME_MILLIS = 30 * 60 * 1000;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME_MILLIS = 30;
 
     private static final String CLAIM = "roles";
 

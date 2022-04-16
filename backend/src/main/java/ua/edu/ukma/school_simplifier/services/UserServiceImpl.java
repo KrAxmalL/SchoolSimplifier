@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.models.security.Role;
 import ua.edu.ukma.school_simplifier.models.security.User;
 import ua.edu.ukma.school_simplifier.repositories.RoleRepository;
+import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
+import ua.edu.ukma.school_simplifier.repositories.TeacherRepository;
 import ua.edu.ukma.school_simplifier.repositories.UserRepository;
 
 import java.util.ArrayList;
