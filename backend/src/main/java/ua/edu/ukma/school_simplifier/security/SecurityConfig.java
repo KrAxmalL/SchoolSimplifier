@@ -12,12 +12,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import ua.edu.ukma.school_simplifier.security.filter.CustomAuthenticationFilter;
-import ua.edu.ukma.school_simplifier.security.filter.CustomAuthorizationFilter;
-import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
+import ua.edu.ukma.school_simplifier.security.filter.JwtAuthorizationFilter;
 import ua.edu.ukma.school_simplifier.services.JwtTokenService;
 
 import java.util.List;
@@ -41,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CustomAuthenticationFilter authenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), jwtTokenService);
         authenticationFilter.setFilterProcessesUrl("/api/login");
 
-        CustomAuthorizationFilter authorizationFilter = new CustomAuthorizationFilter(jwtTokenService);
+        JwtAuthorizationFilter authorizationFilter = new JwtAuthorizationFilter(jwtTokenService);
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
