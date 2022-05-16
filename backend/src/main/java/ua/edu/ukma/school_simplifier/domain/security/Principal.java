@@ -7,14 +7,14 @@ import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Table(name = "principal")
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class User implements UserDetails {
+public class Principal implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "user_id")
+    @Column(name = "principal_id")
     private Long id;
 
     @Column(name = "email")
@@ -25,8 +25,8 @@ public abstract class User implements UserDetails {
 
     @ManyToMany(fetch = FetchType.EAGER,
                 cascade = CascadeType.ALL)
-    @JoinTable(name = "user_role",
-               joinColumns = {@JoinColumn(name = "user_id")},
+    @JoinTable(name = "principal_role",
+               joinColumns = {@JoinColumn(name = "principal_id")},
                inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Collection<Role> roles;
 
