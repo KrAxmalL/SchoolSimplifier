@@ -22,6 +22,6 @@ public class JwtToken {
     @Column(name = "token")
     private String value;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "principal_id")
+    private Long principalId;
 }
