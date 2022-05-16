@@ -1,4 +1,4 @@
-package ua.edu.ukma.school_simplifier.models;
+package ua.edu.ukma.school_simplifier.domain.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

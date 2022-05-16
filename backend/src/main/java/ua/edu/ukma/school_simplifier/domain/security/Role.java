@@ -1,4 +1,4 @@
-package ua.edu.ukma.school_simplifier.models.security;
+package ua.edu.ukma.school_simplifier.domain.security;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

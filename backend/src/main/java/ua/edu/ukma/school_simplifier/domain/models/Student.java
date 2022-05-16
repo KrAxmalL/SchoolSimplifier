@@ -1,10 +1,10 @@
-package ua.edu.ukma.school_simplifier.models;
+package ua.edu.ukma.school_simplifier.domain.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.ukma.school_simplifier.models.security.User;
+import ua.edu.ukma.school_simplifier.domain.security.User;
 
 import javax.persistence.*;
 
