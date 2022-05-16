@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.ukma.school_simplifier.domain.security.User;
+import ua.edu.ukma.school_simplifier.domain.security.Principal;
 
 import javax.persistence.*;
 
@@ -14,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Teacher extends User {
+public class Teacher {
 
     @Column(name = "first_name")
     private String firstName;
