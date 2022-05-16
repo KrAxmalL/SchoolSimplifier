@@ -13,9 +13,4 @@ public class SchoolSimplifierApplication {
         SpringApplication.run(SchoolSimplifierApplication.class, args);
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 }
