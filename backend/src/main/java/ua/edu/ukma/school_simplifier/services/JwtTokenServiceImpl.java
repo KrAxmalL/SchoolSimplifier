@@ -1,5 +1,6 @@
 package ua.edu.ukma.school_simplifier.services;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
@@ -46,39 +47,55 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 final Principal principal = principalService.getPrincipal(email);
                 return getNewTokens(principal);
             } else {
-                throw new TokenNotFoundException("Provided refresh token doesn't exist!");
+                throw new TokenNotFoundException("Provided refresh token doesn't exist");
             }
-        } catch(TokenExpiredException ex) {
-            throw ex;
-        } catch(Exception ex) {
+        } catch(JWTVerificationException ex) {
             throw new InvalidTokenException(ex.getMessage());
         }
     }
 
     @Override
     public String getEmail(String token) {
-        return jwtManager.verifyToken(token)
-                         .getSubject();
+        try {
+            return jwtManager.verifyToken(token)
+                    .getSubject();
+        } catch(JWTVerificationException ex) {
+            throw new InvalidTokenException(ex.getMessage());
+        }
     }
 
     @Override
     public List<String> getRoles(String accessToken) {
-        return jwtManager.verifyToken(accessToken)
-                         .getClaim(JWTManager.CLAIM_ROLES)
-                         .asList(String.class);
+        try {
+            return jwtManager.verifyToken(accessToken)
+                    .getClaim(JWTManager.CLAIM_ROLES)
+                    .asList(String.class);
+        } catch(JWTVerificationException ex) {
+            throw new InvalidTokenException(ex.getMessage());
+        }
     }
 
     @Override
     public boolean isValidToken(String token) {
-        DecodedJWT decodedToken = jwtManager.verifyToken(token);
-        return true;
+        try {
+            DecodedJWT decodedToken = jwtManager.verifyToken(token);
+            return true;
+        } catch(JWTVerificationException ex) {
+            throw new InvalidTokenException(ex.getMessage());
+        }
     }
 
     @Override
     public boolean isTokenExpired(String token) {
-        final Date now = new Date();
-        return jwtManager.verifyToken(token)
-                         .getExpiresAt()
-                         .before(now);
+        try {
+            final Date now = new Date();
+            return jwtManager.verifyToken(token)
+                    .getExpiresAt()
+                    .before(now);
+        } catch(TokenExpiredException ex) {
+            return false;
+        } catch (JWTVerificationException ex) {
+            throw new InvalidTokenException(ex.getMessage());
+        }
     }
 }
