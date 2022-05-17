@@ -1,9 +1,8 @@
 import { DOMAIN_URL } from "../config/config";
 
-const LOGIN_URL = DOMAIN_URL + '/login';
-const REFRESH_URL = DOMAIN_URL + '/token/refresh';
-const LOGOUT_URL = DOMAIN_URL + '/logout';
-
+const AUTHENTICATION_URL = DOMAIN_URL + '/authentication'
+const LOGIN_URL = AUTHENTICATION_URL + '/login';
+const REFRESH_URL = AUTHENTICATION_URL + '/refresh';
 
 export async function login(email, password) {
     const response = await fetch(LOGIN_URL, {
@@ -26,14 +25,14 @@ export async function login(email, password) {
 };
 
 export async function refreshTokens(refreshToken) {
+    console.log(JSON.stringify({
+        refreshToken
+     }));
     const response = await fetch(REFRESH_URL, {
-        method: 'POST',
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-        },
-        body: JSON.stringify({
-           refreshToken
-        })
+            'Authorization': `Bearer ${refreshToken}`
+        }
     });
 
     if(response.ok) {
