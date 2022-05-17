@@ -1,5 +1,5 @@
 import Layout from './layout/Layout';
-import Login from './pages/Login';
+import Login from './pages/public/Login';
 
 import './App.css';
 
