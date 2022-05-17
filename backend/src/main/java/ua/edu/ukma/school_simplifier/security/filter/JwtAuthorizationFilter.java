@@ -1,6 +1,7 @@
 package ua.edu.ukma.school_simplifier.security.filter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +27,11 @@ import java.util.*;
 @Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
+    public static final String BEARER_STR = "Bearer ";
+    public static final int BEARER_LENGTH = BEARER_STR.length();
+
     private static final List<String> ignoredPaths = List.of("/api/authentication/login",
                                                              "/api/authentication/refresh");
-    private static final String BEARER_STR = "Bearer ";
-    private static final int BEARER_LENGTH = BEARER_STR.length();
 
     private final JwtTokenService jwtTokenService;
 
@@ -60,6 +62,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     log.info("Current path: {}", request.getServletPath());
                     log.info("authorized!");
                     filterChain.doFilter(request, response);
+                } catch(TokenExpiredException ex) {
+                    log.error("Error logging in: {}", ex.getMessage());
+                    int responseStatus = HttpStatus.UNAUTHORIZED.value();
+                    response.setStatus(responseStatus);
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    final ErrorResponse errorResponse = new ErrorResponse(responseStatus, ex.getMessage());
+                    new ObjectMapper().writeValue(response.getWriter(), errorResponse);
                 } catch(InvalidTokenException ex) {
                     log.error("Error logging in: {}", ex.getMessage());
                     int responseStatus = HttpStatus.FORBIDDEN.value();

@@ -49,6 +49,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             } else {
                 throw new TokenNotFoundException("Provided refresh token doesn't exist");
             }
+        } catch(TokenExpiredException ex) {
+            throw ex;
         } catch(JWTVerificationException ex) {
             throw new InvalidTokenException(ex.getMessage());
         }
@@ -59,6 +61,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         try {
             return jwtManager.verifyToken(token)
                     .getSubject();
+        } catch(TokenExpiredException ex) {
+            throw ex;
         } catch(JWTVerificationException ex) {
             throw new InvalidTokenException(ex.getMessage());
         }
@@ -70,6 +74,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             return jwtManager.verifyToken(accessToken)
                     .getClaim(JWTManager.CLAIM_ROLES)
                     .asList(String.class);
+        } catch(TokenExpiredException ex) {
+            throw ex;
         } catch(JWTVerificationException ex) {
             throw new InvalidTokenException(ex.getMessage());
         }
@@ -81,7 +87,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             DecodedJWT decodedToken = jwtManager.verifyToken(token);
             return true;
         } catch(JWTVerificationException ex) {
-            throw new InvalidTokenException(ex.getMessage());
+            return false;
         }
     }
 
