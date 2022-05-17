@@ -7,6 +7,7 @@ import lombok.Setter;
 import ua.edu.ukma.school_simplifier.domain.security.Principal;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "teacher")
@@ -15,6 +16,10 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class Teacher {
+
+    @Id
+    @Column(name = "teacher_id")
+    private Long teacherId;
 
     @Column(name = "first_name")
     private String firstName;
@@ -28,4 +33,7 @@ public class Teacher {
     @OneToOne
     @JoinColumn(name = "school_class_id", referencedColumnName = "school_class_id")
     private SchoolClass schoolClass;
+
+    @OneToMany(mappedBy = "teacher")
+    private List<ScheduleRecord> scheduleRecords;
 }

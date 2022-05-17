@@ -17,9 +17,12 @@ import java.util.List;
 public class SchoolClass {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "school_class_id")
-    private Long id;
+    private Long schoolClassId;
+
+    @Column(name = "school_class_name")
+    private String schoolClassName;
 
     @OneToOne(mappedBy = "schoolClass")
     private Teacher formTeacher;
@@ -27,6 +30,6 @@ public class SchoolClass {
     @OneToMany(mappedBy = "schoolClass")
     private List<Student> students;
 
-    @Column(name = "school_class_name")
-    private String schoolClassName;
+    @OneToMany(mappedBy = "schoolClass")
+    private List<ScheduleRecord> scheduleRecords;
 }
