@@ -29,42 +29,19 @@ function LoginForm() {
         const {accessToken, refreshToken} = await login(email, password);
         dispatch(authActions.setAccessToken({ accessToken }));
         dispatch(authActions.setRefreshToken({ refreshToken }));
-
-        const decodedToken = jwtDecode(accessToken);
-        const roles = decodedToken.roles;
-        dispatch(authActions.setRoles({ roles }));
     } catch(error) {
       //todo: add proper error handling
         console.log(error);
     }
   }
 
-  const usersHandler = async (e) => {
-    e.preventDefault();
-
-    const response = await fetch('http://localhost:8000/api/users', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-
-    if(response.ok) {
-      const body = await response.json();
-      console.log(body);
-    }
-  }
-
-  //const usersHandlerBinded = usersHandler.bind({ accessToken });
-
   const refreshHandler = async (e) => {
     e.preventDefault();
 
     try {
         const {accessToken: newAccessToken, refreshToken: newRefreshToken} = await refreshTokens(refreshToken);
-        dispatch(authActions.setAccessToken(newAccessToken));
-        dispatch(authActions.setRefreshToken(newRefreshToken));
+        dispatch(authActions.setAccessToken({ accessToken: newAccessToken }));
+        dispatch(authActions.setRefreshToken({ refreshToken: newRefreshToken }));
     } catch(error) {
       //todo: add proper error handling
         console.log(error);
@@ -79,7 +56,6 @@ function LoginForm() {
             <label htmlFor="password">Your password</label>
             <input type='password' id='password' placeholder="Please, enter your password" ref={passwordInputRef}></input>
             <input type='submit' value='Login'></input>
-            <button onClick={usersHandler}>Users</button>
             <button onClick={refreshHandler}>Refresh</button>
         </form>
     );
