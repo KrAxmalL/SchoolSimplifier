@@ -18,9 +18,8 @@ public class JWTManager {
 
     public static final String CLAIM_ROLES = "roles";
 
-    //private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10 * 60 * 1000;
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10;
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME_MILLIS = 30;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME_MILLIS = 10 * 60 * 1000;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME_MILLIS = 7 * 24 * 60 * 60 * 100;
 
     private static final String ISSUER = "SchoolSimplifierApplication";
 
