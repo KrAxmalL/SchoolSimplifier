@@ -35,6 +35,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         String accessToken = jwtManager.getAccessToken(principal);
         String refreshToken = jwtManager.getRefreshToken(principal);
 
+        jwtRepository.save(new JwtToken(refreshToken, principal.getId()));
+
         return new TokenPair(accessToken, refreshToken);
     }
 
