@@ -4,9 +4,9 @@ import jwtDecode from 'jwt-decode';
 
 import { useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { authActions } from './../../store/auth-slice';
+import { authActions } from '../../store/auth-slice';
 
-import {login, refreshTokens} from './../../api/authentication';
+import {login, refreshTokens} from '../../api/authentication';
 
 import classes from './LoginForm.module.css';
 
