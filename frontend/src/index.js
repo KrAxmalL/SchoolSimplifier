@@ -12,9 +12,11 @@ store.dispatch(authActions.loadTokensFromStorage());
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container);
 root.render(
-    <Provider store={store}>
-        <BrowserRouter>
-            <App name="App"></App>
-        </BrowserRouter>
-    </Provider>
+    <React.StrictMode>
+        <Provider store={store}>
+            <BrowserRouter>
+                <App name="App"></App>
+            </BrowserRouter>
+        </Provider>
+    </React.StrictMode>
 );
