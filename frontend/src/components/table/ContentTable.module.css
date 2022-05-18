@@ -1,0 +1,17 @@
+.content-table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+}
+
+.content-table td, .content-table th {
+    border: 1px solid #523931;
+    text-align: left;
+    padding: 8px;
+}
+
+.content-table tr {
+    background-color: white;
+    color:black;
+}
