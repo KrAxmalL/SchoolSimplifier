@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.Student;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
@@ -40,6 +41,27 @@ public class StudentServiceImpl implements StudentService {
             resDTO.setTeacherLastName(studentObj[6].toString());
             resDTO.setTeacherFirstName(studentObj[7].toString());
             resDTO.setTeacherPatronymic(studentObj[8].toString());
+            return resDTO;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StudentSubjectDTO> getSubjectsForStudent(String studentEmail) {
+        final Optional<Student> studentOpt = studentRepository.findStudentByEmail(studentEmail);
+        if(studentOpt.isEmpty()) {
+            throw new InvalidParameterException("Student with provided email doesn't exist");
+        }
+
+        List<Object[]> subjectRecords = studentRepository.findSubjectsForStudent(studentOpt.get().getStudentId());
+        return subjectRecords.stream().map(studentObj -> {
+            StudentSubjectDTO resDTO = new StudentSubjectDTO();
+            resDTO.setSubjectName(studentObj[0].toString());
+            resDTO.setClassGroupNumber(studentObj[1] == null
+                                            ? null
+                                            : (Integer) studentObj[1]);
+            resDTO.setTeacherLastName(studentObj[2].toString());
+            resDTO.setTeacherFirstName(studentObj[3].toString());
+            resDTO.setTeacherPatronymic(studentObj[4].toString());
             return resDTO;
         }).collect(Collectors.toList());
     }
