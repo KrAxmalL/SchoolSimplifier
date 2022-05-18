@@ -31,7 +31,7 @@ function Header({menus}) {
                 );
                 })}
                 <NavLink className={`navbar-brand ${classes['nav-color']} ${classes['nav-link']}`}
-                         to='../login' onClick={logoutClickHandler}>Вийти</NavLink>
+                         to='../login' onClick={logoutClickHandler}>Logout</NavLink>
             </div>
             <div className={classes['header-right']}>
                 <h1 className={classes['header-title']}>School Simplifier</h1>
