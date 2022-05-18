@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import Layout from "../../layout/Layout";
 
 const studentMenus = [
@@ -19,7 +20,7 @@ function StudentLayout(props) {
 
     return (
         <Layout menus={studentMenus}>
-            {props.children}
+            <Outlet />
         </Layout>
     );
 }

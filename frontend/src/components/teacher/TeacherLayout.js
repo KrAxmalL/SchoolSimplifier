@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import Layout from "../../layout/Layout";
 
 const teacherMenus = [
@@ -11,7 +12,7 @@ function TeacherLayout(props) {
 
     return (
         <Layout menus={teacherMenus}>
-            {props.children}
+            <Outlet />
         </Layout>
     );
 }
