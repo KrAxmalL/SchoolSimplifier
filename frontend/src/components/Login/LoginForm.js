@@ -9,13 +9,9 @@ import { authActions } from '../../store/auth-slice';
 import {login, refreshTokens} from '../../api/authentication';
 
 import classes from './LoginForm.module.css';
+import { Navigate } from "react-router-dom";
 
-function LoginForm() {
-  const accessToken = useSelector(state => state.auth.accessToken);
-  const refreshToken = useSelector(state => state.auth.refreshToken);
-
-  const dispatch = useDispatch();
-
+function LoginForm(props) {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
 
@@ -25,27 +21,7 @@ function LoginForm() {
     const email = emailInputRef.current.value;
     const password = passwordInputRef.current.value;
 
-    try {
-        const {accessToken, refreshToken} = await login(email, password);
-        dispatch(authActions.setAccessToken({ accessToken }));
-        dispatch(authActions.setRefreshToken({ refreshToken }));
-    } catch(error) {
-      //todo: add proper error handling
-        console.log(error);
-    }
-  }
-
-  const refreshHandler = async (e) => {
-    e.preventDefault();
-
-    try {
-        const {accessToken: newAccessToken, refreshToken: newRefreshToken} = await refreshTokens(refreshToken);
-        dispatch(authActions.setAccessToken({ accessToken: newAccessToken }));
-        dispatch(authActions.setRefreshToken({ refreshToken: newRefreshToken }));
-    } catch(error) {
-      //todo: add proper error handling
-        console.log(error);
-    }
+    props.onLogin(email, password);
   }
 
     return (
@@ -56,7 +32,6 @@ function LoginForm() {
             <label htmlFor="password">Your password</label>
             <input type='password' id='password' placeholder="Please, enter your password" ref={passwordInputRef}></input>
             <input type='submit' value='Login'></input>
-            <button onClick={refreshHandler}>Refresh</button>
         </form>
     );
 }
