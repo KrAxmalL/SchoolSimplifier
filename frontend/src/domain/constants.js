@@ -1,7 +1,8 @@
 
 export const Roles = {
     STUDENT: "STUDENT",
-    TEACHER: "TEACHER"
+    TEACHER: "TEACHER",
+    HEADTEACHER: "HEAD_TEACHER"
 };
 
 export const Days = {
