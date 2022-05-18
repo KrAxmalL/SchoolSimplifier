@@ -19,10 +19,6 @@ function Header({menus}) {
     return (
         <header className={classes.header}>
             <div className={classes['header-left']}>
-                <div>
-                    <span></span>
-                    <h2>Menu</h2>
-                </div>
                 {menus.map(menu => {
                     return (
                         <NavLink key={menu.link} className={`navbar-brand ${classes['nav-color']} ${classes['nav-link']}`}
