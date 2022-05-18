@@ -11,6 +11,7 @@ import StudentSchedule from './pages/student/StudentSchedule';
 import TeacherSchedule from './pages/teacher/TeacherSchedule';
 import StudentLayout from './components/student/StudentLayout';
 import TeacherLayout from './components/teacher/TeacherLayout';
+import { Roles } from './domain/constants';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
@@ -22,13 +23,13 @@ function App() {
         <Route path='/login' exact element={<Login />}></Route>
         <Route path='/unauthorized' exact element={<Unauthorized />}></Route>
 
-        <Route path='/student' element={<RequireAuth allowedRoles={['STUDENT']} />}>
+        <Route path='/student' element={<RequireAuth allowedRoles={[Roles.STUDENT]} />}>
           <Route element={<StudentLayout />}>
             <Route path='schedule' element={<StudentSchedule />}></Route>
           </Route>
         </Route>
 
-        <Route path='/teacher' element={<RequireAuth allowedRoles={['TEACHER']} />}>
+        <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER]} />}>
           <Route element={<TeacherLayout />}>
             <Route path='schedule' element={<TeacherSchedule />}></Route>
           </Route>
