@@ -14,6 +14,7 @@ import ua.edu.ukma.school_simplifier.domain.security.Principal;
 import ua.edu.ukma.school_simplifier.repositories.PrincipalRepository;
 import ua.edu.ukma.school_simplifier.security.jwt.JWTManager;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         String accessToken = jwtManager.getAccessToken(principal);
         String refreshToken = jwtManager.getRefreshToken(principal);
 
-        final Long principalId = principal.getId();
+        final BigInteger principalId = principal.getId();
         principalRepository.deleteTokenForPrincipal(principalId);
         principalRepository.addTokenForPrincipal(principalId, refreshToken);
 

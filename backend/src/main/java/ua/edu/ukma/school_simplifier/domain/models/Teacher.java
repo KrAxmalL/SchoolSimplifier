@@ -7,6 +7,7 @@ import lombok.Setter;
 import ua.edu.ukma.school_simplifier.domain.security.Principal;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class Teacher {
 
     @Id
     @Column(name = "teacher_id")
-    private Long teacherId;
+    private BigInteger teacherId;
 
     @Column(name = "first_name")
     private String firstName;
@@ -30,8 +31,7 @@ public class Teacher {
     @Column(name = "patronymic")
     private String patronymic;
 
-    @OneToOne
-    @JoinColumn(name = "school_class_id", referencedColumnName = "school_class_id")
+    @OneToOne(mappedBy = "formTeacher")
     private SchoolClass schoolClass;
 
     @OneToMany(mappedBy = "teacher")

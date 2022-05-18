@@ -24,7 +24,8 @@ public class SchoolClass {
     @Column(name = "school_class_name")
     private String schoolClassName;
 
-    @OneToOne(mappedBy = "schoolClass")
+    @OneToOne
+    @JoinColumn(name = "form_teacher_id")
     private Teacher formTeacher;
 
     @OneToMany(mappedBy = "schoolClass")

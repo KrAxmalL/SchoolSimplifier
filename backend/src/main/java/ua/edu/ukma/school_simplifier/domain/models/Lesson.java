@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 @Entity
 @Table(name = "lesson")
@@ -18,7 +19,7 @@ public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "schedule_record_id")
-    private Long lessonId;
+    private BigInteger lessonId;
 
     @Column(name = "lesson_number")
     private Integer lessonNumber;

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 @Entity
 @Table(name = "schedule")
@@ -18,7 +19,7 @@ public class ScheduleRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "schedule_record_id")
-    private Long scheduleRecordId;
+    private BigInteger scheduleRecordId;
 
     @Column(name = "record_day")
     private String day;

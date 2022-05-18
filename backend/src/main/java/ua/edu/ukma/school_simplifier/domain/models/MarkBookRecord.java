@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +20,7 @@ public class MarkBookRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "mark_book_record_id")
-    private Long markBookRecordId;
+    private BigInteger markBookRecordId;
 
     @Column(name = "record_date")
     private LocalDate recordDate;

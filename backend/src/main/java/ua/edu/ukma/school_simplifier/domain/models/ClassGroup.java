@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class ClassGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "class_group_id")
-    private Long classGroupId;
+    private BigInteger classGroupId;
 
     @Column(name = "class_group_number")
     private Integer classGroupNumber;

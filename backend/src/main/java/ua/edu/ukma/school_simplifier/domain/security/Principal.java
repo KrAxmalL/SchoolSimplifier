@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.Collection;
 
 @Entity
@@ -15,7 +16,7 @@ public class Principal implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "principal_id")
-    private Long id;
+    private BigInteger id;
 
     @Column(name = "email")
     private String email;
@@ -30,11 +31,11 @@ public class Principal implements UserDetails {
                inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Collection<Role> roles;
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

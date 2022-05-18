@@ -7,6 +7,7 @@ import lombok.Setter;
 import ua.edu.ukma.school_simplifier.domain.security.Principal;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class Student {
 
     @Id
     @Column(name = "student_id")
-    private Long studentId;
+    private BigInteger studentId;
 
     @Column(name = "first_name")
     private String firstName;
