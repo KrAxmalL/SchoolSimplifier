@@ -26,14 +26,12 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             nativeQuery = true)
     List<Object[]> findScheduleRecordsForStudent(@Param("target_student_id") BigInteger studentId);
 
-    @Query(value = "SELECT subject.subject_name, class_group.class_group_number, " +
+    @Query(value = "SELECT DISTINCT subject.subject_name, class_group.class_group_number, " +
                                    "teacher.last_name, teacher.first_name, teacher.patronymic " +
             "FROM schedule INNER JOIN subject ON schedule.subject_id = subject.subject_id " +
             "INNER JOIN teacher ON schedule.teacher_id = teacher.teacher_id " +
             "LEFT OUTER JOIN class_group ON schedule.class_group_id = class_group.class_group_id " +
-            "WHERE schedule.school_class_id = (SELECT school_class_id FROM student WHERE student_id = :target_student_id) " +
-            "AND " +
-            "(schedule.class_group_id IS NULL OR schedule.class_group_id = (SELECT class_group_id FROM student WHERE student_id = :target_student_id))",
+            "WHERE schedule.school_class_id = (SELECT school_class_id FROM student WHERE student_id = :target_student_id)",
             nativeQuery = true)
     List<Object[]> findSubjectsForStudent(@Param("target_student_id") BigInteger studentId);
 
