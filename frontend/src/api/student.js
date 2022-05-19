@@ -31,3 +31,18 @@ export async function getSubjectsForStudent(accessToken) {
         throw new Error("Student's subjects fetching failed");
     }
 }
+
+export async function getClassDataForStudent(accessToken) {
+    const response = await fetch(STUDENTS_URL + '/class', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Student's class data fetching failed");
+    }
+}
