@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class SchoolClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "school_class_id")
-    private Long schoolClassId;
+    private BigInteger schoolClassId;
 
     @Column(name = "school_class_name")
     private String schoolClassName;
@@ -30,6 +31,9 @@ public class SchoolClass {
 
     @OneToMany(mappedBy = "schoolClass")
     private List<Student> students;
+
+    @OneToMany(mappedBy = "schoolClass")
+    private List<ClassGroup> classGroups;
 
     @OneToMany(mappedBy = "schoolClass")
     private List<ScheduleRecord> scheduleRecords;

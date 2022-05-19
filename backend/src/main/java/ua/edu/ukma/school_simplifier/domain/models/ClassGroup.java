@@ -27,4 +27,8 @@ public class ClassGroup {
 
     @OneToMany(mappedBy = "classGroup")
     private List<Student> students;
+
+    @ManyToOne
+    @JoinColumn(name = "school_class_id")
+    private SchoolClass schoolClass;
 }
