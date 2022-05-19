@@ -3,7 +3,10 @@ package ua.edu.ukma.school_simplifier.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ua.edu.ukma.school_simplifier.domain.models.ClassGroup;
+import ua.edu.ukma.school_simplifier.domain.models.SchoolClass;
 import ua.edu.ukma.school_simplifier.domain.models.Student;
+import ua.edu.ukma.school_simplifier.domain.models.Teacher;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -33,6 +36,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             "(schedule.class_group_id IS NULL OR schedule.class_group_id = (SELECT class_group_id FROM student WHERE student_id = :target_student_id))",
             nativeQuery = true)
     List<Object[]> findSubjectsForStudent(@Param("target_student_id") BigInteger studentId);
+
+    @Query(value = "select s.schoolClass from Student s where s.studentId = :target_student_id")
+    Optional<SchoolClass> findClassOfStudent(@Param("target_student_id") BigInteger studentId);
 
     @Query(value = "from Student s where s.studentId = (select p.id from Principal p where p.email = :target_email)")
     Optional<Student> findStudentByEmail(@Param("target_email") String studentEmail);
