@@ -4,23 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
-import ua.edu.ukma.school_simplifier.domain.models.ClassGroup;
-import ua.edu.ukma.school_simplifier.domain.models.SchoolClass;
-import ua.edu.ukma.school_simplifier.domain.models.Student;
-import ua.edu.ukma.school_simplifier.domain.models.Teacher;
+import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,5 +103,32 @@ public class StudentServiceImpl implements StudentService {
         resDTO.setGroupStudents(groupStudents);
 
         return resDTO;
+    }
+
+    @Override
+    public List<StudentSubjectMarksDTO> getMarksForStudent(String studentEmail) {
+        final Optional<Student> studentOpt = studentRepository.findStudentByEmail(studentEmail);
+        if(studentOpt.isEmpty()) {
+            throw new InvalidParameterException("Student with provided email doesn't exist");
+        }
+
+        Student student = studentOpt.get();
+        List<MarkBookRecord> allStudentMarks = student.getMarkBookRecords();
+        List<StudentSubjectMarksDTO> marksBySubjects = new ArrayList<>();
+        allStudentMarks.stream()
+                .map(MarkBookRecord::getSubject)
+                .distinct()
+                .forEach(subject -> {
+                    StudentSubjectMarksDTO resDTO = new StudentSubjectMarksDTO();
+                    resDTO.setSubjectName(subject.getSubjectName());
+                    resDTO.setMarks(allStudentMarks.stream()
+                            .filter(mark -> mark.isStudentPresent() && mark.getMark() != null &&
+                                            mark.getSubject().getSubjectId().compareTo(subject.getSubjectId()) == 0)
+                            .map(MarkRecordMapper::toMarkSummary)
+                            .collect(Collectors.toList()));
+                    marksBySubjects.add(resDTO);
+                    }
+                );
+        return marksBySubjects;
     }
 }

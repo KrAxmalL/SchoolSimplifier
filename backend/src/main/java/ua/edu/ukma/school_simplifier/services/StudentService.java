@@ -1,5 +1,6 @@
 package ua.edu.ukma.school_simplifier.services;
 
+import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
@@ -13,4 +14,6 @@ public interface StudentService {
     List<StudentSubjectDTO> getSubjectsForStudent(String studentEmail);
 
     StudentSchoolClassDTO getClassInfoForStudent(String studentEmail);
+
+    List<StudentSubjectMarksDTO> getMarksForStudent(String studentEmail);
 }
