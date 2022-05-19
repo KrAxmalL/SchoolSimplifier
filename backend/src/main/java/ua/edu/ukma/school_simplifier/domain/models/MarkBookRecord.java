@@ -31,6 +31,9 @@ public class MarkBookRecord {
     @Column(name = "mark")
     private Integer mark;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
