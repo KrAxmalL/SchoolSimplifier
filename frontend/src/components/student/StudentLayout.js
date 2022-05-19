@@ -12,7 +12,11 @@ const studentMenus = [
     },
     {
         link: '/student/class',
-        title: 'My Class'
+        title: 'Class'
+    },
+    {
+        link: '/student/marks',
+        title: 'Marks'
     }
 ];
 

@@ -46,3 +46,18 @@ export async function getClassDataForStudent(accessToken) {
         throw new Error("Student's class data fetching failed");
     }
 }
+
+export async function getMarksForStudent(accessToken) {
+    const response = await fetch(STUDENTS_URL + '/marks', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Student's marks fetching failed");
+    }
+}

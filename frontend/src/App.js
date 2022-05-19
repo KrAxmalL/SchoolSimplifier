@@ -14,6 +14,7 @@ import TeacherLayout from './components/teacher/TeacherLayout';
 import { Roles } from './domain/constants';
 import StudentSubjects from './pages/student/StudentSubjects';
 import StudentClass from './pages/student/StudentClass';
+import StudentMarks from './pages/student/StudentMarks';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
@@ -30,6 +31,7 @@ function App() {
             <Route path='schedule' element={<StudentSchedule />}></Route>
             <Route path='subjects' element={<StudentSubjects />}></Route>
             <Route path='class' element={<StudentClass />}></Route>
+            <Route path='marks' element={<StudentMarks />}></Route>
           </Route>
         </Route>
 
