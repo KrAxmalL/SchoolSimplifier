@@ -1,0 +1,18 @@
+import { DOMAIN_URL } from "../config/config";
+
+const TEACHERS_URL = DOMAIN_URL + '/teachers';
+
+export async function getScheduleForTeacher(accessToken) {
+    const response = await fetch(TEACHERS_URL + '/schedule', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Teacher's schedule fetching failed");
+    }
+}
