@@ -16,3 +16,18 @@ export async function getScheduleForTeacher(accessToken) {
         throw new Error("Teacher's schedule fetching failed");
     }
 }
+
+export async function getSubjectsForTeacher(accessToken) {
+    const response = await fetch(TEACHERS_URL + '/subjects', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Teacher's subjects fetching failed");
+    }
+}
