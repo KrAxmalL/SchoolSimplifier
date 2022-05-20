@@ -4,15 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.TeacherRepository;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -65,5 +71,55 @@ public class TeacherServiceImpl implements TeacherService {
             );
             return resDTO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public TeacherSchoolClassDTO getClassInfoForTeacher(String teacherEmail) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        final Teacher teacher = teacherOpt.get();
+        final SchoolClass teacherClass = teacher.getSchoolClass();
+        if(teacherClass == null) {
+            throw new InvalidParameterException("Teacher is not a form teacher");
+        }
+
+        TeacherSchoolClassDTO resTeacherSchoolClassDTO = new TeacherSchoolClassDTO();
+        resTeacherSchoolClassDTO.setSchoolClassName(teacherClass.getSchoolClassName());
+        resTeacherSchoolClassDTO.setClassStudents(teacherClass.getStudents().stream()
+                                                .map(StudentMapper::toStudentInitals)
+                                                .collect(Collectors.toList())
+        );
+        final List<ClassGroup> classGroups = teacherClass.getClassGroups();
+        final Map<Integer, List<StudentInitials>> groupStudents = new HashMap<>();
+        for(ClassGroup classGroup: classGroups) {
+            List<StudentInitials> classGroupStudents = classGroup.getStudents()
+                    .stream().map(StudentMapper::toStudentInitals).toList();
+            groupStudents.put(classGroup.getClassGroupNumber(), classGroupStudents);
+        }
+        resTeacherSchoolClassDTO.setGroupStudents(groupStudents);
+
+        List<Object[]> teacherClassScheduleRecords = teacherRepository.findScheduleRecordsForClass(teacherClass.getSchoolClassId());
+        List<ClassScheduleRecord> classScheduleRecords = teacherClassScheduleRecords.stream().map(scheduleRecordObj -> {
+            ClassScheduleRecord resDTO = new ClassScheduleRecord();
+            resDTO.setScheduleRecordId((BigInteger) scheduleRecordObj[0]);
+            resDTO.setDay(scheduleRecordObj[1].toString());
+            resDTO.setSubjectName(scheduleRecordObj[2].toString());
+            resDTO.setLessonNumber((Integer) scheduleRecordObj[3]);
+            resDTO.setLessonStartTime(scheduleRecordObj[4].toString());
+            resDTO.setLessonFinishTime(scheduleRecordObj[5].toString());
+            resDTO.setGroupNumber(scheduleRecordObj[6] == null
+                                    ? null
+                                    : (Integer) scheduleRecordObj[6]
+            );
+            resDTO.setTeacherLastName(scheduleRecordObj[7].toString());
+            resDTO.setTeacherFirstName(scheduleRecordObj[8].toString());
+            resDTO.setTeacherPatronymic(scheduleRecordObj[9].toString());
+            return resDTO;
+        }).collect(Collectors.toList());
+        resTeacherSchoolClassDTO.setClassScheduleRecords(classScheduleRecords);
+        return resTeacherSchoolClassDTO;
     }
 }

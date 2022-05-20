@@ -23,4 +23,15 @@ public interface TeacherRepository extends JpaRepository<Teacher, BigInteger> {
             "WHERE schedule.teacher_id = :target_teacher_id",
             nativeQuery = true)
     List<Object[]> findSubjectsForTeacher(@Param("target_teacher_id") BigInteger teacherId);
+
+    @Query(value = "SELECT schedule.schedule_record_id, schedule.record_day, subject.subject_name, " +
+            "lesson.lesson_number, lesson.start_time, lesson.finish_time, class_group.class_group_number, " +
+            "teacher.last_name, teacher.first_name, teacher.patronymic " +
+            "FROM schedule INNER JOIN subject ON schedule.subject_id = subject.subject_id " +
+            "INNER JOIN lesson ON schedule.lesson_id = lesson.lesson_id " +
+            "INNER JOIN teacher ON schedule.teacher_id = teacher.teacher_id " +
+            "LEFT OUTER JOIN class_group ON schedule.class_group_id = class_group.class_group_id " +
+            "WHERE schedule.school_class_id = :target_school_class_id ",
+            nativeQuery = true)
+    List<Object[]> findScheduleRecordsForClass(@Param("target_school_class_id") BigInteger schoolClassId);
 }
