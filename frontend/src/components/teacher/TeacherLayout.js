@@ -6,6 +6,14 @@ const teacherMenus = [
         link: '/teacher/schedule',
         title: 'Schedule'
     },
+    {
+        link: '/teacher/subjects',
+        title: 'Subjects'
+    },
+    {
+        link: '/teacher/class',
+        title: 'Class'
+    },
 ];
 
 function TeacherLayout(props) {
