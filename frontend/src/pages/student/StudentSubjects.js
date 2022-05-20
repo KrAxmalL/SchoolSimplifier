@@ -4,7 +4,7 @@ import { getSubjectsForStudent } from "../../api/student";
 import ContentTable from "../../components/table/ContentTable";
 import { Days } from "../../domain/constants";
 
-import classes from './StudentSchedule.module.css';
+import classes from './StudentSubjects.module.css';
 
 const subjectsDisplayFields  = ['Предмет', 'Група', 'Вчитель'];
 
