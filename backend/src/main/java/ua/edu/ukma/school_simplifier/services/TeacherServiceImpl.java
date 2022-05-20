@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.TeacherRepository;
@@ -42,6 +43,26 @@ public class TeacherServiceImpl implements TeacherService {
             resDTO.setClassName(scheduleRecord.getSchoolClass().getSchoolClassName());
             final ClassGroup scheduleGroup = scheduleRecord.getClassGroup();
             resDTO.setGroupNumber(scheduleGroup == null ? null : scheduleGroup.getClassGroupNumber());
+            return resDTO;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TeacherSubjectDTO> getSubjectsForTeacher(String teacherEmail) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        final List<Object[]> subjectRecords = teacherRepository.findSubjectsForTeacher(teacherOpt.get().getTeacherId());
+        return subjectRecords.stream().map(subjectObj -> {
+            TeacherSubjectDTO resDTO = new TeacherSubjectDTO();
+            resDTO.setSubjectName(subjectObj[0].toString());
+            resDTO.setClassName(subjectObj[1].toString());
+            resDTO.setClassGroupNumber(subjectObj[2] == null
+                                            ? null
+                                            : (Integer) subjectObj[2]
+            );
             return resDTO;
         }).collect(Collectors.toList());
     }
