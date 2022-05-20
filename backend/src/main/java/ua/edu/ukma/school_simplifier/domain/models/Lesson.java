@@ -18,7 +18,7 @@ public class Lesson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "schedule_record_id")
+    @Column(name = "lesson_id")
     private BigInteger lessonId;
 
     @Column(name = "lesson_number")

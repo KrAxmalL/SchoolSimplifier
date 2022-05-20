@@ -39,4 +39,8 @@ public class ScheduleRecord {
     @ManyToOne
     @JoinColumn(name = "class_group_id")
     private ClassGroup classGroup;
+
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 }
