@@ -160,4 +160,21 @@ public class TeacherServiceImpl implements TeacherService {
             return resDTO;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<String> getSubjectsOfClass(String teacherEmail) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        final Teacher teacher = teacherOpt.get();
+        final SchoolClass teacherClass = teacher.getSchoolClass();
+        if(teacherClass == null) {
+            throw new InvalidParameterException("Teacher is not a form teacher");
+        }
+
+        return teacherRepository.findSubjectsForClass(teacherClass.getSchoolClassId()).stream()
+                .map(Subject::getSubjectName).distinct().collect(Collectors.toList());
+    }
 }

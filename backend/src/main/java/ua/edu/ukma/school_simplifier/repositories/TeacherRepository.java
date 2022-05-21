@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ua.edu.ukma.school_simplifier.domain.models.Student;
+import ua.edu.ukma.school_simplifier.domain.models.Subject;
 import ua.edu.ukma.school_simplifier.domain.models.Teacher;
 
 import java.math.BigInteger;
@@ -34,4 +35,8 @@ public interface TeacherRepository extends JpaRepository<Teacher, BigInteger> {
             "WHERE schedule.school_class_id = :target_school_class_id ",
             nativeQuery = true)
     List<Object[]> findScheduleRecordsForClass(@Param("target_school_class_id") BigInteger schoolClassId);
+
+    @Query(value = "select sr.subject from ScheduleRecord sr " +
+                   "where sr.schoolClass.schoolClassId = :target_school_class_id")
+    List<Subject> findSubjectsForClass(@Param("target_school_class_id") BigInteger schoolClassId);
 }

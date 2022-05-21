@@ -17,4 +17,6 @@ public interface TeacherService {
     TeacherSchoolClassDTO getClassInfoForTeacher(String teacherEmail);
 
     List<StudentMarksDTO> getMarksForStudentsOfClass(String teacherEmail);
+
+    List<String> getSubjectsOfClass(String teacherEmail);
 }
