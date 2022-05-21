@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.error.Mark;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
@@ -13,13 +16,11 @@ import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDT
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
+import ua.edu.ukma.school_simplifier.repositories.MarkBookRepository;
 import ua.edu.ukma.school_simplifier.repositories.TeacherRepository;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final MarkBookRepository markBookRepository;
 
     @Override
     public List<TeacherScheduleRecordDTO> getScheduleForTeacher(String teacherEmail) {
@@ -121,5 +123,41 @@ public class TeacherServiceImpl implements TeacherService {
         }).collect(Collectors.toList());
         resTeacherSchoolClassDTO.setClassScheduleRecords(classScheduleRecords);
         return resTeacherSchoolClassDTO;
+    }
+
+    @Override
+    public List<StudentMarksDTO> getMarksForStudentsOfClass(String teacherEmail) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        final Teacher teacher = teacherOpt.get();
+        final SchoolClass teacherClass = teacher.getSchoolClass();
+        if(teacherClass == null) {
+            throw new InvalidParameterException("Teacher is not a form teacher");
+        }
+
+        final List<Student> students = teacherClass.getStudents();
+        final List<MarkBookRecord> alLMarks = markBookRepository.findAll();
+        return students.stream().map(student -> {
+            StudentMarksDTO resDTO = new StudentMarksDTO();
+            resDTO.setStudent(StudentMapper.toStudentInitals(student));
+            final List<MarkBookRecord> studentMarksRecord =
+                    alLMarks.stream()
+                            .filter(markRecord -> markRecord.getStudent().getStudentId()
+                                    .compareTo(student.getStudentId()) == 0
+                            ).toList();
+            resDTO.setStudentMarks(studentMarksRecord.stream().map(markRecord -> {
+                TeacherMarkSummary teacherMarkSummary = new TeacherMarkSummary();
+                teacherMarkSummary.setRecordDate(markRecord.getRecordDate());
+                teacherMarkSummary.setStudentPresent(markRecord.isStudentPresent());
+                teacherMarkSummary.setMark(markRecord.getMark());
+                teacherMarkSummary.setDescription(markRecord.getDescription());
+                teacherMarkSummary.setSubjectName(markRecord.getSubject().getSubjectName());
+                return teacherMarkSummary;
+            }).collect(Collectors.toList()));
+            return resDTO;
+        }).collect(Collectors.toList());
     }
 }

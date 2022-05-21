@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
@@ -76,6 +77,25 @@ public class TeacherController {
             try {
                 TeacherSchoolClassDTO teacherClassInfo = teacherService.getClassInfoForTeacher(teacherEmailObj.toString());
                 return ResponseEntity.ok().body(teacherClassInfo);
+            } catch(InvalidParameterException ex) {
+                final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
+        }
+        else {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/class/markBook")
+    public ResponseEntity<Object> getMarksForStudentOfClass() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Object teacherEmailObj = authentication.getPrincipal();
+        if(teacherEmailObj != null) {
+            try {
+                List<StudentMarksDTO> studentsMarks = teacherService.getMarksForStudentsOfClass(teacherEmailObj.toString());
+                return ResponseEntity.ok().body(studentsMarks);
             } catch(InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
