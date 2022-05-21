@@ -14,6 +14,10 @@ const teacherMenus = [
         link: '/teacher/class',
         title: 'Class'
     },
+    {
+        link: '/teacher/markBook',
+        title: 'Class mark book'
+    },
 ];
 
 function TeacherLayout(props) {
