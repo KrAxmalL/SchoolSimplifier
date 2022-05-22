@@ -39,4 +39,10 @@ public interface TeacherRepository extends JpaRepository<Teacher, BigInteger> {
     @Query(value = "select sr.subject from ScheduleRecord sr " +
                    "where sr.schoolClass.schoolClassId = :target_school_class_id")
     List<Subject> findSubjectsForClass(@Param("target_school_class_id") BigInteger schoolClassId);
+
+    @Query(value = "select sc.schoolClass.students from ScheduleRecord sc " +
+                   "where sc.teacher.teacherId = :target_teacher_id " +
+                   "and sc.subject.subjectId = :target_subject_id")
+    List<Student> findStudentsOfTeacherOnSubject(@Param("target_teacher_id") BigInteger teacherId,
+                                                 @Param("target_subject_id") BigInteger subjectId);
 }

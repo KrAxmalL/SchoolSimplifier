@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaml.snakeyaml.error.Mark;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
@@ -17,6 +18,8 @@ import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.MarkBookRepository;
+import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
+import ua.edu.ukma.school_simplifier.repositories.SubjectRepository;
 import ua.edu.ukma.school_simplifier.repositories.TeacherRepository;
 
 import java.math.BigInteger;
@@ -30,6 +33,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final MarkBookRepository markBookRepository;
+    private final StudentRepository studentRepository;
+    private final SubjectRepository subjectRepository;
 
     @Override
     public List<TeacherScheduleRecordDTO> getScheduleForTeacher(String teacherEmail) {
@@ -176,5 +181,65 @@ public class TeacherServiceImpl implements TeacherService {
 
         return teacherRepository.findSubjectsForClass(teacherClass.getSchoolClassId()).stream()
                 .map(Subject::getSubjectName).distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        if(addMarkRecordDTO.getRecordDate() == null) {
+            throw new InvalidParameterException("Record date can't be null");
+        }
+
+        if(!addMarkRecordDTO.isStudentPresent() &&
+                (addMarkRecordDTO.getMark() != null || addMarkRecordDTO.getDescription() != null)
+        ) {
+            throw new InvalidParameterException("Can't set mark or description if student is absent");
+        }
+
+        if(addMarkRecordDTO.getMark() != null &&
+                (addMarkRecordDTO.getMark() < 1 || addMarkRecordDTO.getMark() > 12)
+        ) {
+            throw new InvalidParameterException("Mark must be a value between 1 and 12");
+        }
+
+        if(addMarkRecordDTO.getStudentId() == null) {
+            throw new InvalidParameterException("Student id can't be null");
+        }
+        final Optional<Student> studentOpt = studentRepository.findById(addMarkRecordDTO.getStudentId());
+        if(studentOpt.isEmpty()) {
+            throw new InvalidParameterException("Student with provided id doesn't exist");
+        }
+
+        if(addMarkRecordDTO.getSubjectId() == null) {
+            throw new InvalidParameterException("Subject id can't be null");
+        }
+        final Optional<Subject> subjectOpt = subjectRepository.findById(addMarkRecordDTO.getSubjectId());
+        if(subjectOpt.isEmpty()) {
+            throw new InvalidParameterException("Subject with provided id doesn't exist");
+        }
+
+        final List<Student> studentsOfTeacherOnSubject =
+                teacherRepository.findStudentsOfTeacherOnSubject(teacherOpt.get().getTeacherId(), subjectOpt.get().getSubjectId());
+        final BigInteger searchedStudentId = studentOpt.get().getStudentId();
+        final Optional<Student> foundStudent =
+                studentsOfTeacherOnSubject.stream()
+                                          .filter(student -> student.getStudentId().compareTo(searchedStudentId) == 0)
+                                          .findFirst();
+        if(foundStudent.isEmpty()) {
+            throw new InvalidParameterException("Provided teacher doesn't teach provided subject to provided student");
+        }
+
+        final MarkBookRecord markBookRecord = new MarkBookRecord();
+        markBookRecord.setRecordDate(addMarkRecordDTO.getRecordDate());
+        markBookRecord.setStudentPresent(addMarkRecordDTO.isStudentPresent());
+        markBookRecord.setMark(addMarkRecordDTO.getMark());
+        markBookRecord.setDescription(addMarkRecordDTO.getDescription());
+        markBookRecord.setStudent(studentOpt.get());
+        markBookRecord.setSubject(subjectOpt.get());
+        markBookRepository.save(markBookRecord);
     }
 }
