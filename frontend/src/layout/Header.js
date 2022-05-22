@@ -21,12 +21,12 @@ function Header({menus}) {
             <div className={classes['header-left']}>
                 {menus.map(menu => {
                     return (
-                        <NavLink key={menu.link} className={`navbar-brand ${classes['nav-color']} ${classes['nav-link']}`}
+                        <NavLink key={menu.link} className={classes['navbar-link']}
                                  to={menu.link}>{menu.title}
                         </NavLink>
                 );
                 })}
-                <NavLink className={`navbar-brand ${classes['nav-color']} ${classes['nav-link']}`}
+                <NavLink className={classes['navbar-link']}
                          to='../login' onClick={logoutClickHandler}>Logout</NavLink>
             </div>
             <div className={classes['header-right']}>
