@@ -4,7 +4,7 @@ import { getClassDataForTeacher } from "../../api/teacher";
 import ContentTable from "../../components/table/ContentTable";
 import { Days } from "../../domain/constants";
 
-import classes from './TeacherClass.module.css';
+import classes from './FormTeacherClass.module.css';
 
 const studentDisplayFields  = ['Порядковий номер учня', 'ПІБ'];
 const scheduleDisplayFields = ['Номер уроку', 'Предмет', 'Час', 'Група', 'Вчитель'];
@@ -39,7 +39,7 @@ const transformScheduleForDisplaying = (schedule) => {
     });
 };
 
-function TeacherClass() {
+function FormTeacherClass() {
     const accessToken = useSelector(state => state.auth.accessToken);
     const [classData, setClassData] = useState(null);
 
@@ -114,4 +114,4 @@ function TeacherClass() {
     );
 }
 
-export default TeacherClass;
+export default FormTeacherClass;

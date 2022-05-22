@@ -46,3 +46,33 @@ export async function getClassDataForTeacher(accessToken) {
         throw new Error("Teacher's class data fetching failed");
     }
 }
+
+export async function getMarksForStudentOfClass(accessToken) {
+    const response = await fetch(TEACHERS_URL + '/class/markBook', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Teacher's class mark book data fetching failed");
+    }
+}
+
+export async function getSubjectsOfClass(accessToken) {
+    const response = await fetch(TEACHERS_URL + '/class/subjects', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Teacher's class mark book data fetching failed");
+    }
+}

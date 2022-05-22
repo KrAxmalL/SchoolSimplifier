@@ -14,9 +14,17 @@ const teacherMenus = [
         link: '/teacher/markBook',
         title: 'Mark Book'
     },
+    {
+        link: '/teacher/myClass',
+        title: 'My Class'
+    },
+    {
+        link: '/teacher/myClassMarkBook',
+        title: 'My Class Mark Book'
+    },
 ];
 
-function TeacherLayout(props) {
+function FormTeacherLayout(props) {
 
     return (
         <Layout menus={teacherMenus}>
@@ -25,4 +33,4 @@ function TeacherLayout(props) {
     );
 }
 
-export default TeacherLayout;
+export default FormTeacherLayout;

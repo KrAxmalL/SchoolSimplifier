@@ -1,5 +1,5 @@
+import React, { useMemo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import Layout from './layout/Layout';
 import Login from './pages/public/Login';
 import Unauthorized from './pages/public/Unauthorized';
 import NotFound from './pages/public/NotFound';
@@ -16,10 +16,16 @@ import StudentSubjects from './pages/student/StudentSubjects';
 import StudentClass from './pages/student/StudentClass';
 import StudentMarks from './pages/student/StudentMarks';
 import TeacherSubjects from './pages/teacher/TeacherSubjects';
-import TeacherClass from './pages/teacher/TeacherClass';
+import FormTeacherLayout from './components/formteacher/FormTeacherLayout';
+import FormTeacherClass from './pages/formteacher/FormTeacherClass';
+import FormTeacherClassMarkBook from './pages/formteacher/FormTeacherClassMarkBook';
+import TeacherMarkBook from './pages/teacher/TeacherMarkBook';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
+  const isFormTeacher = useMemo(() => {
+    return !!roles && roles.includes(Roles.FORMTEACHER);
+  }, [roles]);
 
   return (
     <div className="App">
@@ -37,11 +43,17 @@ function App() {
           </Route>
         </Route>
 
-        <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER]} />}>
-          <Route element={<TeacherLayout />}>
+        <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER, Roles.FORMTEACHER]} />}>
+          <Route element={isFormTeacher ? <FormTeacherLayout /> : <TeacherLayout />}>
             <Route path='schedule' element={<TeacherSchedule />}></Route>
             <Route path='subjects' element={<TeacherSubjects />}></Route>
-            <Route path='class' element={<TeacherClass />}></Route>
+            <Route path='markBook' element={<TeacherMarkBook />}></Route>
+            {isFormTeacher &&
+              <React.Fragment>
+                <Route path='myClass' element={<FormTeacherClass />}></Route>
+                <Route path='myClassMarkBook' element={<FormTeacherClassMarkBook />}></Route>
+              </React.Fragment>
+            }
           </Route>
         </Route>
 

@@ -2,6 +2,7 @@
 export const Roles = {
     STUDENT: "STUDENT",
     TEACHER: "TEACHER",
+    FORMTEACHER: "FORM_TEACHER",
     HEADTEACHER: "HEAD_TEACHER"
 };
 
