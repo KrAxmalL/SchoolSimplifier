@@ -1,6 +1,7 @@
 package ua.edu.ukma.school_simplifier.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ua.edu.ukma.school_simplifier.domain.models.ClassGroup;
@@ -9,10 +10,11 @@ import ua.edu.ukma.school_simplifier.domain.models.Student;
 import ua.edu.ukma.school_simplifier.domain.models.Teacher;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface StudentRepository extends JpaRepository<Student, Long> {
+public interface StudentRepository extends JpaRepository<Student, BigInteger> {
 
     @Query(value = "SELECT schedule.schedule_record_id, schedule.record_day, subject.subject_name, " +
                           "lesson.lesson_number, lesson.start_time, lesson.finish_time, " +
