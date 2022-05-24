@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,4 +60,10 @@ public interface TeacherRepository extends JpaRepository<Teacher, BigInteger> {
     List<Subject> findSubjectsOfTeacherAndClassAndGroup(@Param("target_teacher_id") BigInteger teacherId,
                                                         @Param("target_school_class_id") BigInteger schoolClassId,
                                                         @Param("target_class_group_id") BigInteger classGroupId);
+
+    @Query(value = "from MarkBookRecord m where m.subject.subjectId = :target_subject_id " +
+                   "and m.recordDate = :target_date and m.student.studentId = :target_student_id")
+    List<MarkBookRecord> findMarksForStudentOfSubjectAndDate(@Param("target_student_id") BigInteger studentId,
+                                                              @Param("target_subject_id") BigInteger subjectId,
+                                                              @Param("target_date") LocalDate markDate);
 }
