@@ -1,5 +1,6 @@
 package ua.edu.ukma.school_simplifier.services;
 
+import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
@@ -28,6 +29,8 @@ public interface TeacherService {
     List<SchoolClassSubjectsDTO> getSchoolClassesAndSubjects(String teacherEmail);
 
     List<StudentMarksDTO> getMarksForStudentsOfGroupAndSubjectAndDate(BigInteger schoolClassId, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate);
+
+    List<ClassGroupSubjectsDTO> getClassGroupsAndSubjectsForTeacher(String teacherEmail);
 
     void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO);
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaml.snakeyaml.error.Mark;
+import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
@@ -261,6 +262,34 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         return studentsMarks;
+    }
+
+    @Override
+    public List<ClassGroupSubjectsDTO> getClassGroupsAndSubjectsForTeacher(String teacherEmail) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+        final SchoolClass teacherClass = teacherOpt.get().getSchoolClass();
+        final List<ClassGroup> classGroups = teacherClass.getClassGroups();
+        final List<ClassGroupSubjectsDTO> classGroupsSubjects = new ArrayList<>(classGroups.size() + 1);
+        for(ClassGroup classGroup: classGroups) {
+            ClassGroupSubjectsDTO classGroupSubjectsDTO = new ClassGroupSubjectsDTO();
+            classGroupSubjectsDTO.setClassGroupId(classGroup.getClassGroupId());
+            classGroupSubjectsDTO.setClassGroupNumber(classGroup.getClassGroupNumber());
+            final List<Subject> groupSubjects = teacherRepository.findSubjectsOfClassGroup(classGroup.getClassGroupId());
+            classGroupSubjectsDTO.setSubjects(groupSubjects);
+            classGroupsSubjects.add(classGroupSubjectsDTO);
+        }
+
+        ClassGroupSubjectsDTO classGroupSubjectsDTO = new ClassGroupSubjectsDTO();
+        classGroupSubjectsDTO.setClassGroupId(null);
+        classGroupSubjectsDTO.setClassGroupNumber(null);
+        final List<Subject> groupSubjects = teacherRepository.findSubjectsOfClass(teacherClass.getSchoolClassId());
+        classGroupSubjectsDTO.setSubjects(groupSubjects);
+        classGroupsSubjects.add(classGroupSubjectsDTO);
+
+        return classGroupsSubjects;
     }
 
     @Override

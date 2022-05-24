@@ -66,4 +66,14 @@ public interface TeacherRepository extends JpaRepository<Teacher, BigInteger> {
     List<MarkBookRecord> findMarksForStudentOfSubjectAndDate(@Param("target_student_id") BigInteger studentId,
                                                               @Param("target_subject_id") BigInteger subjectId,
                                                               @Param("target_date") LocalDate markDate);
+
+
+    @Query(value = "select distinct sr.subject from ScheduleRecord sr " +
+            "where sr.schoolClass.schoolClassId = :target_school_class_id ")
+    List<Subject> findSubjectsOfClass(@Param("target_school_class_id") BigInteger schoolClassId);
+
+    @Query(value = "select distinct sr.subject from ScheduleRecord sr " +
+            "where ((:target_class_group_id is null and sr.classGroup.classGroupId is null) " +
+                     "or sr.classGroup.classGroupId = :target_class_group_id)")
+    List<Subject> findSubjectsOfClassGroup(@Param("target_class_group_id") BigInteger classGroupId);
 }
