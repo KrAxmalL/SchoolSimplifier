@@ -31,4 +31,12 @@ public class ClassGroup {
     @ManyToOne
     @JoinColumn(name = "school_class_id")
     private SchoolClass schoolClass;
+
+    @Override
+    public String toString() {
+        return "ClassGroup{" +
+                "classGroupId=" + classGroupId +
+                ", classGroupNumber=" + classGroupNumber +
+                '}';
+    }
 }

@@ -3,9 +3,7 @@ package ua.edu.ukma.school_simplifier.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ua.edu.ukma.school_simplifier.domain.models.Student;
-import ua.edu.ukma.school_simplifier.domain.models.Subject;
-import ua.edu.ukma.school_simplifier.domain.models.Teacher;
+import ua.edu.ukma.school_simplifier.domain.models.*;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -45,4 +43,20 @@ public interface TeacherRepository extends JpaRepository<Teacher, BigInteger> {
                    "and sc.subject.subjectId = :target_subject_id")
     List<Student> findStudentsOfTeacherOnSubject(@Param("target_teacher_id") BigInteger teacherId,
                                                  @Param("target_subject_id") BigInteger subjectId);
+
+    @Query(value = "select distinct sr.schoolClass from ScheduleRecord sr where sr.teacher.teacherId = :target_teacher_id")
+    List<SchoolClass> findClassesOfTeacher(@Param("target_teacher_id") BigInteger teacherId);
+
+    @Query(value = "SElECT DISTINCT class_group_id FROM schedule " +
+                   "WHERE teacher_id = :target_teacher_id AND school_class_id = :target_school_class_id",
+    nativeQuery = true)
+    List<BigInteger> findGroupsOfTeacherAndClass(@Param("target_teacher_id") BigInteger teacherId,
+                                                 @Param("target_school_class_id") BigInteger schoolClassId);
+
+    @Query(value = "select distinct sr.subject from ScheduleRecord sr " +
+            "where sr.teacher.teacherId = :target_teacher_id and sr.schoolClass.schoolClassId = :target_school_class_id " +
+            "and ((:target_class_group_id is null and sr.classGroup.classGroupId is null) or sr.classGroup.classGroupId = :target_class_group_id)")
+    List<Subject> findSubjectsOfTeacherAndClassAndGroup(@Param("target_teacher_id") BigInteger teacherId,
+                                                        @Param("target_school_class_id") BigInteger schoolClassId,
+                                                        @Param("target_class_group_id") BigInteger classGroupId);
 }

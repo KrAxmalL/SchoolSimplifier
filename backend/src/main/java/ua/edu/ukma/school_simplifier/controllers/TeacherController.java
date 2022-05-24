@@ -14,6 +14,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.Teacher;
@@ -77,6 +78,25 @@ public class TeacherController {
             try {
                 TeacherSchoolClassDTO teacherClassInfo = teacherService.getClassInfoForTeacher(teacherEmailObj.toString());
                 return ResponseEntity.ok().body(teacherClassInfo);
+            } catch(InvalidParameterException ex) {
+                final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
+        }
+        else {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/classes")
+    public ResponseEntity<Object> getClassesAndSubjectsForTeacher() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Object teacherEmailObj = authentication.getPrincipal();
+        if(teacherEmailObj != null) {
+            try {
+                List<SchoolClassSubjectsDTO> teacherClassesWithSubjects = teacherService.getSchoolClassesAndSubjects(teacherEmailObj.toString());
+                return ResponseEntity.ok().body(teacherClassesWithSubjects);
             } catch(InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);

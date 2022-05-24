@@ -1,6 +1,7 @@
 package ua.edu.ukma.school_simplifier.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +13,13 @@ import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
-import ua.edu.ukma.school_simplifier.repositories.MarkBookRepository;
-import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
-import ua.edu.ukma.school_simplifier.repositories.SubjectRepository;
-import ua.edu.ukma.school_simplifier.repositories.TeacherRepository;
+import ua.edu.ukma.school_simplifier.repositories.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -29,12 +28,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final MarkBookRepository markBookRepository;
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
+    private final ClassGroupRepository classGroupRepository;
 
     @Override
     public List<TeacherScheduleRecordDTO> getScheduleForTeacher(String teacherEmail) {
@@ -181,6 +182,45 @@ public class TeacherServiceImpl implements TeacherService {
 
         return teacherRepository.findSubjectsForClass(teacherClass.getSchoolClassId()).stream()
                 .map(Subject::getSubjectName).distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SchoolClassSubjectsDTO> getSchoolClassesAndSubjects(String teacherEmail) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        final Teacher teacher = teacherOpt.get();
+        final List<SchoolClass> teacherClasses = teacherRepository.findClassesOfTeacher(teacher.getTeacherId());
+        final List<SchoolClassSubjectsDTO> teacherClassesWithSubjects = new ArrayList<>();
+        for(SchoolClass schoolClass: teacherClasses) {
+            final List<ClassGroup> teacherClassGroups =
+                    teacherRepository.findGroupsOfTeacherAndClass(teacher.getTeacherId(), schoolClass.getSchoolClassId())
+                            .stream()
+                            .map(classGroupId -> classGroupId == null ? null : classGroupRepository.findById(classGroupId).get())
+                            .toList();
+            log.info("class groups: " + teacherClassGroups.toString());
+            for(ClassGroup classGroup: teacherClassGroups) {
+                final SchoolClassSubjectsDTO schoolClassSubjectsDTO = new SchoolClassSubjectsDTO();
+                schoolClassSubjectsDTO.setSchoolClassId(schoolClass.getSchoolClassId());
+                schoolClassSubjectsDTO.setSchoolClassName(schoolClass.getSchoolClassName());
+                if(classGroup == null) {
+                    schoolClassSubjectsDTO.setClassGroupId(null);
+                    schoolClassSubjectsDTO.setClassGroupNumber(null);
+                }
+                else {
+                    schoolClassSubjectsDTO.setClassGroupId(classGroup.getClassGroupId());
+                    schoolClassSubjectsDTO.setClassGroupNumber(classGroup.getClassGroupNumber());
+                }
+                final List<Subject> teacherClassSubjects =
+                        teacherRepository.findSubjectsOfTeacherAndClassAndGroup(teacher.getTeacherId(),
+                                schoolClass.getSchoolClassId(), classGroup == null ? null : classGroup.getClassGroupId());
+                schoolClassSubjectsDTO.setSubjects(teacherClassSubjects);
+                teacherClassesWithSubjects.add(schoolClassSubjectsDTO);
+            }
+        }
+        return teacherClassesWithSubjects;
     }
 
     @Override
