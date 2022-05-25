@@ -72,7 +72,7 @@ public class TeacherServiceImpl implements TeacherService {
             throw new InvalidParameterException("Teacher with provided email doesn't exist");
         }
 
-        final List<Object[]> subjectRecords = teacherRepository.findSubjectsForTeacher(teacherOpt.get().getTeacherId());
+        final List<Object[]> subjectRecords = subjectRepository.findSubjectsForTeacher(teacherOpt.get().getTeacherId());
         return subjectRecords.stream().map(subjectObj -> {
             TeacherSubjectDTO resDTO = new TeacherSubjectDTO();
             resDTO.setSubjectName(subjectObj[0].toString());
@@ -93,11 +93,11 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         final Teacher teacher = teacherOpt.get();
-        final List<SchoolClass> teacherClasses = teacherRepository.findClassesOfTeacher(teacher.getTeacherId());
+        final List<SchoolClass> teacherClasses = schoolClassRepository.findClassesOfTeacher(teacher.getTeacherId());
         final List<SchoolClassSubjectsDTO> teacherClassesWithSubjects = new ArrayList<>();
         for(SchoolClass schoolClass: teacherClasses) {
             final List<ClassGroup> teacherClassGroups =
-                    teacherRepository.findGroupsOfTeacherAndClass(teacher.getTeacherId(), schoolClass.getSchoolClassId())
+                    classGroupRepository.findGroupsOfTeacherAndClass(teacher.getTeacherId(), schoolClass.getSchoolClassId())
                             .stream()
                             .map(classGroupId -> classGroupId == null ? null : classGroupRepository.findById(classGroupId).get())
                             .toList();
@@ -115,7 +115,7 @@ public class TeacherServiceImpl implements TeacherService {
                     schoolClassSubjectsDTO.setClassGroupNumber(classGroup.getClassGroupNumber());
                 }
                 final List<Subject> teacherClassSubjects =
-                        teacherRepository.findSubjectsOfTeacherAndClassAndGroup(teacher.getTeacherId(),
+                        subjectRepository.findSubjectsOfTeacherAndClassAndGroup(teacher.getTeacherId(),
                                 schoolClass.getSchoolClassId(), classGroup == null ? null : classGroup.getClassGroupId());
                 schoolClassSubjectsDTO.setSubjects(teacherClassSubjects);
                 teacherClassesWithSubjects.add(schoolClassSubjectsDTO);
@@ -154,7 +154,7 @@ public class TeacherServiceImpl implements TeacherService {
             studentMarksDTO.setStudentId(student.getStudentId());
             studentMarksDTO.setStudent(StudentMapper.toStudentInitals(student));
             final List<TeacherMarkSummary> marksOfStudent =
-                    teacherRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
+                    markBookRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
                                                                          .stream()
                                                                          .map(MarkRecordMapper::toTeacherMarkSummary)
                                                                          .toList();
@@ -205,7 +205,7 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         final List<Student> studentsOfTeacherOnSubject =
-                teacherRepository.findStudentsOfTeacherOnSubject(teacherOpt.get().getTeacherId(), subjectOpt.get().getSubjectId());
+                studentRepository.findStudentsOfTeacherOnSubject(teacherOpt.get().getTeacherId(), subjectOpt.get().getSubjectId());
         final BigInteger searchedStudentId = studentOpt.get().getStudentId();
         final Optional<Student> foundStudent =
                 studentsOfTeacherOnSubject.stream()

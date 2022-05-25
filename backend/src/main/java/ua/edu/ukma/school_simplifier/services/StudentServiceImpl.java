@@ -13,7 +13,10 @@ import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDT
 import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
+import ua.edu.ukma.school_simplifier.repositories.ScheduleRepository;
+import ua.edu.ukma.school_simplifier.repositories.SchoolClassRepository;
 import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
+import ua.edu.ukma.school_simplifier.repositories.SubjectRepository;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -25,6 +28,9 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final SubjectRepository subjectRepository;
+    private final SchoolClassRepository schoolClassRepository;
 
     @Override
     public List<StudentScheduleRecordDTO> getScheduleForStudent(String studentEmail) {
@@ -33,7 +39,7 @@ public class StudentServiceImpl implements StudentService {
             throw new InvalidParameterException("Student with provided email doesn't exist");
         }
 
-        List<Object[]> scheduleRecords = studentRepository.findScheduleRecordsForStudent(studentOpt.get().getStudentId());
+        List<Object[]> scheduleRecords = scheduleRepository.findScheduleRecordsForStudent(studentOpt.get().getStudentId());
         return scheduleRecords.stream().map(studentObj -> {
             StudentScheduleRecordDTO resDTO = new StudentScheduleRecordDTO();
             resDTO.setScheduleRecordId((BigInteger) studentObj[0]);
@@ -56,7 +62,7 @@ public class StudentServiceImpl implements StudentService {
             throw new InvalidParameterException("Student with provided email doesn't exist");
         }
 
-        List<Object[]> subjectRecords = studentRepository.findSubjectsForStudent(studentOpt.get().getStudentId());
+        List<Object[]> subjectRecords = subjectRepository.findSubjectsForStudent(studentOpt.get().getStudentId());
         return subjectRecords.stream().map(studentObj -> {
             StudentSubjectDTO resDTO = new StudentSubjectDTO();
             resDTO.setSubjectName(studentObj[0].toString());
@@ -78,7 +84,7 @@ public class StudentServiceImpl implements StudentService {
         }
 
         final BigInteger studentId = studentOpt.get().getStudentId();
-        Optional<SchoolClass> schoolClassOpt = studentRepository.findClassOfStudent(studentId);
+        Optional<SchoolClass> schoolClassOpt = schoolClassRepository.findClassOfStudent(studentId);
         if(schoolClassOpt.isEmpty()) {
             throw new InvalidParameterException("Student doesn't belong to any class");
         }

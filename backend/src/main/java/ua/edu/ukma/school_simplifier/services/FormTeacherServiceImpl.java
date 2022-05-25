@@ -29,6 +29,8 @@ public class FormTeacherServiceImpl implements FormTeacherService {
 
     private final TeacherRepository teacherRepository;
     private final MarkBookRepository markBookRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final SubjectRepository subjectRepository;
 
     private final TeacherService teacherService;
 
@@ -60,7 +62,7 @@ public class FormTeacherServiceImpl implements FormTeacherService {
         }
         resTeacherSchoolClassDTO.setGroupStudents(groupStudents);
 
-        List<Object[]> teacherClassScheduleRecords = teacherRepository.findScheduleRecordsForClass(teacherClass.getSchoolClassId());
+        List<Object[]> teacherClassScheduleRecords = scheduleRepository.findScheduleRecordsForClass(teacherClass.getSchoolClassId());
         List<ClassScheduleRecord> classScheduleRecords = teacherClassScheduleRecords.stream().map(scheduleRecordObj -> {
             ClassScheduleRecord resDTO = new ClassScheduleRecord();
             resDTO.setScheduleRecordId((BigInteger) scheduleRecordObj[0]);
@@ -127,7 +129,7 @@ public class FormTeacherServiceImpl implements FormTeacherService {
             throw new InvalidParameterException("Teacher is not a form teacher");
         }
 
-        return teacherRepository.findSubjectsForClass(teacherClass.getSchoolClassId()).stream()
+        return subjectRepository.findSubjectsForClass(teacherClass.getSchoolClassId()).stream()
                 .map(Subject::getSubjectName).distinct().collect(Collectors.toList());
     }
 
@@ -144,7 +146,7 @@ public class FormTeacherServiceImpl implements FormTeacherService {
             ClassGroupSubjectsDTO classGroupSubjectsDTO = new ClassGroupSubjectsDTO();
             classGroupSubjectsDTO.setClassGroupId(classGroup.getClassGroupId());
             classGroupSubjectsDTO.setClassGroupNumber(classGroup.getClassGroupNumber());
-            final List<Subject> groupSubjects = teacherRepository.findSubjectsOfClassGroup(classGroup.getClassGroupId());
+            final List<Subject> groupSubjects = subjectRepository.findSubjectsOfClassGroup(classGroup.getClassGroupId());
             classGroupSubjectsDTO.setSubjects(groupSubjects);
             classGroupsSubjects.add(classGroupSubjectsDTO);
         }
@@ -152,7 +154,7 @@ public class FormTeacherServiceImpl implements FormTeacherService {
         ClassGroupSubjectsDTO classGroupSubjectsDTO = new ClassGroupSubjectsDTO();
         classGroupSubjectsDTO.setClassGroupId(null);
         classGroupSubjectsDTO.setClassGroupNumber(null);
-        final List<Subject> groupSubjects = teacherRepository.findSubjectsOfClass(teacherClass.getSchoolClassId());
+        final List<Subject> groupSubjects = subjectRepository.findSubjectsOfClass(teacherClass.getSchoolClassId());
         classGroupSubjectsDTO.setSubjects(groupSubjects);
         classGroupsSubjects.add(classGroupSubjectsDTO);
 
