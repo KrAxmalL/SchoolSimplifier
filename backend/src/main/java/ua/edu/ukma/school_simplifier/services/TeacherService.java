@@ -20,19 +20,9 @@ public interface TeacherService {
 
     List<TeacherSubjectDTO> getSubjectsForTeacher(String teacherEmail);
 
-    TeacherSchoolClassDTO getClassInfoForTeacher(String teacherEmail);
-
-    List<StudentMarksDTO> getMarksForStudentsOfClass(String teacherEmail);
-
-    List<String> getSubjectsOfClass(String teacherEmail);
-
     List<SchoolClassSubjectsDTO> getSchoolClassesAndSubjects(String teacherEmail);
 
     List<StudentMarksDTO> getMarksForStudentsOfGroupAndSubjectAndDate(BigInteger schoolClassId, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate);
-
-    List<ClassGroupSubjectsDTO> getClassGroupsAndSubjectsForTeacher(String teacherEmail);
-
-    List<StudentMarksDTO> getMarksForTeacherClassAndGroupAndSubject(String teacherEmail, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate);
 
     void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO);
 }
