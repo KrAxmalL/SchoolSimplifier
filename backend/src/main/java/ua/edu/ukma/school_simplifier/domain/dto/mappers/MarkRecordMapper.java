@@ -16,6 +16,7 @@ public class MarkRecordMapper {
 
     public static TeacherMarkSummary toTeacherMarkSummary(MarkBookRecord markBookRecord) {
         TeacherMarkSummary teacherMarkSummary = new TeacherMarkSummary();
+        teacherMarkSummary.setMarkRecordId(markBookRecord.getMarkBookRecordId());
         teacherMarkSummary.setRecordDate(markBookRecord.getRecordDate());
         teacherMarkSummary.setStudentPresent(markBookRecord.isStudentPresent());
         teacherMarkSummary.setMark(markBookRecord.getMark());

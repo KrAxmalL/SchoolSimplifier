@@ -10,6 +10,7 @@ import ua.edu.ukma.school_simplifier.domain.models.Subject;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @NoArgsConstructor
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 @Setter
 public class TeacherMarkSummary {
 
+    private BigInteger markRecordId;
     private LocalDate recordDate;
     private boolean studentPresent;
     private Integer mark;
