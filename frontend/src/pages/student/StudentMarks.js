@@ -17,7 +17,7 @@ function StudentMarks() {
             return {
                 subjectName: subjectMarks.subjectName,
                 marks: subjectMarks.marks.map(subjectMark => `${subjectMark.mark}(${subjectMark.recordDate}${subjectMark.description == null ? '' : ` - ${subjectMark.description}`})`)
-                                         .reduce((acc, curr) => `${acc}, ${curr}`)
+                                         .reduce((acc, curr) => `${acc}, ${curr}`, [])
             }
         });
     }, [subjectsMarks]);
