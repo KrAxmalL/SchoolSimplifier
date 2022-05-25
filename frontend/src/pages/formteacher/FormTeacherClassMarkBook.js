@@ -1,35 +1,55 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getMarksForStudentOfClass, getSubjectsOfClass } from "../../api/teacher";
+import { getClassGroupsAndSubjects, getMarksForStudentOfClass } from "../../api/teacher";
 import Modal from '../../layout/Modal';
-import MarkBookSettingsForm from '../../components/teacher/MarkBookSettingsForm';
 import classes from './FormTeacherClassMarkBook.module.css';
-import { dateIsLessEqualThan } from "../../utils/validation";
 import ContentTable from "../../components/table/ContentTable";
+import ClassMarkBookSettingsForm from "../../components/formteacher/ClassMarkBookSettingsForm";
+
+const markBookFields = ['ПІБ учня', 'Оцінки'];
 
 function FormTeacherClassMarkBook() {
     const accessToken = useSelector(state => state.auth.accessToken);
+    const [classGroupsSubjects, setClassGroupsSubjects] = useState([]);
     const [studentsMarks, setStudentsMarks] = useState([]);
-    const [subjects, setSubjects] = useState([]);
-    const [displayDates, setDisplayDates] = useState([]);
     const [displayMarks, setDisplayMarks] = useState([]);
     const [markBookSettingFormVisible, setMarkBookSettingFormVisible] = useState(false);
+
+    const studentsToDisplay = useMemo(() => {
+        return studentsMarks.map(studentMarks => {
+            return {
+                studentInitials: `${studentMarks.student.studentLastName} ${studentMarks.student.studentFirstName} ${studentMarks.student.studentPatronymic}`,
+                marks: studentMarks.studentMarks.map(mark => {
+                    return !mark.studentPresent
+                        ? 'Учень відсутній'
+                        : 'Учень присутній' +
+                            (mark.mark == null
+                                ? ''
+                                : `, ${mark.mark} ${mark.description == null ? '' : `(${mark.description})`}`)
+                })
+            }
+        })
+    }, [studentsMarks]);
+
+    const subjects = useMemo(() => {
+        return classGroupsSubjects.map(classGroupSubjects => classGroupSubjects.subjects)
+                                  .reduce((prev, curr) => [...prev, ...curr], [])
+                                  .filter((subject, index, arr) => arr.findIndex(subj => subj.subjectId === subject.subjectId) === index);
+    }, [classGroupsSubjects]);
 
     useEffect(() => {
         const fetchData = async() => {
             try {
-                const studentsMarks = await getMarksForStudentOfClass(accessToken);
-                const subjects = await getSubjectsOfClass(accessToken);
-                setStudentsMarks(studentsMarks);
-                setSubjects(subjects);
-                console.log(JSON.stringify(studentsMarks));
+                const classGroupsSubjects = await getClassGroupsAndSubjects(accessToken);
+                setClassGroupsSubjects(classGroupsSubjects);
+                console.log(JSON.stringify(classGroupsSubjects));
             }
             catch(er) {
                 console.log(er);
             }
         }
         fetchData();
-    }, [accessToken, setStudentsMarks]);
+    }, [accessToken, setClassGroupsSubjects]);
 
     const showMarkBookSettingFormHandler = (e) => {
         e.preventDefault();
@@ -41,44 +61,17 @@ function FormTeacherClassMarkBook() {
         setMarkBookSettingFormVisible(false);
     }
 
-    const setSettingsHandler = (subjectName, startDate, finishDate) => {
-        console.log(subjectName, startDate, finishDate);
+    const setSettingsHandler = async (subjectId, classGroupId, markBookDate) => {
+        console.log(subjectId, classGroupId, markBookDate);
 
-        const resultMarkBook = studentsMarks.map(studentMarksObj => {
-            return {
-                student: studentMarksObj.student,
-                studentMarks: studentMarksObj.studentMarks.filter(markRecord => {
-                    return dateIsLessEqualThan(new Date(startDate), new Date(markRecord.recordDate))
-                        && dateIsLessEqualThan(new Date(markRecord.recordDate), new Date(finishDate))
-                        && (markRecord.subjectName.localeCompare(subjectName) === 0);
-                })
-            }
-        });
-
-        const displayDatesArr = [''];
-        const displayMarksArr = resultMarkBook.map(studentMarksObj => [studentMarksObj.student]);
-        console.log(displayMarksArr);
-        for(let currDate = new Date(startDate); currDate <= new Date(finishDate); currDate.setDate(currDate.getDate() + 1)) {
-            displayDatesArr.push(currDate.toLocaleDateString());
-            displayMarksArr.forEach(studentMarkArr => {
-                const studentMarksObj = resultMarkBook.find(studentMarksObj => studentMarksObj.student === studentMarkArr[0]);
-                //const currentDateMarks = studentMarksObj.studentMarks.filter(markRecord => dateIsLessEqualThan(new Date(markRecord.recordDate), new Date(currDate)) /*new Date(markRecord.recordDate).toLocaleDateString().localeCompare(currDate) === 0*/);
-                const currentDateMarks = studentMarksObj.studentMarks.filter(markRecord => new Date(markRecord.recordDate).getTime() === new Date(currDate).getTime());
-                console.log('current date marks: ' + JSON.stringify(currentDateMarks));
-                studentMarkArr.push(currentDateMarks);
-            })
+        try {
+            const studentsMarks = await getMarksForStudentOfClass(accessToken, classGroupId, subjectId, markBookDate);
+            setStudentsMarks(studentsMarks);
+            console.log(JSON.stringify(studentsMarks));
         }
-        setDisplayDates(displayDatesArr);
-
-        //const displayMarksArr = [];
-        resultMarkBook.forEach(studentMarksObj => {
-            for(let currDate = new Date(startDate); currDate <= new Date(finishDate); currDate.setDate(currDate.getDate() + 1)) {
-                displayDatesArr.push(currDate.toLocaleDateString());
-                //const studentMarksArr = studentMarksObj.studentMarks.filter(studentMark => new Date(studentMark.recordDate).localeCompare(startDate));
-            }
-    })
-
-        console.log(JSON.stringify(resultMarkBook));
+        catch(er) {
+            console.log(er);
+        }
     }
 
     return (
@@ -87,11 +80,12 @@ function FormTeacherClassMarkBook() {
             <button onClick={showMarkBookSettingFormHandler}>Налаштування журналу</button>
             {markBookSettingFormVisible &&
                 <Modal onClose={hideMarkBookSettingFormHandler}>
-                    <MarkBookSettingsForm subjects={subjects}
-                                          onSetSettings={setSettingsHandler} />
+                    <ClassMarkBookSettingsForm subjects={subjects}
+                                               classGroups={classGroupsSubjects}
+                                               onSetSettings={setSettingsHandler} />
                 </Modal>
             }
-            <ContentTable columns={displayDates} data={[]}/>
+            <ContentTable columns={markBookFields} data={studentsToDisplay}/>
         </div>
     );
 }
