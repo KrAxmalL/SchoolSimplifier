@@ -32,5 +32,7 @@ public interface TeacherService {
 
     List<ClassGroupSubjectsDTO> getClassGroupsAndSubjectsForTeacher(String teacherEmail);
 
+    List<StudentMarksDTO> getMarksForTeacherClassAndGroupAndSubject(String teacherEmail, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate);
+
     void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO);
 }

@@ -293,6 +293,22 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public List<StudentMarksDTO> getMarksForTeacherClassAndGroupAndSubject(String teacherEmail, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate) {
+        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
+        if(teacherOpt.isEmpty()) {
+            throw new InvalidParameterException("Teacher with provided email doesn't exist");
+        }
+
+        final Teacher teacher = teacherOpt.get();
+        final SchoolClass teacherClass = teacher.getSchoolClass();
+        if(teacherClass == null) {
+            throw new InvalidParameterException("Teacher is not a form teacher");
+        }
+
+        return getMarksForStudentsOfGroupAndSubjectAndDate(teacherClass.getSchoolClassId(), classGroupId, subjectId, markDate);
+    }
+
+    @Override
     public void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO) {
         final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
         if(teacherOpt.isEmpty()) {

@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
@@ -22,6 +23,8 @@ import ua.edu.ukma.school_simplifier.domain.models.Teacher;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.TeacherService;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,16 +113,20 @@ public class TeacherController {
     }
 
     @GetMapping("/class/markBook")
-    public ResponseEntity<Object> getMarksForStudentOfClass() {
+    public ResponseEntity<Object> getMarksForStudentOfTeacherClassAndGroupAndSubject(@RequestParam(name = "classGroupId", required = false) BigInteger classGroupId,
+                                                                                     @RequestParam(name = "subjectId") BigInteger subjectId,
+                                                                                     @RequestParam(name = "markDate") String markDate) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final Object teacherEmailObj = authentication.getPrincipal();
         if(teacherEmailObj != null) {
             try {
-                List<StudentMarksDTO> studentsMarks = teacherService.getMarksForStudentsOfClass(teacherEmailObj.toString());
+                List<StudentMarksDTO> studentsMarks =
+                        teacherService.getMarksForTeacherClassAndGroupAndSubject(teacherEmailObj.toString(),
+                                classGroupId, subjectId, LocalDate.parse(markDate));
                 return ResponseEntity.ok().body(studentsMarks);
             } catch(InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
             }
         }
         else {
