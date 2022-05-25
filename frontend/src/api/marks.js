@@ -40,3 +40,15 @@ export async function addMarkForStudent(accessToken, studentId, subjectId, markD
         throw new Error("Mark adding failed");
     }
 }
+
+export async function deleteMark(accessToken, markRecordId) {
+    const response = await fetch(MARKS_URL + `/${markRecordId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Mark deletion failed");
+    }
+}

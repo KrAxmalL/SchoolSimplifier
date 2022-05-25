@@ -1,12 +1,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { addMarkForStudent, getMarksForStudentsOfGroupAndSubjectAndDate } from '../../api/marks';
+import { addMarkForStudent, deleteMark, getMarksForStudentsOfGroupAndSubjectAndDate } from '../../api/marks';
 import { getClassesWithSubjectsForTeacher, getSubjectsForTeacher } from '../../api/teacher';
 import ContentTable from '../../components/table/ContentTable';
 import AddMarkForm from '../../components/teacher/AddMarkForm';
+import DeleteMarkForm from '../../components/teacher/DeleteMarkForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
-import MarkBookSettingsForm from '../../components/teacher/SelectMarkBookForm';
 import Modal from '../../layout/Modal';
 import classes from './TeacherMarkBook.module.css';
 
@@ -19,6 +19,7 @@ function TeacherMarkBook() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectMarkBookFormVisible, setSelectMarkBookFormVisible] = useState(false);
     const [addMarkFormVisible, setAddMarkFormVisible] = useState(false);
+    const [deleteMarkFormVisible, setDeleteMarkFormVisible] = useState(false);
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [selectedSchoolClass, setSelectedSchoolClass] = useState(null);
     const [selectedClassGroup, setSelectedClassGroup] = useState(null);
@@ -66,6 +67,7 @@ function TeacherMarkBook() {
         setModalVisible(false);
         setSelectMarkBookFormVisible(false);
         setAddMarkFormVisible(false);
+        setDeleteMarkFormVisible(false);
     }
 
     const showMarkBookSettingFormHandler = (e) => {
@@ -78,6 +80,13 @@ function TeacherMarkBook() {
         e.preventDefault();
 
         setAddMarkFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showDeleteMarkFormHandler = (e) => {
+        e.preventDefault();
+
+        setDeleteMarkFormVisible(true);
         setModalVisible(true);
     }
 
@@ -108,6 +117,14 @@ function TeacherMarkBook() {
         }
     }
 
+    const submitDeleteMarkFormHandler = async (selectedMarkRecordId) => {
+        try {
+            await deleteMark(accessToken, selectedMarkRecordId);
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             <h2>Журнал оцінок</h2>
@@ -122,11 +139,16 @@ function TeacherMarkBook() {
                         <AddMarkForm students={studentsMarks}
                                      onAddMark={submitAddMarkFormHandler} />
                     }
+                    {deleteMarkFormVisible &&
+                        <DeleteMarkForm studentsMarks={studentsMarks}
+                                        onDeleteMark={submitDeleteMarkFormHandler} />
+                    }
                 </Modal>
             }
             <ContentTable columns={markBookFields} data={studentsToDisplay}/>
             <button onClick={showMarkBookSettingFormHandler}>Налаштування журналу</button>
             {markBookSelected && <button onClick={showAddMarkFormHandler}>Відмітити учнів</button>}
+            {markBookSelected && <button onClick={showDeleteMarkFormHandler}>Видалити запис</button>}
         </div>
     );
 }
