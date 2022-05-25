@@ -49,29 +49,6 @@ public class FormTeacherController {
         }
     }
 
-    @GetMapping("/class/markBook")
-    public ResponseEntity<Object> getMarksForStudentOfTeacherClassAndGroupAndSubject(@RequestParam(name = "classGroupId", required = false) BigInteger classGroupId,
-                                                                                     @RequestParam(name = "subjectId") BigInteger subjectId,
-                                                                                     @RequestParam(name = "markDate") String markDate) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final Object teacherEmailObj = authentication.getPrincipal();
-        if(teacherEmailObj != null) {
-            try {
-                List<StudentMarksDTO> studentsMarks =
-                        formTeacherService.getMarksForTeacherClassAndGroupAndSubject(teacherEmailObj.toString(),
-                                classGroupId, subjectId, LocalDate.parse(markDate));
-                return ResponseEntity.ok().body(studentsMarks);
-            } catch(InvalidParameterException ex) {
-                final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-            }
-        }
-        else {
-            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-    }
-
     @GetMapping("/class/subjects")
     public ResponseEntity<Object> getSubjectsOfClass() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,6 +80,29 @@ public class FormTeacherController {
             } catch(InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
+        }
+        else {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/class/markBook")
+    public ResponseEntity<Object> getMarksForStudentOfTeacherClassAndGroupAndSubject(@RequestParam(name = "classGroupId", required = false) BigInteger classGroupId,
+                                                                                     @RequestParam(name = "subjectId") BigInteger subjectId,
+                                                                                     @RequestParam(name = "markDate") String markDate) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Object teacherEmailObj = authentication.getPrincipal();
+        if(teacherEmailObj != null) {
+            try {
+                List<StudentMarksDTO> studentsMarks =
+                        formTeacherService.getMarksForTeacherClassAndGroupAndSubject(teacherEmailObj.toString(),
+                                classGroupId, subjectId, LocalDate.parse(markDate));
+                return ResponseEntity.ok().body(studentsMarks);
+            } catch(InvalidParameterException ex) {
+                final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
             }
         }
         else {
