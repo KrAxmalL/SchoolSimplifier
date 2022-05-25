@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { authActions } from '../store/auth-slice';
 import classes from './Header.module.css';
 
-function Header({menus}) {
+function Header({menus, needLogout}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -26,8 +26,12 @@ function Header({menus}) {
                         </NavLink>
                 );
                 })}
-                <NavLink className={classes['navbar-link']}
-                         to='../login' onClick={logoutClickHandler}>Logout</NavLink>
+                {needLogout &&
+                    <NavLink className={classes['navbar-link']}
+                         to='../login' onClick={logoutClickHandler}>
+                        Logout
+                    </NavLink>
+                }
             </div>
             <div className={classes['header-right']}>
                 <h1 className={classes['header-title']}>School Simplifier</h1>

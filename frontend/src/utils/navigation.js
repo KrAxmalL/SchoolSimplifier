@@ -1,5 +1,65 @@
 import { Roles } from "../domain/constants";
 
+const studentMenus = [
+  {
+      link: '/student/schedule',
+      title: 'Schedule'
+  },
+  {
+      link: '/student/subjects',
+      title: 'Subjects'
+  },
+  {
+      link: '/student/class',
+      title: 'Class'
+  },
+  {
+      link: '/student/marks',
+      title: 'Marks'
+  }
+];
+
+const teacherMenus = [
+  {
+      link: '/teacher/schedule',
+      title: 'Schedule'
+  },
+  {
+      link: '/teacher/subjects',
+      title: 'Subjects'
+  },
+  {
+      link: '/teacher/markBook',
+      title: 'Mark Book'
+  },
+];
+
+const formTeacherMenus = [
+  {
+      link: '/formteacher/class',
+      title: 'My Class'
+  },
+  {
+      link: '/formteacher/classMarkBook',
+      title: 'My Class Mark Book'
+  },
+];
+
+export const getMenusForRole = (role) => {
+  if(role.localeCompare(Roles.STUDENT) === 0) {
+    return studentMenus;
+  }
+  else if(role.localeCompare(Roles.TEACHER) === 0) {
+    return teacherMenus;
+  }
+  else if(role.localeCompare(Roles.FORMTEACHER) === 0) {
+    return formTeacherMenus;
+  }
+  else {
+    return [];
+  }
+}
+
 export const getHomePageForUser = (roles) => {
     if(!roles) {
       return '/login';

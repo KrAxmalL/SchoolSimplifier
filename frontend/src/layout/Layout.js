@@ -7,7 +7,7 @@ import classes from './Layout.module.css';
 function Layout(props) {
     return (
         <React.Fragment>
-            <Header menus={props.menus}></Header>
+            <Header menus={props.menus} needLogout={props.needLogout}></Header>
             <main className={classes.main}>
                 {props.children}
             </main>

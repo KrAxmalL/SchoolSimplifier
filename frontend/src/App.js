@@ -20,6 +20,8 @@ import FormTeacherLayout from './components/formteacher/FormTeacherLayout';
 import FormTeacherClass from './pages/formteacher/FormTeacherClass';
 import FormTeacherClassMarkBook from './pages/formteacher/FormTeacherClassMarkBook';
 import TeacherMarkBook from './pages/teacher/TeacherMarkBook';
+import AuthLayout from './layout/AuthLayout';
+import PublicLayout from './layout/PublicLayout';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
@@ -30,34 +32,32 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path='/' exact element={<Navigate redirect to={getHomePageForUser(roles)} />}></Route>
-        <Route path='/login' exact element={<Login />}></Route>
-        <Route path='/unauthorized' exact element={<Unauthorized />}></Route>
-
-        <Route path='/student' element={<RequireAuth allowedRoles={[Roles.STUDENT]} />}>
-          <Route element={<StudentLayout />}>
-            <Route path='schedule' element={<StudentSchedule />}></Route>
-            <Route path='subjects' element={<StudentSubjects />}></Route>
-            <Route path='class' element={<StudentClass />}></Route>
-            <Route path='marks' element={<StudentMarks />}></Route>
-          </Route>
+        <Route element={<PublicLayout />}>
+          <Route path='/' exact element={<Navigate redirect to={getHomePageForUser(roles)} />}></Route>
+          <Route path='/login' exact element={<Login />}></Route>
+          <Route path='/unauthorized' exact element={<Unauthorized />}></Route>
+          <Route path='*' element={<NotFound />}></Route>
         </Route>
 
-        <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER, Roles.FORMTEACHER]} />}>
-          <Route element={isFormTeacher ? <FormTeacherLayout /> : <TeacherLayout />}>
-            <Route path='schedule' element={<TeacherSchedule />}></Route>
-            <Route path='subjects' element={<TeacherSubjects />}></Route>
-            <Route path='markBook' element={<TeacherMarkBook />}></Route>
-            {isFormTeacher &&
-              <React.Fragment>
-                <Route path='myClass' element={<FormTeacherClass />}></Route>
-                <Route path='myClassMarkBook' element={<FormTeacherClassMarkBook />}></Route>
-              </React.Fragment>
-            }
+        <Route element={<AuthLayout />}>
+          <Route path='/student' element={<RequireAuth allowedRoles={[Roles.STUDENT]} />}>
+              <Route path='schedule' element={<StudentSchedule />}></Route>
+              <Route path='subjects' element={<StudentSubjects />}></Route>
+              <Route path='class' element={<StudentClass />}></Route>
+              <Route path='marks' element={<StudentMarks />}></Route>
+          </Route>
+
+          <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER, Roles.FORMTEACHER]} />}>
+              <Route path='schedule' element={<TeacherSchedule />}></Route>
+              <Route path='subjects' element={<TeacherSubjects />}></Route>
+              <Route path='markBook' element={<TeacherMarkBook />}></Route>
+            </Route>
+
+          <Route path='/formteacher' element={<RequireAuth allowedRoles={[Roles.FORMTEACHER]} />}>
+              <Route path='class' element={<FormTeacherClass />}></Route>
+              <Route path='classMarkBook' element={<FormTeacherClassMarkBook />}></Route>
           </Route>
         </Route>
-
-        <Route path='*' element={<NotFound />}></Route>
       </Routes>
     </div>
   );
