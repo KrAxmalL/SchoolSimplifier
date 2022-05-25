@@ -25,4 +25,6 @@ public interface TeacherService {
     List<StudentMarksDTO> getMarksForStudentsOfGroupAndSubjectAndDate(BigInteger schoolClassId, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate);
 
     void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO);
+
+    void deleteMark(BigInteger markRecordId);
 }

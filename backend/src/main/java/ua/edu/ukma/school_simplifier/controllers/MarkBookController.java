@@ -70,4 +70,23 @@ public class MarkBookController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
+
+    @DeleteMapping("/{markRecordId}")
+    public ResponseEntity<Object> addMarkForStudent(@PathVariable BigInteger markRecordId) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Object teacherEmailObj = authentication.getPrincipal();
+        if(teacherEmailObj != null) {
+            try {
+                teacherService.deleteMark(markRecordId);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } catch(InvalidParameterException ex) {
+                final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
+        }
+        else {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
 }

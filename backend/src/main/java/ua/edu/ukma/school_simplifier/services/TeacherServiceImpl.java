@@ -224,4 +224,12 @@ public class TeacherServiceImpl implements TeacherService {
         markBookRecord.setSubject(subjectOpt.get());
         markBookRepository.save(markBookRecord);
     }
+
+    @Override
+    public void deleteMark(BigInteger markRecordId) {
+        if(!markBookRepository.existsById(markRecordId)) {
+            throw new InvalidParameterException("Mark book record with provided id doesn't exist");
+        }
+        markBookRepository.deleteById(markRecordId);
+    }
 }
