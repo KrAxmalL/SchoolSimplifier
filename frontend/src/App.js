@@ -19,6 +19,9 @@ import FormTeacherClassMarkBook from './pages/formteacher/FormTeacherClassMarkBo
 import TeacherMarkBook from './pages/teacher/TeacherMarkBook';
 import AuthLayout from './layout/AuthLayout';
 import PublicLayout from './layout/PublicLayout';
+import Home from './pages/public/Home';
+import HeadTeacherClass from './pages/headteacher/HeadTeacherClass';
+import HeadTeacherSchedule from './pages/headteacher/HeadTeacherSchedule';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
@@ -28,6 +31,7 @@ function App() {
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path='/' exact element={<Navigate redirect to={getHomePageForUser(roles)} />}></Route>
+          <Route path='/home' exact element={<Home />}></Route>
           <Route path='/login' exact element={<Login />}></Route>
           <Route path='/unauthorized' exact element={<Unauthorized />}></Route>
           <Route path='*' element={<NotFound />}></Route>
@@ -41,7 +45,7 @@ function App() {
               <Route path='marks' element={<StudentMarks />}></Route>
           </Route>
 
-          <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER, Roles.FORMTEACHER]} />}>
+          <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER]} />}>
               <Route path='schedule' element={<TeacherSchedule />}></Route>
               <Route path='subjects' element={<TeacherSubjects />}></Route>
               <Route path='markBook' element={<TeacherMarkBook />}></Route>
@@ -50,6 +54,11 @@ function App() {
           <Route path='/formteacher' element={<RequireAuth allowedRoles={[Roles.FORMTEACHER]} />}>
               <Route path='class' element={<FormTeacherClass />}></Route>
               <Route path='classMarkBook' element={<FormTeacherClassMarkBook />}></Route>
+          </Route>
+
+          <Route path='/headteacher' element={<RequireAuth allowedRoles={[Roles.HEADTEACHER]} />}>
+              <Route path='class' element={<HeadTeacherClass />}></Route>
+              <Route path='schedule' element={<HeadTeacherSchedule />}></Route>
           </Route>
         </Route>
       </Routes>

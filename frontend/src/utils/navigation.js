@@ -45,6 +45,17 @@ const formTeacherMenus = [
   },
 ];
 
+const headTeacherMenus = [
+  {
+      link: '/headteacher/class',
+      title: 'Classes'
+  },
+  {
+      link: '/headteacher/schedule',
+      title: 'General Schedule'
+  },
+];
+
 export const getMenusForRole = (role) => {
   if(role.localeCompare(Roles.STUDENT) === 0) {
     return studentMenus;
@@ -54,6 +65,9 @@ export const getMenusForRole = (role) => {
   }
   else if(role.localeCompare(Roles.FORMTEACHER) === 0) {
     return formTeacherMenus;
+  }
+  else if(role.localeCompare(Roles.HEADTEACHER) === 0) {
+    return headTeacherMenus;
   }
   else {
     return [];
