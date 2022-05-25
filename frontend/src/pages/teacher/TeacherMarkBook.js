@@ -1,9 +1,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getMarksForStudentsOfGroupAndSubjectAndDate } from '../../api/marks';
+import { addMarkForStudent, getMarksForStudentsOfGroupAndSubjectAndDate } from '../../api/marks';
 import { getClassesWithSubjectsForTeacher, getSubjectsForTeacher } from '../../api/teacher';
 import ContentTable from '../../components/table/ContentTable';
+import AddMarkForm from '../../components/teacher/AddMarkForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import MarkBookSettingsForm from '../../components/teacher/SelectMarkBookForm';
 import Modal from '../../layout/Modal';
@@ -14,7 +15,10 @@ const markBookFields = ['ПІБ учня', 'Оцінки'];
 function TeacherMarkBook() {
     const accessToken = useSelector(state => state.auth.accessToken);
     const [classesWithSubjects, setClassesWithSubjects] = useState([]);
+    const [markBookSelected, setMarkBookSelected] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
     const [selectMarkBookFormVisible, setSelectMarkBookFormVisible] = useState(false);
+    const [addMarkFormVisible, setAddMarkFormVisible] = useState(false);
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [selectedSchoolClass, setSelectedSchoolClass] = useState(null);
     const [selectedClassGroup, setSelectedClassGroup] = useState(null);
@@ -57,14 +61,24 @@ function TeacherMarkBook() {
         fetchData();
     }, [accessToken, setClassesWithSubjects]);
 
+    const hideModalHandler = (e) => {
+        e.preventDefault();
+        setModalVisible(false);
+        setSelectMarkBookFormVisible(false);
+        setAddMarkFormVisible(false);
+    }
+
     const showMarkBookSettingFormHandler = (e) => {
         e.preventDefault();
         setSelectMarkBookFormVisible(true);
+        setModalVisible(true);
     }
 
-    const hideMarkBookSettingFormHandler = (e) => {
+    const showAddMarkFormHandler = (e) => {
         e.preventDefault();
-        setSelectMarkBookFormVisible(false);
+
+        setAddMarkFormVisible(true);
+        setModalVisible(true);
     }
 
     const submitSelectMarkBookFormHandler = async(subjectId, schoolClassId, classGroupId, markBookDate) => {
@@ -78,6 +92,7 @@ function TeacherMarkBook() {
             const studentsMarks = await getMarksForStudentsOfGroupAndSubjectAndDate(accessToken, schoolClassId,
                  classGroupId, subjectId, markBookDate);
             setStudentsMarks(studentsMarks);
+            setMarkBookSelected(true);
             console.log(JSON.stringify(studentsMarks));
         }
         catch(er) {
@@ -85,18 +100,33 @@ function TeacherMarkBook() {
         }
     }
 
+    const submitAddMarkFormHandler = async (selectedStudentId, selectedDate, studentPresent, mark, description) => {
+        try {
+            await addMarkForStudent(accessToken, selectedStudentId, selectedSubject, selectedDate, studentPresent, mark, description);
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             <h2>Журнал оцінок</h2>
-            {selectMarkBookFormVisible &&
-                <Modal onClose={hideMarkBookSettingFormHandler}>
-                    <SelectMarkBookForm subjects={subjects}
-                                        schoolClasses={classesWithSubjects}
-                                        onSelectMarkBook={submitSelectMarkBookFormHandler} />
+            {modalVisible &&
+                <Modal onClose={hideModalHandler}>
+                    {selectMarkBookFormVisible &&
+                        <SelectMarkBookForm subjects={subjects}
+                                            schoolClasses={classesWithSubjects}
+                                            onSelectMarkBook={submitSelectMarkBookFormHandler} />
+                    }
+                    {addMarkFormVisible &&
+                        <AddMarkForm students={studentsMarks}
+                                     onAddMark={submitAddMarkFormHandler} />
+                    }
                 </Modal>
             }
-            {<ContentTable columns={markBookFields} data={studentsToDisplay}/>}
+            <ContentTable columns={markBookFields} data={studentsToDisplay}/>
             <button onClick={showMarkBookSettingFormHandler}>Налаштування журналу</button>
+            {markBookSelected && <button onClick={showAddMarkFormHandler}>Відмітити учнів</button>}
         </div>
     );
 }

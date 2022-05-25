@@ -19,3 +19,24 @@ export async function getMarksForStudentsOfGroupAndSubjectAndDate(accessToken, s
         throw new Error("Teacher's student and marks data fetching failed");
     }
 }
+
+export async function addMarkForStudent(accessToken, studentId, subjectId, markDate, studentPresent, mark, description) {
+    const response = await fetch(MARKS_URL, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+            studentId,
+            subjectId,
+            recordDate: markDate,
+            studentPresent,
+            mark,
+            description
+        })
+    });
+    if(!response.ok) {
+        throw new Error("Mark adding failed");
+    }
+}
