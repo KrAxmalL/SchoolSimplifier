@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getClassDataForTeacher } from "../../api/teacher";
+import { getClassDataForTeacher } from "../../api/formteacher";
 import ContentTable from "../../components/table/ContentTable";
 import { Days } from "../../domain/constants";
 

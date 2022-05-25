@@ -32,21 +32,6 @@ export async function getSubjectsForTeacher(accessToken) {
     }
 }
 
-export async function getClassDataForTeacher(accessToken) {
-    const response = await fetch(TEACHERS_URL + '/class', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if(response.ok) {
-        return await response.json();
-    }
-    else {
-        throw new Error("Teacher's class data fetching failed");
-    }
-}
-
 export async function getClassesWithSubjectsForTeacher(accessToken) {
     const response = await fetch(TEACHERS_URL + '/classes', {
         method: 'GET',
@@ -59,54 +44,5 @@ export async function getClassesWithSubjectsForTeacher(accessToken) {
     }
     else {
         throw new Error("Teacher's classes and subjects data fetching failed");
-    }
-}
-
-export async function getMarksForStudentOfClass(accessToken, classGroupId, subjectId, markDate) {
-    const classGroupStr = classGroupId == null
-                            ? ''
-                            : `classGroupId=${classGroupId}&`;
-    const response = await fetch(TEACHERS_URL + `/class/markBook?${classGroupStr}subjectId=${subjectId}&markDate=${markDate}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if(response.ok) {
-        return await response.json();
-    }
-    else {
-        throw new Error("Teacher's class mark book data fetching failed");
-    }
-}
-
-
-export async function getClassGroupsAndSubjects(accessToken) {
-    const response = await fetch(TEACHERS_URL + '/class/groupsSubjects', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if(response.ok) {
-        return await response.json();
-    }
-    else {
-        throw new Error("Teacher's class mark book data fetching failed");
-    }
-}
-
-export async function getSubjectsOfClass(accessToken) {
-    const response = await fetch(TEACHERS_URL + '/class/subjects', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if(response.ok) {
-        return await response.json();
-    }
-    else {
-        throw new Error("Teacher's class mark book data fetching failed");
     }
 }

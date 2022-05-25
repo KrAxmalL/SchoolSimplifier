@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getClassGroupsAndSubjects, getMarksForStudentOfClass } from "../../api/teacher";
+import { getClassGroupsAndSubjects, getMarksForStudentOfClass } from "../../api/formteacher";
 import Modal from '../../layout/Modal';
 import classes from './FormTeacherClassMarkBook.module.css';
 import ContentTable from "../../components/table/ContentTable";
