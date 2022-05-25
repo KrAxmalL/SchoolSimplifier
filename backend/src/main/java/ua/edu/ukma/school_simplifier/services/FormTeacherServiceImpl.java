@@ -29,10 +29,10 @@ public class FormTeacherServiceImpl implements FormTeacherService {
 
     private final TeacherRepository teacherRepository;
     private final MarkBookRepository markBookRepository;
-    private final ScheduleRepository scheduleRepository;
     private final SubjectRepository subjectRepository;
 
     private final TeacherService teacherService;
+    private final SchoolClassService schoolClassService;
 
     @Override
     public TeacherSchoolClassDTO getClassInfoForTeacher(String teacherEmail) {
@@ -47,41 +47,7 @@ public class FormTeacherServiceImpl implements FormTeacherService {
             throw new InvalidParameterException("Teacher is not a form teacher");
         }
 
-        TeacherSchoolClassDTO resTeacherSchoolClassDTO = new TeacherSchoolClassDTO();
-        resTeacherSchoolClassDTO.setSchoolClassName(teacherClass.getSchoolClassName());
-        resTeacherSchoolClassDTO.setClassStudents(teacherClass.getStudents().stream()
-                .map(StudentMapper::toStudentInitals)
-                .collect(Collectors.toList())
-        );
-        final List<ClassGroup> classGroups = teacherClass.getClassGroups();
-        final Map<Integer, List<StudentInitials>> groupStudents = new HashMap<>();
-        for(ClassGroup classGroup: classGroups) {
-            List<StudentInitials> classGroupStudents = classGroup.getStudents()
-                    .stream().map(StudentMapper::toStudentInitals).toList();
-            groupStudents.put(classGroup.getClassGroupNumber(), classGroupStudents);
-        }
-        resTeacherSchoolClassDTO.setGroupStudents(groupStudents);
-
-        List<Object[]> teacherClassScheduleRecords = scheduleRepository.findScheduleRecordsForClass(teacherClass.getSchoolClassId());
-        List<ClassScheduleRecord> classScheduleRecords = teacherClassScheduleRecords.stream().map(scheduleRecordObj -> {
-            ClassScheduleRecord resDTO = new ClassScheduleRecord();
-            resDTO.setScheduleRecordId((BigInteger) scheduleRecordObj[0]);
-            resDTO.setDay(scheduleRecordObj[1].toString());
-            resDTO.setSubjectName(scheduleRecordObj[2].toString());
-            resDTO.setLessonNumber((Integer) scheduleRecordObj[3]);
-            resDTO.setLessonStartTime(scheduleRecordObj[4].toString());
-            resDTO.setLessonFinishTime(scheduleRecordObj[5].toString());
-            resDTO.setGroupNumber(scheduleRecordObj[6] == null
-                    ? null
-                    : (Integer) scheduleRecordObj[6]
-            );
-            resDTO.setTeacherLastName(scheduleRecordObj[7].toString());
-            resDTO.setTeacherFirstName(scheduleRecordObj[8].toString());
-            resDTO.setTeacherPatronymic(scheduleRecordObj[9].toString());
-            return resDTO;
-        }).collect(Collectors.toList());
-        resTeacherSchoolClassDTO.setClassScheduleRecords(classScheduleRecords);
-        return resTeacherSchoolClassDTO;
+        return schoolClassService.getClassInfo(teacherClass);
     }
 
     @Override

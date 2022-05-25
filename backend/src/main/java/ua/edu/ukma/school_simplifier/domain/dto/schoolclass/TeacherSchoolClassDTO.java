@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 @Setter
 public class TeacherSchoolClassDTO {
 
+    private BigInteger schoolClassId;
     private String schoolClassName;
 
     private List<StudentInitials> classStudents;
