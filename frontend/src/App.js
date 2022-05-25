@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/public/Login';
 import Unauthorized from './pages/public/Unauthorized';
@@ -22,9 +22,6 @@ import PublicLayout from './layout/PublicLayout';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
-  const isFormTeacher = useMemo(() => {
-    return !!roles && roles.includes(Roles.FORMTEACHER);
-  }, [roles]);
 
   return (
     <div className="App">
