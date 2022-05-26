@@ -19,6 +19,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDT
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.models.Teacher;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.TeacherService;
@@ -35,6 +36,11 @@ import java.util.Optional;
 public class TeacherController {
 
     private final TeacherService teacherService;
+
+    @GetMapping("")
+    public List<TeacherSummaryDTO> getAllTeachers() {
+        return teacherService.getAllTeachers();
+    }
 
     @GetMapping("/schedule")
     public ResponseEntity<Object> getScheduleForTeacher() {

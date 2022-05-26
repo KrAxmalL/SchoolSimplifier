@@ -9,6 +9,7 @@ import org.yaml.snakeyaml.error.Mark;
 import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
@@ -19,6 +20,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsD
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.*;
@@ -40,6 +42,12 @@ public class TeacherServiceImpl implements TeacherService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final ClassGroupRepository classGroupRepository;
+
+    @Override
+    public List<TeacherSummaryDTO> getAllTeachers() {
+        return teacherRepository.findAll().stream()
+                                .map(TeacherMapper::toTeacherSummary).toList();
+    }
 
     @Override
     public List<TeacherScheduleRecordDTO> getScheduleForTeacher(String teacherEmail) {

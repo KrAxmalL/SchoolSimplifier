@@ -8,6 +8,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDT
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TeacherService {
+
+    List<TeacherSummaryDTO> getAllTeachers();
 
     List<TeacherScheduleRecordDTO> getScheduleForTeacher(String teacherEmail);
 
