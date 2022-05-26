@@ -38,6 +38,7 @@ function StudentSchedule() {
             thursday: getScheduleRecordsForDay(schedule, Days.THURSDAY),
             friday: getScheduleRecordsForDay(schedule, Days.FRIDAY),
             saturday: getScheduleRecordsForDay(schedule, Days.SATURDAY),
+            sunday: getScheduleRecordsForDay(schedule, Days.SUNDAY),
         }
     }, [schedule]);
 

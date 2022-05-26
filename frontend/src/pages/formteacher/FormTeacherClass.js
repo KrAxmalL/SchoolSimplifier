@@ -65,6 +65,7 @@ function FormTeacherClass() {
                 thursday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.THURSDAY),
                 friday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.FRIDAY),
                 saturday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.SATURDAY),
+                sunday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.SUNDAY),
             }
         }
     }, [classData]);
