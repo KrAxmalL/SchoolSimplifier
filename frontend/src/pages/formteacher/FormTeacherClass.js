@@ -2,21 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassDataForTeacher } from "../../api/formteacher";
 import ContentTable from "../../components/table/ContentTable";
+import StudentsTable from "../../components/table/StudentsTable";
 import { Days } from "../../domain/constants";
 
 import classes from './FormTeacherClass.module.css';
 
-const studentDisplayFields  = ['Порядковий номер учня', 'ПІБ'];
 const scheduleDisplayFields = ['Номер уроку', 'Предмет', 'Час', 'Група', 'Вчитель'];
-
-const studentsToDisplayStudents = (students) => {
-    return students.map((student, index) => {
-        return {
-            number: index + 1,
-            studentInitials: `${student.studentLastName} ${student.studentFirstName} ${student.studentPatronymic}`
-        }
-    })
-};
 
 const getScheduleRecordsForDay = (schedule, day) => {
     return schedule.filter(scheduleRecord =>
@@ -49,7 +40,7 @@ function FormTeacherClass() {
                 return (
                     <div key={groupNumber}>
                         <p>Учні {groupNumber} групи</p>
-                        <ContentTable columns={studentDisplayFields} data={studentsToDisplayStudents(classData.groupStudents[groupNumber])} />
+                        <StudentsTable students={classData.groupStudents[groupNumber]} />
                     </div>
                 );
             });
@@ -91,7 +82,7 @@ function FormTeacherClass() {
                 <React.Fragment>
                     <p>{classData.schoolClassName}</p>
                     <p>Список учнів</p>
-                    <ContentTable columns={studentDisplayFields} data={studentsToDisplayStudents(classData.classStudents)} />
+                    <StudentsTable students={classData.classStudents} />
                     {groupsToDisplay}
                     <p>Розклад класу</p>
 

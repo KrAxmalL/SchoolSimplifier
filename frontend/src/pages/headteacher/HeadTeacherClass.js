@@ -3,22 +3,13 @@ import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
 import ContentTable from "../../components/table/ContentTable";
+import StudentsTable from "../../components/table/StudentsTable";
 import { Days } from "../../domain/constants";
 import Modal from "../../layout/Modal";
 
 import classes from './HeadTeacherClass.module.css';
 
-const studentDisplayFields  = ['Порядковий номер учня', 'ПІБ'];
 const scheduleDisplayFields = ['Номер уроку', 'Предмет', 'Час', 'Група', 'Вчитель'];
-
-const studentsToDisplayStudents = (students) => {
-    return students.map((student, index) => {
-        return {
-            number: index + 1,
-            studentInitials: `${student.studentLastName} ${student.studentFirstName} ${student.studentPatronymic}`
-        }
-    })
-};
 
 const getScheduleRecordsForDay = (schedule, day) => {
     return schedule.filter(scheduleRecord =>
@@ -54,7 +45,7 @@ function HeadTeacherClass() {
                 return (
                     <div key={groupNumber}>
                         <p>Учні {groupNumber} групи</p>
-                        <ContentTable columns={studentDisplayFields} data={studentsToDisplayStudents(selectedClassData.groupStudents[groupNumber])} />
+                        <StudentsTable students={selectedClassData.groupStudents[groupNumber]} />
                     </div>
                 );
             });
@@ -118,7 +109,7 @@ function HeadTeacherClass() {
                 <React.Fragment>
                     <p>{selectedClassData.schoolClassName}</p>
                     <p>Список учнів</p>
-                    <ContentTable columns={studentDisplayFields} data={studentsToDisplayStudents(selectedClassData.classStudents)} />
+                    <StudentsTable students={selectedClassData.classStudents} />
                     {groupsToDisplay}
                     <p>Розклад класу</p>
 
