@@ -9,8 +9,6 @@ import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
@@ -68,7 +66,7 @@ public class FormTeacherServiceImpl implements FormTeacherService {
         return students.stream().map(student -> {
             StudentMarksDTO resDTO = new StudentMarksDTO();
             resDTO.setStudentId(student.getStudentId());
-            resDTO.setStudent(StudentMapper.toStudentInitals(student));
+            resDTO.setStudent(StudentMapper.toStudentSummary(student));
             final List<MarkBookRecord> studentMarksRecord =
                     alLMarks.stream()
                             .filter(markRecord -> markRecord.getStudent().getStudentId()

@@ -5,20 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.yaml.snakeyaml.error.Mark;
-import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
-import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
@@ -160,7 +154,7 @@ public class TeacherServiceImpl implements TeacherService {
         for(Student student: searchedStudents) {
             final StudentMarksDTO studentMarksDTO = new StudentMarksDTO();
             studentMarksDTO.setStudentId(student.getStudentId());
-            studentMarksDTO.setStudent(StudentMapper.toStudentInitals(student));
+            studentMarksDTO.setStudent(StudentMapper.toStudentSummary(student));
             final List<TeacherMarkSummary> marksOfStudent =
                     markBookRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
                                                                          .stream()

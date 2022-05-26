@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,11 +19,8 @@ public class StudentSchoolClassDTO {
 
     private String schoolClassName;
 
-    private String teacherLastName;
-    private String teacherFirstName;
-    private String teacherPatronymic;
+    private TeacherSummaryDTO formTeacher;
 
-    private List<StudentInitials> classStudents;
-
-    private Map<Integer, List<StudentInitials>> groupStudents;
+    private List<StudentSummaryDTO> classStudents;
+    private Map<Integer, List<StudentSummaryDTO>> groupStudents;
 }

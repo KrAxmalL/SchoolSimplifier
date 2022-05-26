@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
+import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,6 +16,6 @@ import java.util.List;
 public class StudentMarksDTO {
 
     private BigInteger studentId;
-    private StudentInitials student;
+    private StudentSummaryDTO student;
     private List<TeacherMarkSummary> studentMarks;
 }

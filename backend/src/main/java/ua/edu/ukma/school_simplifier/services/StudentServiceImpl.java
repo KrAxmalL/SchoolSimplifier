@@ -6,10 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
@@ -96,14 +97,12 @@ public class StudentServiceImpl implements StudentService {
 
         final StudentSchoolClassDTO resDTO = new StudentSchoolClassDTO();
         resDTO.setSchoolClassName(schoolClass.getSchoolClassName());
-        resDTO.setTeacherLastName(formTeacher.getLastName());
-        resDTO.setTeacherFirstName(formTeacher.getFirstName());
-        resDTO.setTeacherPatronymic(formTeacher.getPatronymic());
-        resDTO.setClassStudents(classmates.stream().map(StudentMapper::toStudentInitals).toList());
-        final Map<Integer, List<StudentInitials>> groupStudents = new HashMap<>();
+        resDTO.setFormTeacher(TeacherMapper.toTeacherSummary(formTeacher));
+        resDTO.setClassStudents(classmates.stream().map(StudentMapper::toStudentSummary).toList());
+        final Map<Integer, List<StudentSummaryDTO>> groupStudents = new HashMap<>();
         for(ClassGroup classGroup: classGroups) {
-            List<StudentInitials> classGroupStudents = classGroup.getStudents()
-                    .stream().map(StudentMapper::toStudentInitals).toList();
+            List<StudentSummaryDTO> classGroupStudents = classGroup.getStudents()
+                    .stream().map(StudentMapper::toStudentSummary).toList();
             groupStudents.put(classGroup.getClassGroupNumber(), classGroupStudents);
         }
         resDTO.setGroupStudents(groupStudents);

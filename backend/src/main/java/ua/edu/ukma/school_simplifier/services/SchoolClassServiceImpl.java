@@ -7,13 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentInitials;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.models.ClassGroup;
 import ua.edu.ukma.school_simplifier.domain.models.SchoolClass;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.ScheduleRepository;
-import ua.edu.ukma.school_simplifier.repositories.SchoolClassRepository;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -39,14 +38,14 @@ public class SchoolClassServiceImpl implements SchoolClassService{
         resTeacherSchoolClassDTO.setSchoolClassId(schoolClass.getSchoolClassId());
         resTeacherSchoolClassDTO.setSchoolClassName(schoolClass.getSchoolClassName());
         resTeacherSchoolClassDTO.setClassStudents(schoolClass.getStudents().stream()
-                .map(StudentMapper::toStudentInitals)
+                .map(StudentMapper::toStudentSummary)
                 .collect(Collectors.toList())
         );
         final List<ClassGroup> classGroups = schoolClass.getClassGroups();
-        final Map<Integer, List<StudentInitials>> groupStudents = new HashMap<>();
+        final Map<Integer, List<StudentSummaryDTO>> groupStudents = new HashMap<>();
         for(ClassGroup classGroup: classGroups) {
-            List<StudentInitials> classGroupStudents = classGroup.getStudents()
-                    .stream().map(StudentMapper::toStudentInitals).toList();
+            List<StudentSummaryDTO> classGroupStudents = classGroup.getStudents()
+                    .stream().map(StudentMapper::toStudentSummary).toList();
             groupStudents.put(classGroup.getClassGroupNumber(), classGroupStudents);
         }
         resTeacherSchoolClassDTO.setGroupStudents(groupStudents);
