@@ -21,3 +21,13 @@ export function sortScheduleRecords(scheduleRecords) {
         return compareRes;
     });
 };
+
+export function sortSubjects(subjects) {
+    return subjects.sort((subj1, subj2) => {
+        let compareRes = subj1.subjectName.localeCompare(subj2.subjectName);
+        if(compareRes === 0) {
+            compareRes = subj1.groupNumber - subj2.groupNumber;
+        }
+        return compareRes;
+    });
+}
