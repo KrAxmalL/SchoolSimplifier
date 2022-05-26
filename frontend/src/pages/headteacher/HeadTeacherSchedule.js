@@ -122,7 +122,7 @@ function HeadTeacherSchedule() {
         {modalVisible &&
             <Modal onClose={hideModalHandler}>
                 {selectSchoolClassFormVisible &&
-                    <SelectSchoolClassForm schoolClasses={classData} 
+                    <SelectSchoolClassForm schoolClasses={classData}
                                            onSelectSchoolClass={submitSelectSchoolClassFormHandler}/>
                 }
                 {addScheduleRecordFormVisible &&

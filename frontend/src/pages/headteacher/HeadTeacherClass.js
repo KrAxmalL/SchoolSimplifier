@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
 import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
+import GroupsStudents from "../../components/table/GroupsStudents";
 import StudentsTable from "../../components/table/StudentsTable";
 import Modal from "../../layout/Modal";
 
@@ -14,19 +15,6 @@ function HeadTeacherClass() {
     const [selectedClassData, setSelectedClassData] = useState(null);
 
     const [selectSchoolClassFormVisible, setSelectedSchoolClassFormVisible] = useState(false);
-
-    const groupsToDisplay = useMemo(() => {
-        if(selectedClassData) {
-            return Object.keys(selectedClassData.groupStudents).map(groupNumber => {
-                return (
-                    <div key={groupNumber}>
-                        <p>Учні {groupNumber} групи</p>
-                        <StudentsTable students={selectedClassData.groupStudents[groupNumber]} />
-                    </div>
-                );
-            });
-        }
-    }, [selectedClassData]);
 
     useEffect(() => {
         const fetchData = async() => {
@@ -73,14 +61,11 @@ function HeadTeacherClass() {
                     <p>{selectedClassData.schoolClassName}</p>
                     <p>Список учнів</p>
                     <StudentsTable students={selectedClassData.classStudents} />
-                    {groupsToDisplay}
-                    <p>Розклад класу</p>
+                    <GroupsStudents groupStudents={selectedClassData.groupStudents} />
 
+                    <h2>Розклад уроків</h2>
+                    <FormTeacherScheduleTable scheduleRecords={selectedClassData.classScheduleRecords} />
                 </React.Fragment>
-            }
-            <h2>Розклад уроків</h2>
-            {selectedClassData &&
-                <FormTeacherScheduleTable scheduleRecords={selectedClassData.classScheduleRecords} />
             }
         </div>
     );

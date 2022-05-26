@@ -2,27 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassDataForTeacher } from "../../api/formteacher";
 import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
+import GroupsStudents from "../../components/table/GroupsStudents";
 import StudentsTable from "../../components/table/StudentsTable";
 
 import classes from './FormTeacherClass.module.css';
 
-
 function FormTeacherClass() {
     const accessToken = useSelector(state => state.auth.accessToken);
     const [classData, setClassData] = useState(null);
-
-    const groupsToDisplay = useMemo(() => {
-        if(classData) {
-            return Object.keys(classData.groupStudents).map(groupNumber => {
-                return (
-                    <div key={groupNumber}>
-                        <p>Учні {groupNumber} групи</p>
-                        <StudentsTable students={classData.groupStudents[groupNumber]} />
-                    </div>
-                );
-            });
-        }
-    }, [classData]);
 
     useEffect(() => {
         const fetchData = async() => {
@@ -46,14 +33,12 @@ function FormTeacherClass() {
                     <p>{classData.schoolClassName}</p>
                     <p>Список учнів</p>
                     <StudentsTable students={classData.classStudents} />
-                    {groupsToDisplay}
-                    <p>Розклад класу</p>
+                    <GroupsStudents groupStudents={classData.groupStudents} />
+
+                    <h2>Розклад уроків</h2>
+                    <FormTeacherScheduleTable scheduleRecords={classData.classScheduleRecords} />
 
                 </React.Fragment>
-            }
-            <h2>Розклад уроків</h2>
-            {classData &&
-                <FormTeacherScheduleTable scheduleRecords={classData.classScheduleRecords} />
             }
         </div>
     );
