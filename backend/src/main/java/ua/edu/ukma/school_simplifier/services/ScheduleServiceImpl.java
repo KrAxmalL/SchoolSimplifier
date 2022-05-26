@@ -10,6 +10,7 @@ import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -63,5 +64,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRecordToAdd.setSubject(subject);
         scheduleRecordToAdd.setTeacher(teacher);
         scheduleRepository.save(scheduleRecordToAdd);
+    }
+
+    @Override
+    public void deleteScheduleRecord(BigInteger scheduleRecordId) {
+        if(!scheduleRepository.existsById(scheduleRecordId)) {
+            throw new InvalidParameterException("Schedule record with provided id doesn't exist");
+        }
+        scheduleRepository.deleteById(scheduleRecordId);
     }
 }
