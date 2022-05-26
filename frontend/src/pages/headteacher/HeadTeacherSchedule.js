@@ -2,10 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
 import { getAllLessons } from "../../api/lessons";
-import { addScheduleRecord } from "../../api/schedule";
+import { addScheduleRecord, deleteScheduleRecord } from "../../api/schedule";
 import { getAllSubjects } from "../../api/subjects";
 import { getAllTeachers } from "../../api/teacher";
 import AddScheduleRecordForm from "../../components/headteacher/AddScheduleRecordForm";
+import DeleteScheduleRecordForm from "../../components/headteacher/DeleteScheduleRecordForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
 import ContentTable from "../../components/table/ContentTable";
 import { Days } from "../../domain/constants";
@@ -38,11 +39,11 @@ const transformScheduleForDisplaying = (schedule) => {
 
 function HeadTeacherSchedule() {
     const accessToken = useSelector(state => state.auth.accessToken);
-    const [classData, setClassData] = useState(null);
+    const [classData, setClassData] = useState([]);
     const [selectedClassData, setSelectedClassData] = useState(null);
-    const [teachers, setTeachers] = useState(null);
-    const [subjects, setSubjects] = useState(null);
-    const [lessons, setLessons] = useState(null);
+    const [teachers, setTeachers] = useState([]);
+    const [subjects, setSubjects] = useState([]);
+    const [lessons, setLessons] = useState([]);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectSchoolClassFormVisible, setSelectedSchoolClassFormVisible] = useState(false);
@@ -143,6 +144,14 @@ function HeadTeacherSchedule() {
         }
     }
 
+    const submitDeleteScheduleRecordFormHandler = async (scheduleRecordId) => {
+        try {
+            await deleteScheduleRecord(accessToken, scheduleRecordId);
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
         <h2>Інформація про клас</h2>
@@ -162,7 +171,8 @@ function HeadTeacherSchedule() {
                                            onAddScheduleRecord={submitAddScheduleRecordFormHandler} />
                 }
                 {deleteScheduleRecordFormVisible &&
-                    <></>
+                    <DeleteScheduleRecordForm scheduleRecords={selectedClassData.classScheduleRecords}
+                                              onDeleteScheduleRecord={submitDeleteScheduleRecordFormHandler} />
                 }
             </Modal>
         }
