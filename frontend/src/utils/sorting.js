@@ -14,9 +14,9 @@ export function sortStudentsByInitials(students) {
 
 export function sortScheduleRecords(scheduleRecords) {
     return scheduleRecords.sort((rec1, rec2) => {
-        let compareRes = rec1.lessonNumber < rec2.lessonNumber;
+        let compareRes = rec1.lessonNumber - rec2.lessonNumber;
         if(compareRes === 0) {
-            compareRes = rec1.groupNumber < rec2.groupNumber;
+            compareRes = rec1.groupNumber - rec2.groupNumber;
         }
         return compareRes;
     });

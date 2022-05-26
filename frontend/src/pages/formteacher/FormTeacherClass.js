@@ -1,34 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassDataForTeacher } from "../../api/formteacher";
-import ContentTable from "../../components/table/ContentTable";
+import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
 import StudentsTable from "../../components/table/StudentsTable";
-import { Days } from "../../domain/constants";
 
 import classes from './FormTeacherClass.module.css';
 
-const scheduleDisplayFields = ['Номер уроку', 'Предмет', 'Час', 'Група', 'Вчитель'];
-
-const getScheduleRecordsForDay = (schedule, day) => {
-    return schedule.filter(scheduleRecord =>
-        scheduleRecord.day.toLowerCase()
-                          .localeCompare(day.toLowerCase()) === 0
-    );
-};
-
-const transformScheduleForDisplaying = (schedule) => {
-    return schedule.map(scheduleRecord => {
-        return {
-            lessonNumber: scheduleRecord.lessonNumber,
-            subjectName: scheduleRecord.subjectName,
-            lessonTime: `${scheduleRecord.lessonStartTime} - ${scheduleRecord.lessonFinishTime}`,
-            groupNumber: scheduleRecord.groupNumber !== null
-                            ? scheduleRecord.groupNumber
-                            : 'Весь клас',
-            teacherInitials: `${scheduleRecord.teacherLastName} ${scheduleRecord.teacherFirstName} ${scheduleRecord.teacherPatronymic}`
-        }
-    });
-};
 
 function FormTeacherClass() {
     const accessToken = useSelector(state => state.auth.accessToken);
@@ -44,20 +21,6 @@ function FormTeacherClass() {
                     </div>
                 );
             });
-        }
-    }, [classData]);
-
-    const scheduleByDays = useMemo(() => {
-        if(classData) {
-            return {
-                monday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.MONDAY),
-                tuesday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.TUESDAY),
-                wednesday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.WEDNESDAY),
-                thursday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.THURSDAY),
-                friday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.FRIDAY),
-                saturday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.SATURDAY),
-                sunday: getScheduleRecordsForDay(classData.classScheduleRecords, Days.SUNDAY),
-            }
         }
     }, [classData]);
 
@@ -89,18 +52,8 @@ function FormTeacherClass() {
                 </React.Fragment>
             }
             <h2>Розклад уроків</h2>
-            {scheduleByDays &&
-                Object.keys(scheduleByDays).map(dayName => {
-                    return (
-                        <div key={dayName}>
-                            <h3>{Days[dayName.toUpperCase()]}</h3>
-                            {scheduleByDays[dayName].length === 0
-                                ? <p>Немає уроків у цей день</p>
-                                : <ContentTable columns={scheduleDisplayFields} data={transformScheduleForDisplaying(scheduleByDays[dayName])} />
-                            }
-                        </div>
-                    );
-                })
+            {classData &&
+                <FormTeacherScheduleTable scheduleRecords={classData.classScheduleRecords} />
             }
         </div>
     );

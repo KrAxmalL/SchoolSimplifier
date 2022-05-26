@@ -1,48 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getScheduleForTeacher } from "../../api/teacher";
-import ContentTable from "../../components/table/ContentTable";
-import { Days } from "../../domain/constants";
-
+import TeacherScheduleTable from "../../components/table/TeacherScheduleTable";
 import classes from './TeacherSchedule.module.css';
-
-const scheduleDisplayFields  = ['Номер уроку', 'Предмет', 'Час', 'Клас', 'Група'];
-
-const getScheduleRecordsForDay = (schedule, day) => {
-    return schedule.filter(scheduleRecord =>
-        scheduleRecord.day.toLowerCase()
-                          .localeCompare(day.toLowerCase()) === 0
-    );
-};
-
-const transformScheduleForDisplaying = (schedule) => {
-    return schedule.map(scheduleRecord => {
-        return {
-            lessonNumber: scheduleRecord.lessonNumber,
-            subjectName: scheduleRecord.subjectName,
-            lessonTime: `${scheduleRecord.lessonStartTime} - ${scheduleRecord.lessonFinishTime}`,
-            className: scheduleRecord.className,
-            groupNumber: scheduleRecord.groupNumber !== null
-                            ? scheduleRecord.groupNumber
-                            : 'Весь клас'
-        }
-    });
-};
 
 function TeacherSchedule() {
     const accessToken = useSelector(state => state.auth.accessToken);
     const [schedule, setSchedule] = useState([]);
-
-    const scheduleByDays = useMemo(() => {
-        return {
-            monday: getScheduleRecordsForDay(schedule, Days.MONDAY),
-            tuesday: getScheduleRecordsForDay(schedule, Days.TUESDAY),
-            wednesday: getScheduleRecordsForDay(schedule, Days.WEDNESDAY),
-            thursday: getScheduleRecordsForDay(schedule, Days.THURSDAY),
-            friday: getScheduleRecordsForDay(schedule, Days.FRIDAY),
-            saturday: getScheduleRecordsForDay(schedule, Days.SATURDAY),
-        }
-    }, [schedule]);
 
     useEffect(() => {
         const fetchData = async() => {
@@ -61,19 +25,7 @@ function TeacherSchedule() {
     return (
         <div className={classes['page-container']}>
             <h2>Розклад уроків</h2>
-            {
-                Object.keys(scheduleByDays).map(dayName => {
-                    return (
-                        <div key={dayName}>
-                            <h3>{Days[dayName.toUpperCase()]}</h3>
-                            {scheduleByDays[dayName].length === 0
-                                ? <p>Немає уроків у цей день</p>
-                                : <ContentTable columns={scheduleDisplayFields} data={transformScheduleForDisplaying(scheduleByDays[dayName])} />
-                            }
-                        </div>
-                    );
-                })
-            }
+            <TeacherScheduleTable scheduleRecords={schedule} />
         </div>
     );
 }

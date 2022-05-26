@@ -8,34 +8,11 @@ import { getAllTeachers } from "../../api/teacher";
 import AddScheduleRecordForm from "../../components/headteacher/AddScheduleRecordForm";
 import DeleteScheduleRecordForm from "../../components/headteacher/DeleteScheduleRecordForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
-import ContentTable from "../../components/table/ContentTable";
+import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
 import { Days } from "../../domain/constants";
 import Modal from "../../layout/Modal";
 
 import classes from './HeadTeacherSchedule.module.css';
-
-const scheduleDisplayFields = ['Номер уроку', 'Предмет', 'Час', 'Група', 'Вчитель'];
-
-const getScheduleRecordsForDay = (schedule, day) => {
-    return schedule.filter(scheduleRecord =>
-        scheduleRecord.day.toLowerCase()
-                          .localeCompare(day.toLowerCase()) === 0
-    );
-};
-
-const transformScheduleForDisplaying = (schedule) => {
-    return schedule.map(scheduleRecord => {
-        return {
-            lessonNumber: scheduleRecord.lessonNumber,
-            subjectName: scheduleRecord.subjectName,
-            lessonTime: `${scheduleRecord.lessonStartTime} - ${scheduleRecord.lessonFinishTime}`,
-            groupNumber: scheduleRecord.groupNumber !== null
-                            ? scheduleRecord.groupNumber
-                            : 'Весь клас',
-            teacherInitials: `${scheduleRecord.teacherLastName} ${scheduleRecord.teacherFirstName} ${scheduleRecord.teacherPatronymic}`
-        }
-    });
-};
 
 function HeadTeacherSchedule() {
     const accessToken = useSelector(state => state.auth.accessToken);
@@ -49,20 +26,6 @@ function HeadTeacherSchedule() {
     const [selectSchoolClassFormVisible, setSelectedSchoolClassFormVisible] = useState(false);
     const [addScheduleRecordFormVisible, setAddScheduleRecordFormVisible] = useState(false);
     const [deleteScheduleRecordFormVisible, setDeleteScheduleRecordFormVisible] = useState(false);
-
-    const scheduleByDays = useMemo(() => {
-        if(selectedClassData) {
-            return {
-                monday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.MONDAY),
-                tuesday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.TUESDAY),
-                wednesday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.WEDNESDAY),
-                thursday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.THURSDAY),
-                friday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.FRIDAY),
-                saturday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.SATURDAY),
-                sunday: getScheduleRecordsForDay(selectedClassData.classScheduleRecords, Days.SUNDAY),
-            }
-        }
-    }, [selectedClassData]);
 
     const classGroups = useMemo(() => {
         if(selectedClassData) {
@@ -177,23 +140,9 @@ function HeadTeacherSchedule() {
             </Modal>
         }
 
-        <h2>Розклад уроків</h2>
-        {scheduleByDays &&
-            Object.keys(scheduleByDays).map(dayName => {
-                return (
-                    <div key={dayName}>
-                        <h3>{Days[dayName.toUpperCase()]}</h3>
-                        {scheduleByDays[dayName].length === 0
-                            ? <p>Немає уроків у цей день</p>
-                            : <ContentTable columns={scheduleDisplayFields} data={transformScheduleForDisplaying(scheduleByDays[dayName])} />
-                        }
-                    </div>
-                );
-            })
-        }
-
         {selectedClassData &&
             <React.Fragment>
+                <FormTeacherScheduleTable scheduleRecords={selectedClassData.classScheduleRecords} />
                 <button onClick={showAddScheduleRecordFormHandler}>Додати запис у розклад</button>
                 <button onClick={showDeleteScheduleRecordFormHandler}>Видалити запис із розкладу</button>
             </React.Fragment>
