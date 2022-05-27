@@ -3,10 +3,13 @@ package ua.edu.ukma.school_simplifier.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
+import ua.edu.ukma.school_simplifier.domain.dto.lesson.AddLessonDTO;
 import ua.edu.ukma.school_simplifier.domain.models.Lesson;
+import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.LessonService;
 
 import java.util.List;
@@ -22,5 +25,16 @@ public class LessonController {
     @GetMapping("")
     public List<Lesson> getAllLessons() {
         return lessonService.getAllLessons();
+    }
+
+    @PostMapping("")
+    public ResponseEntity<Object> addNewLesson(@RequestBody final AddLessonDTO addLessonDTO) {
+        try {
+            lessonService.addLesson(addLessonDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch(InvalidParameterException ex) {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
     }
 }
