@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
-import { getAllLessons } from "../../api/lessons";
+import { addLesson, getAllLessons } from "../../api/lessons";
 import { addScheduleRecord, deleteScheduleRecord } from "../../api/schedule";
 import { getAllSubjects } from "../../api/subjects";
 import { getAllTeachers } from "../../api/teacher";
+import AddLessonForm from "../../components/headteacher/AddLessonForm";
 import AddScheduleRecordForm from "../../components/headteacher/AddScheduleRecordForm";
 import DeleteScheduleRecordForm from "../../components/headteacher/DeleteScheduleRecordForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
@@ -26,6 +27,7 @@ function HeadTeacherSchedule() {
     const [selectSchoolClassFormVisible, setSelectedSchoolClassFormVisible] = useState(false);
     const [addScheduleRecordFormVisible, setAddScheduleRecordFormVisible] = useState(false);
     const [deleteScheduleRecordFormVisible, setDeleteScheduleRecordFormVisible] = useState(false);
+    const [addLessonFormVisible, setAddLessonFormVisible] = useState(false);
 
     const classGroups = useMemo(() => {
         if(selectedClassData) {
@@ -82,6 +84,13 @@ function HeadTeacherSchedule() {
         setModalVisible(true);
     };
 
+    const showAddLessonFormVisible = (e) => {
+        e.preventDefault();
+
+        setAddLessonFormVisible(true);
+        setModalVisible(true);
+    };
+
     const hideModalHandler = (e) => {
         e.preventDefault();
 
@@ -89,6 +98,7 @@ function HeadTeacherSchedule() {
         setSelectedSchoolClassFormVisible(false);
         setAddScheduleRecordFormVisible(false);
         setDeleteScheduleRecordFormVisible(false);
+        setAddLessonFormVisible(false);
     };
 
     const submitSelectSchoolClassFormHandler = (selectedSchoolClassId) => {
@@ -110,6 +120,14 @@ function HeadTeacherSchedule() {
     const submitDeleteScheduleRecordFormHandler = async (scheduleRecordId) => {
         try {
             await deleteScheduleRecord(accessToken, scheduleRecordId);
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
+    const submitAddLessonFormHandler = async (lessonNumber, startTime, finishTime) => {
+        try {
+            await addLesson(accessToken, lessonNumber, startTime, finishTime);
         } catch(er) {
             console.log(er);
         }
@@ -137,6 +155,9 @@ function HeadTeacherSchedule() {
                     <DeleteScheduleRecordForm scheduleRecords={selectedClassData.classScheduleRecords}
                                               onDeleteScheduleRecord={submitDeleteScheduleRecordFormHandler} />
                 }
+                {addLessonFormVisible &&
+                    <AddLessonForm onAddLesson={submitAddLessonFormHandler}/>
+                }
             </Modal>
         }
 
@@ -147,6 +168,7 @@ function HeadTeacherSchedule() {
                 <button onClick={showDeleteScheduleRecordFormHandler}>Видалити запис із розкладу</button>
             </React.Fragment>
         }
+        <button onClick={showAddLessonFormVisible}>Додати урок</button>
     </div>
     );
 };
