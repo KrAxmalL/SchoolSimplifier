@@ -1,16 +1,14 @@
-
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { addMarkForStudent, deleteMark, getMarksForStudentsOfGroupAndSubjectAndDate } from '../../api/marks';
-import { getClassesWithSubjectsForTeacher, getSubjectsForTeacher } from '../../api/teacher';
+import { getClassesWithSubjectsForTeacher } from '../../api/teacher';
 import ContentTable from '../../components/table/ContentTable';
+import TeacherMarkBookTable from '../../components/table/TeacherMarkBookTable';
 import AddMarkForm from '../../components/teacher/AddMarkForm';
 import DeleteMarkForm from '../../components/teacher/DeleteMarkForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import Modal from '../../layout/Modal';
 import classes from './TeacherMarkBook.module.css';
-
-const markBookFields = ['ПІБ учня', 'Оцінки'];
 
 function TeacherMarkBook() {
     const accessToken = useSelector(state => state.auth.accessToken);
@@ -25,22 +23,6 @@ function TeacherMarkBook() {
     const [selectedClassGroup, setSelectedClassGroup] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [studentsMarks, setStudentsMarks] = useState([]);
-
-    const studentsToDisplay = useMemo(() => {
-        return studentsMarks.map(studentMarks => {
-            return {
-                studentInitials: `${studentMarks.student.studentLastName} ${studentMarks.student.studentFirstName} ${studentMarks.student.studentPatronymic}`,
-                marks: studentMarks.studentMarks.map(mark => {
-                    return !mark.studentPresent
-                        ? 'Учень відсутній'
-                        : 'Учень присутній' +
-                            (mark.mark == null
-                                ? ''
-                                : `, ${mark.mark} ${mark.description == null ? '' : `(${mark.description})`}`)
-                })
-            }
-        })
-    }, [studentsMarks]);
 
     const subjects = useMemo(() => {
         return classesWithSubjects.map(classData => classData.subjects)
@@ -145,10 +127,14 @@ function TeacherMarkBook() {
                     }
                 </Modal>
             }
-            <ContentTable columns={markBookFields} data={studentsToDisplay}/>
             <button onClick={showMarkBookSettingFormHandler}>Налаштування журналу</button>
-            {markBookSelected && <button onClick={showAddMarkFormHandler}>Відмітити учнів</button>}
-            {markBookSelected && <button onClick={showDeleteMarkFormHandler}>Видалити запис</button>}
+            {markBookSelected &&
+                <React.Fragment>
+                    <TeacherMarkBookTable studentsMarks={studentsMarks} />
+                    <button onClick={showAddMarkFormHandler}>Відмітити учнів</button>
+                    <button onClick={showDeleteMarkFormHandler}>Видалити запис</button>
+                </React.Fragment>
+            }
         </div>
     );
 }

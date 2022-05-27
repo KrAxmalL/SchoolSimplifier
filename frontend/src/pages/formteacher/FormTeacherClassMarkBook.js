@@ -3,33 +3,14 @@ import { useSelector } from "react-redux";
 import { getClassGroupsAndSubjects, getMarksForStudentOfClass } from "../../api/formteacher";
 import Modal from '../../layout/Modal';
 import classes from './FormTeacherClassMarkBook.module.css';
-import ContentTable from "../../components/table/ContentTable";
 import ClassMarkBookSettingsForm from "../../components/formteacher/ClassMarkBookSettingsForm";
-
-const markBookFields = ['ПІБ учня', 'Оцінки'];
+import TeacherMarkBookTable from "../../components/table/TeacherMarkBookTable";
 
 function FormTeacherClassMarkBook() {
     const accessToken = useSelector(state => state.auth.accessToken);
     const [classGroupsSubjects, setClassGroupsSubjects] = useState([]);
     const [studentsMarks, setStudentsMarks] = useState([]);
-    const [displayMarks, setDisplayMarks] = useState([]);
     const [markBookSettingFormVisible, setMarkBookSettingFormVisible] = useState(false);
-
-    const studentsToDisplay = useMemo(() => {
-        return studentsMarks.map(studentMarks => {
-            return {
-                studentInitials: `${studentMarks.student.studentLastName} ${studentMarks.student.studentFirstName} ${studentMarks.student.studentPatronymic}`,
-                marks: studentMarks.studentMarks.map(mark => {
-                    return !mark.studentPresent
-                        ? 'Учень відсутній'
-                        : 'Учень присутній' +
-                            (mark.mark == null
-                                ? ''
-                                : `, ${mark.mark} ${mark.description == null ? '' : `(${mark.description})`}`)
-                })
-            }
-        })
-    }, [studentsMarks]);
 
     const subjects = useMemo(() => {
         return classGroupsSubjects.map(classGroupSubjects => classGroupSubjects.subjects)
@@ -85,7 +66,7 @@ function FormTeacherClassMarkBook() {
                                                onSetSettings={setSettingsHandler} />
                 </Modal>
             }
-            <ContentTable columns={markBookFields} data={studentsToDisplay}/>
+            <TeacherMarkBookTable studentsMarks={studentsMarks} />
         </div>
     );
 }
