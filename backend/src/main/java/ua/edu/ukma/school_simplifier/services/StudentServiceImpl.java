@@ -11,6 +11,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.student.UpdateStudentClassAndGroupDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
@@ -19,6 +20,7 @@ import ua.edu.ukma.school_simplifier.repositories.SchoolClassRepository;
 import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
 import ua.edu.ukma.school_simplifier.repositories.SubjectRepository;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -126,5 +128,35 @@ public class StudentServiceImpl implements StudentService {
                     }
                 );
         return marksBySubjects;
+    }
+
+    @Override
+    public void updateClassAndGroupForStudent(UpdateStudentClassAndGroupDTO updateStudentClassAndGroupDTO) {
+        final BigInteger studentId = updateStudentClassAndGroupDTO.getStudentId();
+        if(studentId == null) {
+            throw new InvalidParameterException("Student id can't be null");
+        }
+        final Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new InvalidParameterException("Student with provided id doesn't exist"));
+
+        final BigInteger schoolClassId = updateStudentClassAndGroupDTO.getSchoolClassId();
+        if(schoolClassId == null) {
+            throw new InvalidParameterException("School class id can't be null");
+        }
+        final SchoolClass schoolClass = schoolClassRepository.findById(schoolClassId)
+                .orElseThrow(() -> new InvalidParameterException("Class with provided id doesn't exist"));
+
+        final Integer classGroupNumber = updateStudentClassAndGroupDTO.getClassGroupNumber();
+        final ClassGroup newClassGroup  = schoolClass.getClassGroups().stream()
+                                      .filter(classGroup -> classGroup.getClassGroupNumber().equals(classGroupNumber))
+                                      .findAny()
+                                      .orElse(null);
+        if(newClassGroup == null && classGroupNumber != null) {
+            throw new InvalidParameterException("School class doesn't have group with provided number");
+        }
+
+        student.setSchoolClass(schoolClass);
+        student.setClassGroup(newClassGroup);
+        studentRepository.save(student);
     }
 }

@@ -7,13 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.student.UpdateStudentClassAndGroupDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.StudentService;
@@ -98,6 +97,18 @@ public class StudentController {
         } else {
             final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Student's email not foundS!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
+
+    @PatchMapping("")
+    public ResponseEntity<Object> updateClassAndGroupForStudent
+            (@RequestBody UpdateStudentClassAndGroupDTO updateStudentClassAndGroupDTO) {
+        try {
+            studentService.updateClassAndGroupForStudent(updateStudentClassAndGroupDTO);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch(InvalidParameterException ex) {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 }
