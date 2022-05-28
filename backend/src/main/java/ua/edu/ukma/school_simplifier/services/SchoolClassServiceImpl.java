@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.AddSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
@@ -49,6 +50,7 @@ public class SchoolClassServiceImpl implements SchoolClassService{
         TeacherSchoolClassDTO resTeacherSchoolClassDTO = new TeacherSchoolClassDTO();
         resTeacherSchoolClassDTO.setSchoolClassId(schoolClass.getSchoolClassId());
         resTeacherSchoolClassDTO.setSchoolClassName(schoolClass.getSchoolClassName());
+        resTeacherSchoolClassDTO.setFormTeacher(TeacherMapper.toTeacherSummary(schoolClass.getFormTeacher()));
         resTeacherSchoolClassDTO.setClassStudents(schoolClass.getStudents().stream()
                 .map(StudentMapper::toStudentSummary)
                 .collect(Collectors.toList())
