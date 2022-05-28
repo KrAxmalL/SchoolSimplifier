@@ -18,7 +18,7 @@ import java.util.List;
 public class ClassGroup {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "class_group_id")
     private BigInteger classGroupId;
 

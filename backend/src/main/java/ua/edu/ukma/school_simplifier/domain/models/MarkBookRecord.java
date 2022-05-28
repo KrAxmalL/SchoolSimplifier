@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class MarkBookRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mark_book_record_id")
     private BigInteger markBookRecordId;
 

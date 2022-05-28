@@ -17,7 +17,7 @@ import java.math.BigInteger;
 public class ScheduleRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_record_id")
     private BigInteger scheduleRecordId;
 

@@ -14,7 +14,7 @@ import java.util.Collection;
 public class Principal implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "principal_id")
     private BigInteger id;
 
