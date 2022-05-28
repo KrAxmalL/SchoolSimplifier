@@ -29,6 +29,7 @@ function HeadTeacherSchedule() {
     const [addScheduleRecordFormVisible, setAddScheduleRecordFormVisible] = useState(false);
     const [deleteScheduleRecordFormVisible, setDeleteScheduleRecordFormVisible] = useState(false);
     const [addLessonFormVisible, setAddLessonFormVisible] = useState(false);
+    const [cantAddLessonError, setCantAddLessonError] = useState(false);
     const [deleteLessonFormVisible, setDeleteLessonFormVisible] = useState(false);
     const [cantDeleteLessonError, setCantDeleteLessonError] = useState(null);
 
@@ -137,10 +138,22 @@ function HeadTeacherSchedule() {
     }
 
     const submitAddLessonFormHandler = async (lessonNumber, startTime, finishTime) => {
-        try {
-            await addLesson(accessToken, lessonNumber, startTime, finishTime);
-        } catch(er) {
-            console.log(er);
+        const lessonWithSameParametersExists = lessons.some(lesson => {
+            return lesson.lessonNumber === lessonNumber
+                   && lesson.startTime.localeCompare(startTime) === 0
+                   && lesson.finishTime.localeCompare(finishTime) === 0
+        });
+        if(!lessonWithSameParametersExists) {
+            setCantAddLessonError(null);
+            try {
+                await addLesson(accessToken, lessonNumber, startTime, finishTime);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+        else {
+            setCantAddLessonError('Такий урок уже існує');
+            return;
         }
     }
 
@@ -186,14 +199,15 @@ function HeadTeacherSchedule() {
                                            subjects={subjects}
                                            teachers={teachers}
                                            classGroups={classGroups}
-                                           onAddScheduleRecord={submitAddScheduleRecordFormHandler} />
+                                           onAddScheduleRecord={submitAddScheduleRecordFormHandler}/>
                 }
                 {deleteScheduleRecordFormVisible &&
                     <DeleteScheduleRecordForm scheduleRecords={selectedClassData.classScheduleRecords}
                                               onDeleteScheduleRecord={submitDeleteScheduleRecordFormHandler} />
                 }
                 {addLessonFormVisible &&
-                    <AddLessonForm onAddLesson={submitAddLessonFormHandler}/>
+                    <AddLessonForm onAddLesson={submitAddLessonFormHandler}
+                                   cantAddLessonError={cantAddLessonError} />
                 }
                 {deleteLessonFormVisible &&
                     <DeleteLessonForm lessons={lessons}

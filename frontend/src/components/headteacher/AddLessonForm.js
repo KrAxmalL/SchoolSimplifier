@@ -12,6 +12,7 @@ const AddLessonForm = (props) => {
     const [lessonNumberError, setLessonNumberError] = useState(null);
     const [startTimeError, setStartTimeError] = useState(null);
     const [finishTimeError, setFinishTimeError] = useState(null);
+    const cantAddLessonError = props.cantAddLessonError;
 
     const submitFormHandler = (e) => {
         e.preventDefault();
@@ -87,6 +88,7 @@ const AddLessonForm = (props) => {
             {finishTimeError && <p className={classes.error}>{finishTimeError}</p>}
 
             <input type="submit" value="Додати урок" />
+            {cantAddLessonError && <p className={classes.error}>{cantAddLessonError}</p>}
         </form>
     );
 }
