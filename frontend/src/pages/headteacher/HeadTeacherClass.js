@@ -134,6 +134,9 @@ function HeadTeacherClass() {
                 await deleteSchoolClass(accessToken, schoolClassId);
                 const newClassesData = await getClassesDataForHeadTeacher(accessToken);
                 setClassesData(newClassesData);
+                setSelectedClassData(prevClassData => {
+                    return newClassesData.find(schoolClass => schoolClass.schoolClassId === prevClassData.schoolClassId);
+                });
             } catch(er) {
                 console.log(er);
             }
@@ -153,6 +156,9 @@ function HeadTeacherClass() {
                 await addClassGroup(accessToken, classGroupNumber, selectedClassData.schoolClassId);
                 const newClassesData = await getClassesDataForHeadTeacher(accessToken);
                 setClassesData(newClassesData);
+                setSelectedClassData(prevClassData => {
+                    return newClassesData.find(schoolClass => schoolClass.schoolClassId === prevClassData.schoolClassId);
+                });
             } catch(er) {
                 console.log(er);
             }
@@ -171,6 +177,9 @@ function HeadTeacherClass() {
                 await deleteClassGroup(accessToken, classGroupNumber, selectedClassData.schoolClassId);
                 const newClassesData = await getClassesDataForHeadTeacher(accessToken);
                 setClassesData(newClassesData);
+                setSelectedClassData(prevClassData => {
+                    return newClassesData.find(schoolClass => schoolClass.schoolClassId === prevClassData.schoolClassId);
+                });
             } catch(er) {
                 console.log(er);
             }
