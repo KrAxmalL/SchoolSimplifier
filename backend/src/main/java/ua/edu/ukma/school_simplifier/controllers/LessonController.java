@@ -12,6 +12,7 @@ import ua.edu.ukma.school_simplifier.domain.models.Lesson;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.LessonService;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,17 @@ public class LessonController {
         try {
             lessonService.addLesson(addLessonDTO);
             return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch(InvalidParameterException ex) {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/{lessonId}")
+    public ResponseEntity<Object> deleteMarkRecord(@PathVariable(name = "lessonId") BigInteger lessonId) {
+        try {
+            lessonService.deleteLesson(lessonId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch(InvalidParameterException ex) {
             final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

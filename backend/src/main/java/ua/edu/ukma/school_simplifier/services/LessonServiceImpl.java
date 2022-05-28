@@ -9,7 +9,9 @@ import ua.edu.ukma.school_simplifier.domain.dto.lesson.AddLessonDTO;
 import ua.edu.ukma.school_simplifier.domain.models.Lesson;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.LessonRepository;
+import ua.edu.ukma.school_simplifier.repositories.ScheduleRepository;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 public class LessonServiceImpl implements LessonService {
 
     private final LessonRepository lessonRepository;
+    private final ScheduleRepository scheduleRepository;
     private static final String LESSON_TIME_REGEXP = "^\\d{2}:\\d{2}$";
 
     @Override
@@ -54,6 +57,22 @@ public class LessonServiceImpl implements LessonService {
         lessonToAdd.setStartTime(lessonStartTime);
         lessonToAdd.setFinishTime(lessonFinishTime);
         lessonRepository.save(lessonToAdd);
+    }
+
+    @Override
+    public void deleteLesson(BigInteger lessonId) {
+        if(!lessonRepository.existsById(lessonId)) {
+            throw new InvalidParameterException("Lesson with provided id doesn't exist");
+        }
+
+        boolean existsScheduleRecordWithLesson = scheduleRepository.findAll()
+                .stream()
+                .anyMatch(scheduleRecord -> scheduleRecord.getLesson().getLessonId().equals(lessonId));
+        if(existsScheduleRecordWithLesson) {
+            throw new InvalidParameterException("Can't delete lesson if exists schedule record with provided lesson");
+        }
+
+        lessonRepository.deleteById(lessonId);
     }
 
     private String validateLessonTime(final String lessonTime) {
