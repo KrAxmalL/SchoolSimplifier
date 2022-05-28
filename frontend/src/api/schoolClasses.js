@@ -19,3 +19,15 @@ export async function addSchoolClass(accessToken, schoolClassName, formTeacherId
         throw new Error("School class adding failed");
     }
 }
+
+export async function deleteSchoolClass(accessToken, schoolClassId) {
+    const response = await fetch(SCHOOL_CLASSES_URL + `/${schoolClassId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("School class deletion failed");
+    }
+}
