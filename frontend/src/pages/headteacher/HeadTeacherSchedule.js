@@ -157,6 +157,8 @@ function HeadTeacherSchedule() {
             setCantAddLessonError(null);
             try {
                 await addLesson(accessToken, lessonNumber, startTime, finishTime);
+                const lessons = await getAllLessons(accessToken);
+                setLessons(lessons);
             } catch(er) {
                 console.log(er);
             }
@@ -183,6 +185,8 @@ function HeadTeacherSchedule() {
             setCantDeleteLessonError(null);
             try {
                 await deleteLesson(accessToken, lessonId);
+                const lessons = await getAllLessons(accessToken);
+                setLessons(lessons);
             } catch(er) {
                 console.log(er);
             }
