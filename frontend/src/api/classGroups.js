@@ -18,3 +18,15 @@ export async function addClassGroup(accessToken, classGroupNumber, schoolClassId
         throw new Error("Class group adding failed");
     }
 }
+
+export async function deleteClassGroup(accessToken, classGroupNumber, schoolClassId) {
+    const response = await fetch(CLASS_GROUPS_URL + `/${schoolClassId}/${classGroupNumber}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Class group deletion failed");
+    }
+}

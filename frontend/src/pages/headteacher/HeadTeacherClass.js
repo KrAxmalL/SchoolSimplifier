@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { addClassGroup } from "../../api/classGroups";
+import { addClassGroup, deleteClassGroup } from "../../api/classGroups";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
 import { addSchoolClass, deleteSchoolClass } from "../../api/schoolClasses";
 import { getAllTeachers } from "../../api/teacher";
 import FullClassData from "../../components/formteacher/FullClassData";
 import AddClassGroupForm from "../../components/headteacher/AddClassGroupForm";
 import AddSchoolClassForm from "../../components/headteacher/AddSchoolClassForm";
+import DeleteClassGroupForm from "../../components/headteacher/DeleteClassGroupForm";
 import DeleteSchoolClassForm from "../../components/headteacher/DeleteSchoolClassForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
 import Modal from "../../layout/Modal";
@@ -24,8 +25,21 @@ function HeadTeacherClass() {
     const [addSchoolClassFormVisible, setAddSchoolClassFormVisible] = useState(false);
     const [deleteSchoolClassFormVisible, setDeleteSchoolClassFormVisible] = useState(false);
     const [addClassGroupFormVisible, setAddClassGroupFormVisible] = useState(false);
+    const [deleteClassGroupFormVisible, setDeleteClassGroupFormVisible] = useState(false);
     const [cantDeleteSchoolClassError, setCantDeleteSchoolClassError] = useState(null);
     const [cantAddClassGroupError, setCantAddClassGroupError] = useState(null);
+    const [cantDeleteClassGroupError, setCantDeleteClassGroupError] = useState(null);
+
+    const classGroups = useMemo(() => {
+        if(selectedClassData) {
+            return Object.keys(selectedClassData.groupStudents).map(groupNumber => {
+                return {classGroupNumber: groupNumber}
+            });
+        }
+        else {
+            return [];
+        }
+    }, [selectedClassData]);
 
     const notFormTeachers = useMemo(() => {
         return teachers.filter(teacher => !classesData.some(classData => classData.formTeacher.teacherId === teacher.teacherId));
@@ -75,6 +89,13 @@ function HeadTeacherClass() {
         setModalVisible(true);
     }
 
+    const showDeleteClassGroupFormHandler = (e) => {
+        e.preventDefault();
+
+        setDeleteClassGroupFormVisible(true);
+        setModalVisible(true);
+    }
+
     const hideModalHandler = (e) => {
         e.preventDefault();
 
@@ -83,6 +104,7 @@ function HeadTeacherClass() {
         setAddSchoolClassFormVisible(false);
         setDeleteSchoolClassFormVisible(false);
         setAddClassGroupFormVisible(false);
+        setDeleteClassGroupFormVisible(false);
     }
 
     const submitSelectSchoolClassFormHandler = (selectedSchoolClassId) => {
@@ -141,6 +163,24 @@ function HeadTeacherClass() {
         }
     }
 
+    const submitDeleteClassGroupFormHandler = async (classGroupNumber) => {
+        const groupStudents = selectedClassData.groupStudents[`${classGroupNumber}`];
+        if(groupStudents.length === 0) {
+            setCantDeleteClassGroupError(null);
+            try {
+                await deleteClassGroup(accessToken, classGroupNumber, selectedClassData.schoolClassId);
+                const newClassesData = await getClassesDataForHeadTeacher(accessToken);
+                setClassesData(newClassesData);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+        else {
+            setCantDeleteClassGroupError(`У групі є ${groupStudents.length} учнів, не можна видалити`);
+            return;
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -162,6 +202,11 @@ function HeadTeacherClass() {
                         <AddClassGroupForm onAddClassGroup={submitAddClassGroupFormHandler}
                                           cantAddClassGroupError={cantAddClassGroupError}/>
                     }
+                    {deleteClassGroupFormVisible &&
+                        <DeleteClassGroupForm classGroups={classGroups}
+                                              onDeleteClassGroup={submitDeleteClassGroupFormHandler}
+                                              cantDeleteClassGroupError={cantDeleteClassGroupError}/>
+                    }
                 </Modal>
             }
             <h2>Інформація про клас</h2>
@@ -171,6 +216,7 @@ function HeadTeacherClass() {
             {selectedClassData &&
                 <React.Fragment>
                     <button onClick={showAddClassGroupFormHandler}>Додати групу для класу</button>
+                    <button onClick={showDeleteClassGroupFormHandler}>Видалити групу для класу</button>
                     <FullClassData classData={selectedClassData} />
                 </React.Fragment>
             }
