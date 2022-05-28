@@ -51,4 +51,28 @@ public class ClassGroupServiceImpl implements ClassGroupService {
         classGroupToAdd.setSchoolClass(schoolClass);
         classGroupRepository.save(classGroupToAdd);
     }
+
+    @Override
+    public void deleteClassGroup(Integer classGroupNumber, BigInteger schoolClassId) {
+        if(schoolClassId == null) {
+            throw new InvalidParameterException("School class id can't be null");
+        }
+
+        final SchoolClass schoolClass = schoolClassRepository.findById(schoolClassId)
+                .orElseThrow(() -> new InvalidParameterException("School class with provided id doesn't exist"));
+
+        if(classGroupNumber == null) {
+            throw new InvalidParameterException("Class group number can't be null");
+        }
+
+        final ClassGroup searchedClassGroup = schoolClass.getClassGroups().stream()
+                .filter(classGroup -> classGroup.getClassGroupNumber().equals(classGroupNumber))
+                .findFirst()
+                .orElseThrow(() -> new InvalidParameterException("Class group with provided number doesn't exist"));
+        if(searchedClassGroup.getStudents().size() > 0) {
+            throw new InvalidParameterException("Can't delete class group if it has any students");
+        }
+        
+        classGroupRepository.deleteById(searchedClassGroup.getClassGroupId());
+    }
 }
