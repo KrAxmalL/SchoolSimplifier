@@ -1,17 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
+import FullClassData from "../../components/formteacher/FullClassData";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
-import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
-import GroupsStudents from "../../components/table/GroupsStudents";
-import StudentsTable from "../../components/table/StudentsTable";
 import Modal from "../../layout/Modal";
 
 import classes from './HeadTeacherClass.module.css';
 
 function HeadTeacherClass() {
     const accessToken = useSelector(state => state.auth.accessToken);
-    const [classData, setClassData] = useState(null);
+    const [classData, setClassData] = useState([]);
     const [selectedClassData, setSelectedClassData] = useState(null);
 
     const [selectSchoolClassFormVisible, setSelectedSchoolClassFormVisible] = useState(false);
@@ -57,15 +55,7 @@ function HeadTeacherClass() {
                 </Modal>
             }
             {selectedClassData &&
-                <React.Fragment>
-                    <p>{selectedClassData.schoolClassName}</p>
-                    <p>Список учнів</p>
-                    <StudentsTable students={selectedClassData.classStudents} />
-                    <GroupsStudents groupStudents={selectedClassData.groupStudents} />
-
-                    <h2>Розклад уроків</h2>
-                    <FormTeacherScheduleTable scheduleRecords={selectedClassData.classScheduleRecords} />
-                </React.Fragment>
+                <FullClassData classData={selectedClassData} />
             }
         </div>
     );

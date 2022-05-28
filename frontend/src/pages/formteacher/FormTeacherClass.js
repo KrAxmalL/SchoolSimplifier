@@ -1,9 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassDataForTeacher } from "../../api/formteacher";
-import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
-import GroupsStudents from "../../components/table/GroupsStudents";
-import StudentsTable from "../../components/table/StudentsTable";
+import FullClassData from "../../components/formteacher/FullClassData";
 
 import classes from './FormTeacherClass.module.css';
 
@@ -29,16 +27,7 @@ function FormTeacherClass() {
         <div className={classes['page-container']}>
             <h2>Мій клас</h2>
             {classData &&
-                <React.Fragment>
-                    <p>{classData.schoolClassName}</p>
-                    <p>Список учнів</p>
-                    <StudentsTable students={classData.classStudents} />
-                    <GroupsStudents groupStudents={classData.groupStudents} />
-
-                    <h2>Розклад уроків</h2>
-                    <FormTeacherScheduleTable scheduleRecords={classData.classScheduleRecords} />
-
-                </React.Fragment>
+                <FullClassData classData={classData} />
             }
         </div>
     );
