@@ -15,7 +15,6 @@ import java.util.List;
 @Setter
 public class StudentMarksDTO {
 
-    private BigInteger studentId;
     private StudentSummaryDTO student;
     private List<TeacherMarkSummary> studentMarks;
 }

@@ -65,7 +65,6 @@ public class FormTeacherServiceImpl implements FormTeacherService {
         final List<MarkBookRecord> alLMarks = markBookRepository.findAll();
         return students.stream().map(student -> {
             StudentMarksDTO resDTO = new StudentMarksDTO();
-            resDTO.setStudentId(student.getStudentId());
             resDTO.setStudent(StudentMapper.toStudentSummary(student));
             final List<MarkBookRecord> studentMarksRecord =
                     alLMarks.stream()

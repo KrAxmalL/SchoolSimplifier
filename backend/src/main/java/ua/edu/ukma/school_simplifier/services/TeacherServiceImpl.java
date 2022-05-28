@@ -153,7 +153,6 @@ public class TeacherServiceImpl implements TeacherService {
         final List<StudentMarksDTO> studentsMarks = new ArrayList<>(searchedStudents.size());
         for(Student student: searchedStudents) {
             final StudentMarksDTO studentMarksDTO = new StudentMarksDTO();
-            studentMarksDTO.setStudentId(student.getStudentId());
             studentMarksDTO.setStudent(StudentMapper.toStudentSummary(student));
             final List<TeacherMarkSummary> marksOfStudent =
                     markBookRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
