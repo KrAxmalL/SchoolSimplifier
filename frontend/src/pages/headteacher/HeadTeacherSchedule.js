@@ -124,6 +124,11 @@ function HeadTeacherSchedule() {
         try {
             await addScheduleRecord(accessToken, day, lessonId, subjectId, teacherId,
                                     selectedClassData.schoolClassId, classGroupNumber);
+            const newClassesData = await getClassesDataForHeadTeacher(accessToken);
+            setClassesData(newClassesData);
+            setSelectedClassData(prevSelectedClassData => {
+                return newClassesData.find(schoolClass => schoolClass.schoolClassId === prevSelectedClassData.schoolClassId)
+            });
         } catch(er) {
             console.log(er);
         }
@@ -132,6 +137,11 @@ function HeadTeacherSchedule() {
     const submitDeleteScheduleRecordFormHandler = async (scheduleRecordId) => {
         try {
             await deleteScheduleRecord(accessToken, scheduleRecordId);
+            const newClassesData = await getClassesDataForHeadTeacher(accessToken);
+            setClassesData(newClassesData);
+            setSelectedClassData(prevSelectedClassData => {
+                return newClassesData.find(schoolClass => schoolClass.schoolClassId === prevSelectedClassData.schoolClassId)
+            });
         } catch(er) {
             console.log(er);
         }
