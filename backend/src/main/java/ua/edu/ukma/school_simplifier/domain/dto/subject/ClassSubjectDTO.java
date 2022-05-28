@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class StudentSubjectDTO {
+public class ClassSubjectDTO {
 
     private String subjectName;
     private Integer classGroupNumber;

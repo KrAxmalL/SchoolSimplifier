@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -21,5 +22,6 @@ public class TeacherSchoolClassDTO {
 
     private List<StudentSummaryDTO> classStudents;
     private Map<Integer, List<StudentSummaryDTO>> groupStudents;
+    private List<ClassSubjectDTO> classSubjects;
     private List<ClassScheduleRecord> classScheduleRecords;
 }

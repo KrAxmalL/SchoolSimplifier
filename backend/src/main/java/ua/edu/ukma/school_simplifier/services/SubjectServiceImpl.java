@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.Subject;
 import ua.edu.ukma.school_simplifier.repositories.SubjectRepository;
 
+import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -21,5 +25,21 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public List<Subject> getAllSubjects() {
         return subjectRepository.findAll();
+    }
+
+    @Override
+    public List<ClassSubjectDTO> getSubjectsOfClassByClassGroups(BigInteger schoolClassId) {
+        List<Object[]> subjectRecords = subjectRepository.findSubjectsForClassByGroups(schoolClassId);
+        return subjectRecords.stream().map(classSubjectRecord -> {
+            ClassSubjectDTO resDTO = new ClassSubjectDTO();
+            resDTO.setSubjectName(classSubjectRecord[0].toString());
+            resDTO.setClassGroupNumber(classSubjectRecord[1] == null
+                    ? null
+                    : (Integer) classSubjectRecord[1]);
+            resDTO.setTeacherLastName(classSubjectRecord[2].toString());
+            resDTO.setTeacherFirstName(classSubjectRecord[3].toString());
+            resDTO.setTeacherPatronymic(classSubjectRecord[4].toString());
+            return resDTO;
+        }).collect(Collectors.toList());
     }
 }

@@ -14,11 +14,10 @@ import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.StudentService;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -54,7 +53,7 @@ public class StudentController {
         final Object studentEmailObj = authentication.getPrincipal();
         if (studentEmailObj != null) {
             try {
-                final List<StudentSubjectDTO> studentSchedule = studentService.getSubjectsForStudent(studentEmailObj.toString());
+                final List<ClassSubjectDTO> studentSchedule = studentService.getSubjectsForStudent(studentEmailObj.toString());
                 return ResponseEntity.ok().body(studentSchedule);
             } catch (InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());

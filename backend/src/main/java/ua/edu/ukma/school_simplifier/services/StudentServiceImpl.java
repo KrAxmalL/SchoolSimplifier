@@ -11,7 +11,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.subject.StudentSubjectDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.ScheduleRepository;
@@ -32,6 +32,8 @@ public class StudentServiceImpl implements StudentService {
     private final ScheduleRepository scheduleRepository;
     private final SubjectRepository subjectRepository;
     private final SchoolClassRepository schoolClassRepository;
+
+    private final SubjectService subjectService;
 
     @Override
     public List<StudentScheduleRecordDTO> getScheduleForStudent(String studentEmail) {
@@ -57,24 +59,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentSubjectDTO> getSubjectsForStudent(String studentEmail) {
+    public List<ClassSubjectDTO> getSubjectsForStudent(String studentEmail) {
         final Optional<Student> studentOpt = studentRepository.findStudentByEmail(studentEmail);
         if(studentOpt.isEmpty()) {
             throw new InvalidParameterException("Student with provided email doesn't exist");
         }
 
-        List<Object[]> subjectRecords = subjectRepository.findSubjectsForStudent(studentOpt.get().getStudentId());
-        return subjectRecords.stream().map(studentObj -> {
-            StudentSubjectDTO resDTO = new StudentSubjectDTO();
-            resDTO.setSubjectName(studentObj[0].toString());
-            resDTO.setClassGroupNumber(studentObj[1] == null
-                                            ? null
-                                            : (Integer) studentObj[1]);
-            resDTO.setTeacherLastName(studentObj[2].toString());
-            resDTO.setTeacherFirstName(studentObj[3].toString());
-            resDTO.setTeacherPatronymic(studentObj[4].toString());
-            return resDTO;
-        }).collect(Collectors.toList());
+        return subjectService.getSubjectsOfClassByClassGroups(studentOpt.get().getSchoolClass().getSchoolClassId());
     }
 
     @Override

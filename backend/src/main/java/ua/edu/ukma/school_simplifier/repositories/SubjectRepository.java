@@ -44,7 +44,7 @@ public interface SubjectRepository extends JpaRepository<Subject, BigInteger> {
             "FROM schedule INNER JOIN subject ON schedule.subject_id = subject.subject_id " +
             "INNER JOIN teacher ON schedule.teacher_id = teacher.teacher_id " +
             "LEFT OUTER JOIN class_group ON schedule.class_group_id = class_group.class_group_id " +
-            "WHERE schedule.school_class_id = (SELECT school_class_id FROM student WHERE student_id = :target_student_id)",
+            "WHERE schedule.school_class_id = :target_school_class_id",
             nativeQuery = true)
-    List<Object[]> findSubjectsForStudent(@Param("target_student_id") BigInteger studentId);
+    List<Object[]> findSubjectsForClassByGroups(@Param("target_school_class_id") BigInteger schoolClassId);
 }

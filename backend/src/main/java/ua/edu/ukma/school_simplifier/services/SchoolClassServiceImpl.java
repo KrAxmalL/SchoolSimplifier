@@ -9,6 +9,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.ClassScheduleRecord;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.ClassGroup;
 import ua.edu.ukma.school_simplifier.domain.models.SchoolClass;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class SchoolClassServiceImpl implements SchoolClassService{
 
     private final ScheduleRepository scheduleRepository;
+    private final SubjectService subjectService;
 
     @Override
     public TeacherSchoolClassDTO getClassInfo(SchoolClass schoolClass) {
@@ -49,6 +51,9 @@ public class SchoolClassServiceImpl implements SchoolClassService{
             groupStudents.put(classGroup.getClassGroupNumber(), classGroupStudents);
         }
         resTeacherSchoolClassDTO.setGroupStudents(groupStudents);
+
+        final List<ClassSubjectDTO> classSubjects = subjectService.getSubjectsOfClassByClassGroups(schoolClass.getSchoolClassId());
+        resTeacherSchoolClassDTO.setClassSubjects(classSubjects);
 
         List<Object[]> schoolClassScheduleRecords = scheduleRepository.findScheduleRecordsForClass(schoolClass.getSchoolClassId());
         List<ClassScheduleRecord> classScheduleRecords = schoolClassScheduleRecords.stream().map(scheduleRecordObj -> {
