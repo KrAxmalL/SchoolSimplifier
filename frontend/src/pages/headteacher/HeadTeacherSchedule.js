@@ -199,8 +199,6 @@ function HeadTeacherSchedule() {
 
     return (
         <div className={classes['page-container']}>
-        <h2>Інформація про клас</h2>
-        <button onClick={showSelectSchoolClassFormHandler}>Обрати клас</button>
         {modalVisible &&
             <Modal onClose={hideModalHandler}>
                 {selectSchoolClassFormVisible &&
@@ -231,6 +229,10 @@ function HeadTeacherSchedule() {
             </Modal>
         }
 
+        <h2>Інформація про клас</h2>
+        <button onClick={showSelectSchoolClassFormHandler}>Обрати клас</button>
+        <button onClick={showAddLessonFormVisible}>Додати урок</button>
+        <button onClick={showDeleteLessonFormVisible}>Видалити урок</button>
         {selectedClassData &&
             <React.Fragment>
                 <FormTeacherScheduleTable scheduleRecords={selectedClassData.classScheduleRecords} />
@@ -238,8 +240,6 @@ function HeadTeacherSchedule() {
                 <button onClick={showDeleteScheduleRecordFormHandler}>Видалити запис із розкладу</button>
             </React.Fragment>
         }
-        <button onClick={showAddLessonFormVisible}>Додати урок</button>
-        <button onClick={showDeleteLessonFormVisible}>Видалити урок</button>
     </div>
     );
 };

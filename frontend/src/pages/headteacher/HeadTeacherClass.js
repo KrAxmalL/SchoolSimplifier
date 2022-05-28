@@ -112,10 +112,6 @@ function HeadTeacherClass() {
 
     return (
         <div className={classes['page-container']}>
-            <h2>Інформація про клас</h2>
-            <button onClick={showSelectSchoolClassFormHandler}>Обрати клас</button>
-            <button onClick={showAddSchoolClassFormHandler}>Додати клас</button>
-            <button onClick={showDeleteSchoolClassFormHandler}>Видалити клас</button>
             {modalVisible &&
                 <Modal onClose={hideModalHandler}>
                     {selectSchoolClassFormVisible &&
@@ -133,6 +129,10 @@ function HeadTeacherClass() {
                     }
                 </Modal>
             }
+            <h2>Інформація про клас</h2>
+            <button onClick={showSelectSchoolClassFormHandler}>Обрати клас</button>
+            <button onClick={showAddSchoolClassFormHandler}>Додати клас</button>
+            <button onClick={showDeleteSchoolClassFormHandler}>Видалити клас</button>
             {selectedClassData &&
                 <FullClassData classData={selectedClassData} />
             }
