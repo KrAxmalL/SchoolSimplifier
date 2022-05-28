@@ -123,6 +123,23 @@ public class SchoolClassServiceImpl implements SchoolClassService{
         }
     }
 
+    @Override
+    public void deleteSchoolClass(BigInteger schoolClassId) {
+        final SchoolClass schoolClassToDelete = schoolClassRepository.findById(schoolClassId)
+                .orElseThrow(() -> new InvalidParameterException("Class with provided id doesn't exist"));
+        final int classStudentsNumber = schoolClassToDelete.getStudents().size();
+        if(classStudentsNumber > 0) {
+            throw new InvalidParameterException("Can't delete school class if it has any students");
+        }
+
+        final int classGroupsNumber = schoolClassToDelete.getClassGroups().size();
+        if(classGroupsNumber > 0) {
+            throw new InvalidParameterException("Can't delete school class if it has any groups");
+        }
+
+        schoolClassRepository.deleteById(schoolClassId);
+    }
+
     private String validateSchoolClassName(String schoolClassName) {
         if(schoolClassName == null) {
             throw new InvalidParameterException("School class name can't be null");

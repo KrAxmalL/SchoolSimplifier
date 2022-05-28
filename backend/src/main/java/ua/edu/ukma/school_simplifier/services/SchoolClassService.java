@@ -11,4 +11,6 @@ public interface SchoolClassService {
     TeacherSchoolClassDTO getClassInfo(SchoolClass schoolClass);
 
     void addSchoolClass(AddSchoolClassDTO addSchoolClassDTO);
+
+    void deleteSchoolClass(BigInteger schoolClassId);
 }
