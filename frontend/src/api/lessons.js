@@ -34,3 +34,15 @@ export async function addLesson(accessToken, lessonNumber, startTime, finishTime
         throw new Error("Lesson adding failed");
     }
 }
+
+export async function deleteLesson(accessToken, lessonId) {
+    const response = await fetch(LESSONS_URL + `/${lessonId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Lesson deletion failed");
+    }
+}

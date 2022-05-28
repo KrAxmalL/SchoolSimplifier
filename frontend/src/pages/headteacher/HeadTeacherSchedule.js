@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
-import { addLesson, getAllLessons } from "../../api/lessons";
+import { addLesson, deleteLesson, getAllLessons } from "../../api/lessons";
 import { addScheduleRecord, deleteScheduleRecord } from "../../api/schedule";
 import { getAllSubjects } from "../../api/subjects";
 import { getAllTeachers } from "../../api/teacher";
 import AddLessonForm from "../../components/headteacher/AddLessonForm";
 import AddScheduleRecordForm from "../../components/headteacher/AddScheduleRecordForm";
+import DeleteLessonForm from "../../components/headteacher/DeleteLessonForm";
 import DeleteScheduleRecordForm from "../../components/headteacher/DeleteScheduleRecordForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
 import FormTeacherScheduleTable from "../../components/table/FormTeacherScheduleTable";
@@ -17,7 +18,7 @@ import classes from './HeadTeacherSchedule.module.css';
 
 function HeadTeacherSchedule() {
     const accessToken = useSelector(state => state.auth.accessToken);
-    const [classData, setClassData] = useState([]);
+    const [classesData, setClassesData] = useState([]);
     const [selectedClassData, setSelectedClassData] = useState(null);
     const [teachers, setTeachers] = useState([]);
     const [subjects, setSubjects] = useState([]);
@@ -28,6 +29,8 @@ function HeadTeacherSchedule() {
     const [addScheduleRecordFormVisible, setAddScheduleRecordFormVisible] = useState(false);
     const [deleteScheduleRecordFormVisible, setDeleteScheduleRecordFormVisible] = useState(false);
     const [addLessonFormVisible, setAddLessonFormVisible] = useState(false);
+    const [deleteLessonFormVisible, setDeleteLessonFormVisible] = useState(false);
+    const [cantDeleteLessonError, setCantDeleteLessonError] = useState(null);
 
     const classGroups = useMemo(() => {
         if(selectedClassData) {
@@ -46,15 +49,15 @@ function HeadTeacherSchedule() {
     useEffect(() => {
         const fetchData = async() => {
             try {
-                const classData = await getClassesDataForHeadTeacher(accessToken);
+                const classesData = await getClassesDataForHeadTeacher(accessToken);
                 const teachers = await getAllTeachers(accessToken);
                 const subjects = await getAllSubjects(accessToken);
                 const lessons = await getAllLessons(accessToken);
-                setClassData(classData);
+                setClassesData(classesData);
                 setTeachers(teachers);
                 setSubjects(subjects)
                 setLessons(lessons);
-                console.log(`teacher class data: ${JSON.stringify(classData)}`);
+                console.log(`teacher class data: ${JSON.stringify(classesData)}`);
             }
             catch(er) {
                 console.log(`fetching failed: ${er}`);
@@ -91,6 +94,13 @@ function HeadTeacherSchedule() {
         setModalVisible(true);
     };
 
+    const showDeleteLessonFormVisible = (e) => {
+        e.preventDefault();
+
+        setDeleteLessonFormVisible(true);
+        setModalVisible(true);
+    };
+
     const hideModalHandler = (e) => {
         e.preventDefault();
 
@@ -99,10 +109,11 @@ function HeadTeacherSchedule() {
         setAddScheduleRecordFormVisible(false);
         setDeleteScheduleRecordFormVisible(false);
         setAddLessonFormVisible(false);
+        setDeleteLessonFormVisible(false);
     };
 
     const submitSelectSchoolClassFormHandler = (selectedSchoolClassId) => {
-        const selectedClassData = classData.find(schoolClass => schoolClass.schoolClassId === selectedSchoolClassId);
+        const selectedClassData = classesData.find(schoolClass => schoolClass.schoolClassId === selectedSchoolClassId);
         setSelectedClassData(selectedClassData);
     };
 
@@ -133,6 +144,32 @@ function HeadTeacherSchedule() {
         }
     }
 
+    const submitDeleteLessonFormHandler = async (lessonId) => {
+        console.log(lessonId);
+
+        const selectedLesson = lessons.find(lesson => lesson.lessonId === lessonId);
+        const scheduleRecordsOfLesson = classesData.map(classData => classData.classScheduleRecords)
+                                                 .reduce((prev, curr) => [...prev, ...curr], [])
+                                                 .filter(scheduleRecord => {
+                                                    return scheduleRecord.lessonNumber === selectedLesson.lessonNumber
+                                                           && scheduleRecord.lessonStartTime.localeCompare(selectedLesson.startTime) === 0
+                                                           && scheduleRecord.lessonFinishTime.localeCompare(selectedLesson.finishTime) === 0;
+                                                   });
+        console.log('records with lesson: ' + JSON.stringify(scheduleRecordsOfLesson));
+        if(scheduleRecordsOfLesson.length === 0) {
+            setCantDeleteLessonError(null);
+            try {
+                await deleteLesson(accessToken, lessonId);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+        else {
+            setCantDeleteLessonError(`Існує ${scheduleRecordsOfLesson.length} записів у розкладі для даного уроку, не можна видалити`);
+            return;
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
         <h2>Інформація про клас</h2>
@@ -140,7 +177,7 @@ function HeadTeacherSchedule() {
         {modalVisible &&
             <Modal onClose={hideModalHandler}>
                 {selectSchoolClassFormVisible &&
-                    <SelectSchoolClassForm schoolClasses={classData}
+                    <SelectSchoolClassForm schoolClasses={classesData}
                                            onSelectSchoolClass={submitSelectSchoolClassFormHandler}/>
                 }
                 {addScheduleRecordFormVisible &&
@@ -158,6 +195,11 @@ function HeadTeacherSchedule() {
                 {addLessonFormVisible &&
                     <AddLessonForm onAddLesson={submitAddLessonFormHandler}/>
                 }
+                {deleteLessonFormVisible &&
+                    <DeleteLessonForm lessons={lessons}
+                                      onDeleteLesson={submitDeleteLessonFormHandler}
+                                      cantDeleteLessonError={cantDeleteLessonError} />
+                }
             </Modal>
         }
 
@@ -169,6 +211,7 @@ function HeadTeacherSchedule() {
             </React.Fragment>
         }
         <button onClick={showAddLessonFormVisible}>Додати урок</button>
+        <button onClick={showDeleteLessonFormVisible}>Видалити урок</button>
     </div>
     );
 };
