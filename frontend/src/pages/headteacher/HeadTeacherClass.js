@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { addClassGroup } from "../../api/classGroups";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
 import { addSchoolClass, deleteSchoolClass } from "../../api/schoolClasses";
 import { getAllTeachers } from "../../api/teacher";
 import FullClassData from "../../components/formteacher/FullClassData";
+import AddClassGroupForm from "../../components/headteacher/AddClassGroupForm";
 import AddSchoolClassForm from "../../components/headteacher/AddSchoolClassForm";
 import DeleteSchoolClassForm from "../../components/headteacher/DeleteSchoolClassForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
@@ -21,7 +23,9 @@ function HeadTeacherClass() {
     const [selectSchoolClassFormVisible, setSelectSchoolClassFormVisible] = useState(false);
     const [addSchoolClassFormVisible, setAddSchoolClassFormVisible] = useState(false);
     const [deleteSchoolClassFormVisible, setDeleteSchoolClassFormVisible] = useState(false);
+    const [addClassGroupFormVisible, setAddClassGroupFormVisible] = useState(false);
     const [cantDeleteSchoolClassError, setCantDeleteSchoolClassError] = useState(null);
+    const [cantAddClassGroupError, setCantAddClassGroupError] = useState(null);
 
     const notFormTeachers = useMemo(() => {
         return teachers.filter(teacher => !classesData.some(classData => classData.formTeacher.teacherId === teacher.teacherId));
@@ -64,6 +68,13 @@ function HeadTeacherClass() {
         setModalVisible(true);
     }
 
+    const showAddClassGroupFormHandler = (e) => {
+        e.preventDefault();
+
+        setAddClassGroupFormVisible(true);
+        setModalVisible(true);
+    }
+
     const hideModalHandler = (e) => {
         e.preventDefault();
 
@@ -71,6 +82,7 @@ function HeadTeacherClass() {
         setSelectSchoolClassFormVisible(false);
         setAddSchoolClassFormVisible(false);
         setDeleteSchoolClassFormVisible(false);
+        setAddClassGroupFormVisible(false);
     }
 
     const submitSelectSchoolClassFormHandler = (selectedSchoolClassId) => {
@@ -110,6 +122,25 @@ function HeadTeacherClass() {
         }
     }
 
+    const submitAddClassGroupFormHandler = async (classGroupNumber) => {
+        const groupWithSuchNumberExists = Object.keys(selectedClassData.groupStudents)
+                                                .some(groupNumber => Number.parseInt(groupNumber) === classGroupNumber);
+        if(!groupWithSuchNumberExists) {
+            setCantAddClassGroupError(null);
+            try {
+                await addClassGroup(accessToken, classGroupNumber, selectedClassData.schoolClassId);
+                const newClassesData = await getClassesDataForHeadTeacher(accessToken);
+                setClassesData(newClassesData);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+        else {
+            setCantAddClassGroupError('У класі вже є група із таким номером');
+            return;
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -127,6 +158,10 @@ function HeadTeacherClass() {
                                                onSelectSchoolClass={submitDeleteSchoolClassFormHandler}
                                                cantDeleteSchoolClassError={cantDeleteSchoolClassError}/>
                     }
+                    {addClassGroupFormVisible &&
+                        <AddClassGroupForm onAddClassGroup={submitAddClassGroupFormHandler}
+                                          cantAddClassGroupError={cantAddClassGroupError}/>
+                    }
                 </Modal>
             }
             <h2>Інформація про клас</h2>
@@ -134,7 +169,10 @@ function HeadTeacherClass() {
             <button onClick={showAddSchoolClassFormHandler}>Додати клас</button>
             <button onClick={showDeleteSchoolClassFormHandler}>Видалити клас</button>
             {selectedClassData &&
-                <FullClassData classData={selectedClassData} />
+                <React.Fragment>
+                    <button onClick={showAddClassGroupFormHandler}>Додати групу для класу</button>
+                    <FullClassData classData={selectedClassData} />
+                </React.Fragment>
             }
         </div>
     );
