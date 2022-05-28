@@ -39,7 +39,7 @@ public class SchoolClassServiceImpl implements SchoolClassService{
     private final ScheduleRepository scheduleRepository;
     private final SubjectService subjectService;
 
-    private static final String SCHOOL_CLASS_NAME_REGEXP = "^\\d\\d?-[а-яА-Я]$";
+    private static final String SCHOOL_CLASS_NAME_REGEXP = "^\\d\\d?-[А-Я]$";
 
     @Override
     public TeacherSchoolClassDTO getClassInfo(SchoolClass schoolClass) {
