@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getClassesDataForHeadTeacher } from "../../api/headteacher";
+import { addSchoolClass } from "../../api/schoolClasses";
+import { getAllTeachers } from "../../api/teacher";
 import FullClassData from "../../components/formteacher/FullClassData";
+import AddSchoolClassForm from "../../components/headteacher/AddSchoolClassForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
 import Modal from "../../layout/Modal";
 
@@ -9,49 +12,86 @@ import classes from './HeadTeacherClass.module.css';
 
 function HeadTeacherClass() {
     const accessToken = useSelector(state => state.auth.accessToken);
-    const [classData, setClassData] = useState([]);
+    const [classesData, setClassesData] = useState([]);
+    const [teachers, setTeachers] = useState([]);
     const [selectedClassData, setSelectedClassData] = useState(null);
 
-    const [selectSchoolClassFormVisible, setSelectedSchoolClassFormVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectSchoolClassFormVisible, setSelectSchoolClassFormVisible] = useState(false);
+    const [addSchoolClassFormVisible, setAddSchoolClassFormVisible] = useState(false);
+
+    const notFormTeachers = useMemo(() => {
+        return teachers.filter(teacher => !classesData.some(classData => classData.formTeacher.teacherId === teacher.teacherId));
+    }, [classesData, teachers]);
 
     useEffect(() => {
         const fetchData = async() => {
             try {
-                const classData = await getClassesDataForHeadTeacher(accessToken);
-                setClassData(classData);
-                console.log(`teacher class data: ${JSON.stringify(classData)}`);
+                const classesData = await getClassesDataForHeadTeacher(accessToken);
+                const teachers = await getAllTeachers(accessToken);
+                setClassesData(classesData);
+                setTeachers(teachers);
+                console.log(`teacher class data: ${JSON.stringify(classesData)}`);
             }
             catch(er) {
                 console.log(`teacher class error: ${er}`);
             }
         }
         fetchData();
-    }, [accessToken, setClassData]);
+    }, [accessToken, setClassesData]);
 
     const showSelectSchoolClassFormHandler = (e) => {
         e.preventDefault();
 
-        setSelectedSchoolClassFormVisible(true);
+        setSelectSchoolClassFormVisible(true);
+        setModalVisible(true);
     }
 
-    const hideSelectSchoolClassFormHandler = (e) => {
+    const showAddSchoolClassFormHandler = (e) => {
         e.preventDefault();
 
-        setSelectedSchoolClassFormVisible(false);
+        setAddSchoolClassFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const hideModalHandler = (e) => {
+        e.preventDefault();
+
+        setModalVisible(false);
+        setSelectSchoolClassFormVisible(false);
+        setAddSchoolClassFormVisible(false);
     }
 
     const submitSelectSchoolClassFormHandler = (selectedSchoolClassId) => {
-        const selectedClassData = classData.find(schoolClass => schoolClass.schoolClassId === selectedSchoolClassId);
+        const selectedClassData = classesData.find(schoolClass => schoolClass.schoolClassId === selectedSchoolClassId);
         setSelectedClassData(selectedClassData);
+    }
+
+    const submitAddSchoolClassFormHandler = async (schoolClassName, formTeacherId, classGroupNumber) => {
+        console.log(schoolClassName, formTeacherId, classGroupNumber);
+        try {
+            await addSchoolClass(accessToken, schoolClassName, formTeacherId, classGroupNumber);
+            const newClassesData = await getClassesDataForHeadTeacher(accessToken);
+            setClassesData(newClassesData);
+        } catch(er) {
+            console.log(er);
+        }
     }
 
     return (
         <div className={classes['page-container']}>
             <h2>Інформація про клас</h2>
             <button onClick={showSelectSchoolClassFormHandler}>Обрати клас</button>
-            {selectSchoolClassFormVisible &&
-                <Modal onClose={hideSelectSchoolClassFormHandler}>
-                    <SelectSchoolClassForm schoolClasses={classData} onSelectSchoolClass={submitSelectSchoolClassFormHandler}/>
+            <button onClick={showAddSchoolClassFormHandler}>Додати клас</button>
+            {modalVisible &&
+                <Modal onClose={hideModalHandler}>
+                    {selectSchoolClassFormVisible &&
+                        <SelectSchoolClassForm schoolClasses={classesData}
+                                               onSelectSchoolClass={submitSelectSchoolClassFormHandler}/>
+                    }
+                    {addSchoolClassFormVisible &&
+                     <AddSchoolClassForm teachers={notFormTeachers}
+                                         onAddSchoolClass={submitAddSchoolClassFormHandler}/>}
                 </Modal>
             }
             {selectedClassData &&
