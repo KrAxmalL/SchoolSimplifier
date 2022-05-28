@@ -30,6 +30,10 @@ function TeacherMarkBook() {
                                   .filter((subject, index, subjects) => subjects.findIndex(subj => subj.subjectId === subject.subjectId) === index);
     }, [classesWithSubjects]);
 
+    const students = useMemo(() => {
+        return studentsMarks.map(studentMarks => studentMarks.student);
+    }, [studentsMarks]);
+
     useEffect(() => {
         const fetchData = async() => {
             try {
@@ -118,7 +122,7 @@ function TeacherMarkBook() {
                                             onSelectMarkBook={submitSelectMarkBookFormHandler} />
                     }
                     {addMarkFormVisible &&
-                        <AddMarkForm students={studentsMarks}
+                        <AddMarkForm students={students}
                                      onAddMark={submitAddMarkFormHandler} />
                     }
                     {deleteMarkFormVisible &&

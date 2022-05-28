@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { getFullNameFromInitials } from "../../utils/transformation";
 
 import classes from './SelectMarkBookForm.module.css';
 
@@ -72,7 +73,7 @@ function AddMarkForm(props) {
         <form className={classes['form-layout']} onSubmit={submitFormHandler}>
             <label>Оберіть учня:</label>
             <select ref={selectStudentRef} required>
-                {students.map(student => <option key={student.studentId} value={student.studentId}>{`${student.student.studentLastName} ${student.student.studentFirstName} ${student.student.studentPatronymic}`}</option>)}
+                {students.map(student => <option key={student.studentId} value={student.studentId}>{getFullNameFromInitials(student)}</option>)}
             </select>
             {studentError && <p className={classes.error}>Предмет має бути обраний</p>}
 
