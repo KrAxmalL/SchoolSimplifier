@@ -14,6 +14,9 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, BigInt
     @Query(value = "select s.schoolClass from Student s where s.studentId = :target_student_id")
     Optional<SchoolClass> findClassOfStudent(@Param("target_student_id") BigInteger studentId);
 
+    @Query(value = "from SchoolClass sc where sc.schoolClassName = :target_school_class_name")
+    Optional<SchoolClass> findClassByName(@Param("target_school_class_name") String schoolClassName);
+
     @Query(value = "select distinct sr.schoolClass from ScheduleRecord sr where sr.teacher.teacherId = :target_teacher_id")
     List<SchoolClass> findClassesOfTeacher(@Param("target_teacher_id") BigInteger teacherId);
 }

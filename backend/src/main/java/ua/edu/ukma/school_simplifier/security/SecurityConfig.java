@@ -55,6 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/marks*").hasAuthority("TEACHER");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/schedule*").hasAuthority("HEAD_TEACHER");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/lessons*").hasAuthority("HEAD_TEACHER");
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/schoolClasses*").hasAuthority("HEAD_TEACHER");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/authentication/login",
                                                                          "/api/authentication/refresh"
                                             ).permitAll();
