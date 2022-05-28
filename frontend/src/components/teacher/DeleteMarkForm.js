@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { getFullNameFromInitials } from "../../utils/transformation";
 
 import classes from './DeleteMarkForm.module.css';
 
@@ -18,18 +19,18 @@ function DeleteMarkForm(props) {
 
     const studentOptions = useMemo(() => {
         return studentsMarks.map(studentMarks => {
-            const studentId = studentMarks.studentId;
-            const {studentLastName, studentFirstName, studentPatronymic} = studentMarks.student;
+            const student= studentMarks.student;
+            const studentId = student.studentId;
             return (
                 <option key={studentId} value={studentId}>
-                    {`${studentLastName} ${studentFirstName} ${studentPatronymic}`}
+                    {getFullNameFromInitials(student)}
                 </option>
             );
         });
     }, [studentsMarks]);
 
     const markRecordOptions = useMemo(() => {
-        const neededStudentMarks = studentsMarks.find(studentMarks => studentMarks.studentId === Number.parseInt(selectedStudent));
+        const neededStudentMarks = studentsMarks.find(studentMarks => studentMarks.student.studentId === Number.parseInt(selectedStudent));
         if(!neededStudentMarks) {
             return [];
         }
