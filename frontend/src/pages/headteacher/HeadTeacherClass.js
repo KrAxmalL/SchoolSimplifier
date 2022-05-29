@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { addClassGroup, deleteClassGroup } from "../../api/classGroups";
-import { getClassesDataForHeadTeacher } from "../../api/headteacher";
+import { getAllStudentForHeadTeacher, getClassesDataForHeadTeacher } from "../../api/headteacher";
 import { addSchoolClass, deleteSchoolClass } from "../../api/schoolClasses";
+import { updateClassAndGroupForStudent } from "../../api/student";
 import { getAllTeachers } from "../../api/teacher";
 import FullClassData from "../../components/formteacher/FullClassData";
 import AddClassGroupForm from "../../components/headteacher/AddClassGroupForm";
 import AddSchoolClassForm from "../../components/headteacher/AddSchoolClassForm";
+import AddStudentToClassForm from "../../components/headteacher/AddStudentToClassForm";
 import DeleteClassGroupForm from "../../components/headteacher/DeleteClassGroupForm";
 import DeleteSchoolClassForm from "../../components/headteacher/DeleteSchoolClassForm";
 import SelectSchoolClassForm from "../../components/headteacher/SelectSchoolClassForm";
@@ -18,6 +20,7 @@ function HeadTeacherClass() {
     const accessToken = useSelector(state => state.auth.accessToken);
     const [classesData, setClassesData] = useState([]);
     const [teachers, setTeachers] = useState([]);
+    const [students, setStudents] = useState([]);
     const [selectedClassData, setSelectedClassData] = useState(null);
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -26,9 +29,11 @@ function HeadTeacherClass() {
     const [deleteSchoolClassFormVisible, setDeleteSchoolClassFormVisible] = useState(false);
     const [addClassGroupFormVisible, setAddClassGroupFormVisible] = useState(false);
     const [deleteClassGroupFormVisible, setDeleteClassGroupFormVisible] = useState(false);
+    const [AddStudentToClassFormVisible, setAddStudentToClassFormVisible] = useState(false);
     const [cantDeleteSchoolClassError, setCantDeleteSchoolClassError] = useState(null);
     const [cantAddClassGroupError, setCantAddClassGroupError] = useState(null);
     const [cantDeleteClassGroupError, setCantDeleteClassGroupError] = useState(null);
+    const [cantAddStudentToClassError, setCantAddStudentToClassError] = useState(null);
 
     const classGroups = useMemo(() => {
         if(selectedClassData) {
@@ -41,6 +46,12 @@ function HeadTeacherClass() {
         }
     }, [selectedClassData]);
 
+    const classGroupsWithFullClass = useMemo(() => {
+        const resArray = [...classGroups];
+        resArray.push({classGroupNumber: 'Лише до класу'});
+        return resArray;
+    }, [classGroups]);
+
     const notFormTeachers = useMemo(() => {
         return teachers.filter(teacher => !classesData.some(classData => classData.formTeacher.teacherId === teacher.teacherId));
     }, [classesData, teachers]);
@@ -50,8 +61,10 @@ function HeadTeacherClass() {
             try {
                 const classesData = await getClassesDataForHeadTeacher(accessToken);
                 const teachers = await getAllTeachers(accessToken);
+                const students = await getAllStudentForHeadTeacher(accessToken);
                 setClassesData(classesData);
                 setTeachers(teachers);
+                setStudents(students);
                 console.log(`teacher class data: ${JSON.stringify(classesData)}`);
             }
             catch(er) {
@@ -96,6 +109,13 @@ function HeadTeacherClass() {
         setModalVisible(true);
     }
 
+    const showAddStudentToClassForm = (e) => {
+        e.preventDefault();
+
+        setAddStudentToClassFormVisible(true);
+        setModalVisible(true);
+    }
+
     const hideModalHandler = (e) => {
         e.preventDefault();
 
@@ -105,6 +125,7 @@ function HeadTeacherClass() {
         setDeleteSchoolClassFormVisible(false);
         setAddClassGroupFormVisible(false);
         setDeleteClassGroupFormVisible(false);
+        setAddStudentToClassFormVisible(false);
     }
 
     const submitSelectSchoolClassFormHandler = (selectedSchoolClassId) => {
@@ -190,6 +211,29 @@ function HeadTeacherClass() {
         }
     }
 
+    const submitAddStudentToClassFormHandler = async (studentId, classGroupNumber) => {
+        const selectedStudent = students.find(student => student.studentId === studentId);
+        if(classGroupNumber !== selectedStudent.classGroupNumber) {
+            setCantAddStudentToClassError(null);
+            try {
+                await updateClassAndGroupForStudent(accessToken, studentId, selectedClassData.schoolClassId, classGroupNumber);
+                const newClassesData = await getClassesDataForHeadTeacher(accessToken);
+                setClassesData(newClassesData);
+                setSelectedClassData(prevClassData => {
+                    return newClassesData.find(schoolClass => schoolClass.schoolClassId === prevClassData.schoolClassId);
+                });
+                const students = await getAllStudentForHeadTeacher(accessToken);
+                setStudents(students);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+        else {
+            setCantAddStudentToClassError('Учень уже належить до цього класу та групи');
+            return;
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -216,6 +260,12 @@ function HeadTeacherClass() {
                                               onDeleteClassGroup={submitDeleteClassGroupFormHandler}
                                               cantDeleteClassGroupError={cantDeleteClassGroupError}/>
                     }
+                    {AddStudentToClassFormVisible &&
+                        <AddStudentToClassForm students={students}
+                                               classGroups={classGroupsWithFullClass}
+                                               onAddStudentToClass={submitAddStudentToClassFormHandler}
+                                               cantAddStudentToClassError={cantAddStudentToClassError}/>
+                    }
                 </Modal>
             }
             <h2>Інформація про клас</h2>
@@ -226,6 +276,7 @@ function HeadTeacherClass() {
                 <React.Fragment>
                     <button onClick={showAddClassGroupFormHandler}>Додати групу для класу</button>
                     <button onClick={showDeleteClassGroupFormHandler}>Видалити групу для класу</button>
+                    <button onClick={showAddStudentToClassForm}>Змінити клас та групу для учня</button>
                     <FullClassData classData={selectedClassData} />
                 </React.Fragment>
             }

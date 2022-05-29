@@ -61,3 +61,21 @@ export async function getMarksForStudent(accessToken) {
         throw new Error("Student's marks fetching failed");
     }
 }
+
+export async function updateClassAndGroupForStudent(accessToken, studentId, schoolClassId, classGroupNumber) {
+    const response = await fetch(STUDENTS_URL, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+            studentId,
+            schoolClassId,
+            classGroupNumber
+        })
+    });
+    if(!response.ok) {
+        throw new Error("Student class and group updating failed");
+    }
+}
