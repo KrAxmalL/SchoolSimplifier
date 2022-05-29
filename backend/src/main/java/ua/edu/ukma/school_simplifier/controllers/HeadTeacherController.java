@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.student.HeadTeacherStudentSummaryDTO;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.HeadTeacherService;
 
@@ -42,5 +43,10 @@ public class HeadTeacherController {
             final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
+    }
+
+    @GetMapping("/students")
+    public List<HeadTeacherStudentSummaryDTO> getAllStudents() {
+        return headTeacherService.getAllStudents();
     }
 }
