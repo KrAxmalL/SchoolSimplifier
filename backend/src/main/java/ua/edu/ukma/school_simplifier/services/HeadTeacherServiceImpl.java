@@ -37,7 +37,10 @@ public class HeadTeacherServiceImpl implements HeadTeacherService {
         return studentRepository.findAll().stream()
                 .map(student -> {
                     HeadTeacherStudentSummaryDTO resDTO = new HeadTeacherStudentSummaryDTO();
-                    resDTO.setStudent(StudentMapper.toStudentSummary(student));
+                    resDTO.setStudentId(student.getStudentId());
+                    resDTO.setLastName(student.getLastName());
+                    resDTO.setFirstName(student.getFirstName());
+                    resDTO.setPatronymic(student.getPatronymic());
                     final SchoolClass schoolClass = student.getSchoolClass();
                     resDTO.setSchoolClassId(schoolClass == null ? null : schoolClass.getSchoolClassId());
                     final ClassGroup classGroup = student.getClassGroup();

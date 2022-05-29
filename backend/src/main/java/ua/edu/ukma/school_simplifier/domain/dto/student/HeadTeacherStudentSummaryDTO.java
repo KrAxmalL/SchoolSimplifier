@@ -13,7 +13,10 @@ import java.math.BigInteger;
 @Setter
 public class HeadTeacherStudentSummaryDTO {
 
-    private StudentSummaryDTO student;
+    private BigInteger studentId;
+    private String firstName;
+    private String lastName;
+    private String patronymic;
     private BigInteger schoolClassId;
     private Integer classGroupNumber;
 }
