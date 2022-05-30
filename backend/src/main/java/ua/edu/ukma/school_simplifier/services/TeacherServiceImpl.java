@@ -9,7 +9,10 @@ import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.*;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassStudentsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
@@ -32,6 +35,8 @@ public class TeacherServiceImpl implements TeacherService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final ClassGroupRepository classGroupRepository;
+
+    private final SchoolClassService schoolClassService;
 
     @Override
     public List<TeacherSummaryDTO> getAllTeachers() {
@@ -191,6 +196,21 @@ public class TeacherServiceImpl implements TeacherService {
                         }).toList();
         teacherMarkBookDTO.setMarkBookDateTopics(markBookDateTopics);
         return teacherMarkBookDTO;
+    }
+
+    @Override
+    public SchoolClassStudentsDTO getStudentsOfClass(BigInteger schoolClassId) {
+        final SchoolClass schoolClass = schoolClassRepository.findById(schoolClassId)
+                .orElseThrow(() -> new InvalidParameterException("Class with provided id doesn't exist"));
+
+        final SchoolClassStudentsDTO schoolClassStudentsDTO = new SchoolClassStudentsDTO();
+        final TeacherSchoolClassDTO teacherSchoolClassDTO = schoolClassService.getClassInfo(schoolClass);
+        schoolClassStudentsDTO.setSchoolClassId(teacherSchoolClassDTO.getSchoolClassId());
+        schoolClassStudentsDTO.setSchoolClassName(teacherSchoolClassDTO.getSchoolClassName());
+        schoolClassStudentsDTO.setClassStudents(teacherSchoolClassDTO.getClassStudents());
+        schoolClassStudentsDTO.setGroupStudents(teacherSchoolClassDTO.getGroupStudents());
+
+        return schoolClassStudentsDTO;
     }
 
     @Override

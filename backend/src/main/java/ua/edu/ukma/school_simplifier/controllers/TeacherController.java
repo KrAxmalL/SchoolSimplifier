@@ -16,6 +16,7 @@ import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassStudentsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
@@ -96,6 +97,17 @@ public class TeacherController {
         else {
             final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Teacher's email not foundS!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/students")
+    public ResponseEntity<Object> getStudentsOfClass(@RequestParam(name = "schoolClassId") BigInteger schoolClassId) {
+        try {
+            SchoolClassStudentsDTO schoolClassStudentsDTO = teacherService.getStudentsOfClass(schoolClassId);
+            return ResponseEntity.ok().body(schoolClassStudentsDTO);
+        } catch(InvalidParameterException ex) {
+            final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 }
