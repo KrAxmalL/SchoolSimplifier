@@ -32,13 +32,14 @@ public class SubjectServiceImpl implements SubjectService {
         List<Object[]> subjectRecords = subjectRepository.findSubjectsForClassByGroups(schoolClassId);
         return subjectRecords.stream().map(classSubjectRecord -> {
             ClassSubjectDTO resDTO = new ClassSubjectDTO();
-            resDTO.setSubjectName(classSubjectRecord[0].toString());
-            resDTO.setClassGroupNumber(classSubjectRecord[1] == null
+            resDTO.setSubjectId((BigInteger) classSubjectRecord[0]);
+            resDTO.setSubjectName(classSubjectRecord[1].toString());
+            resDTO.setClassGroupNumber(classSubjectRecord[2] == null
                     ? null
-                    : (Integer) classSubjectRecord[1]);
-            resDTO.setTeacherLastName(classSubjectRecord[2].toString());
-            resDTO.setTeacherFirstName(classSubjectRecord[3].toString());
-            resDTO.setTeacherPatronymic(classSubjectRecord[4].toString());
+                    : (Integer) classSubjectRecord[2]);
+            resDTO.setTeacherLastName(classSubjectRecord[3].toString());
+            resDTO.setTeacherFirstName(classSubjectRecord[4].toString());
+            resDTO.setTeacherPatronymic(classSubjectRecord[5].toString());
             return resDTO;
         }).collect(Collectors.toList());
     }

@@ -39,7 +39,7 @@ public interface SubjectRepository extends JpaRepository<Subject, BigInteger> {
             nativeQuery = true)
     List<Object[]> findSubjectsForTeacher(@Param("target_teacher_id") BigInteger teacherId);
 
-    @Query(value = "SELECT DISTINCT subject.subject_name, class_group.class_group_number, " +
+    @Query(value = "SELECT DISTINCT subject.subject_id, subject.subject_name, class_group.class_group_number, " +
             "teacher.last_name, teacher.first_name, teacher.patronymic " +
             "FROM schedule INNER JOIN subject ON schedule.subject_id = subject.subject_id " +
             "INNER JOIN teacher ON schedule.teacher_id = teacher.teacher_id " +
