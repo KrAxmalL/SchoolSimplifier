@@ -38,7 +38,4 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "class_group_id")
     private ClassGroup classGroup;
-
-    @OneToMany(mappedBy = "student")
-    private List<MarkBookRecord> markBookRecords;
 }
