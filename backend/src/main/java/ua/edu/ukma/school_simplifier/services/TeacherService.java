@@ -1,19 +1,15 @@
 package ua.edu.ukma.school_simplifier.services;
 
-import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkSummary;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.teacher.TeacherSummaryDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface TeacherService {
 

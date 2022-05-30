@@ -16,5 +16,4 @@ import java.util.List;
 public class StudentMarksDTO {
 
     private StudentSummaryDTO student;
-    private List<TeacherMarkSummary> studentMarks;
 }
