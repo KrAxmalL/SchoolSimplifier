@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { addMarkForStudent, deleteMark, getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
+import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
 import SelectMarkBookDateForm from '../../components/formteacher/SelectMarkBookDateForm';
 import SelectMarkBookTopicForm from '../../components/formteacher/SelectMarkBookTopicForm';
 import TeacherDateMarksTable from '../../components/table/TeacherDateMarksTable';
 import TeacherTopicMarksTable from '../../components/table/TeacherTopicMarksTable';
-import AddMarkForm from '../../components/teacher/AddMarkForm';
-import DeleteMarkForm from '../../components/teacher/DeleteMarkForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import Modal from '../../layout/Modal';
 import classes from './TeacherMarkBook.module.css';
@@ -25,13 +23,14 @@ function TeacherMarkBook() {
     const [selectMarkBookFormVisible, setSelectMarkBookFormVisible] = useState(false);
     const [selectMarkBookTopicFormVisible, setSelectMarkBookTopicFormVisible] = useState(false);
     const [selectMarkBookDateFormVisible, setSelectMarkBookDateFormVisible] = useState(false);
-    const [addMarkFormVisible, setAddMarkFormVisible] = useState(false);
-    const [deleteMarkFormVisible, setDeleteMarkFormVisible] = useState(false);
-
-    const [selectedSubject, setSelectedSubject] = useState(null);
-    const [selectedSchoolClass, setSelectedSchoolClass] = useState(null);
-    const [selectedClassGroup, setSelectedClassGroup] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [addMarkBookDateFormVisible, setAddMarkBookDateFormVisible] = useState(false);
+    const [deleteMarkBookDateFormVisible, setDeleteMarkBookDateFormVisible] = useState(false);
+    const [addMarkBookDateRecordFormVisible, setAddMarkBookDateRecordFormVisible] = useState(false);
+    const [deleteMarkBookDateRecordFormVisible, setDeleteMarkBookDateRecordFormVisible] = useState(false);
+    const [addMarkBookTopicFormVisible, setAddMarkBookTopicFormVisible] = useState(false);
+    const [deleteMarkBookTopicFormVisible, setDeleteMarkBookTopicFormVisible] = useState(false);
+    const [addMarkBookTopicRecordFormVisible, setAddMarkBookTopicRecordFormVisible] = useState(false);
+    const [deleteMarkBookTopicRecordFormVisible, setDeleteMarkBookTopicRecordFormVisible] = useState(false);
 
     const subjects = useMemo(() => {
         return classesWithSubjects.map(classData => classData.subjects)
@@ -75,17 +74,59 @@ function TeacherMarkBook() {
         setModalVisible(true);
     }
 
-    const showAddMarkFormHandler = (e) => {
+    const showAddMarkBookDateFormHandler = (e) => {
         e.preventDefault();
 
-        setAddMarkFormVisible(true);
+        setAddMarkBookDateFormVisible(true);
         setModalVisible(true);
     }
 
-    const showDeleteMarkFormHandler = (e) => {
+    const showDeleteMarkBookDateFormHandler = (e) => {
         e.preventDefault();
 
-        setDeleteMarkFormVisible(true);
+        setDeleteMarkBookDateFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showAddMarkBookDateRecordFormHandler = (e) => {
+        e.preventDefault();
+
+        setAddMarkBookDateRecordFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showDeleteMarkBookDateRecordFormHandler = (e) => {
+        e.preventDefault();
+
+        setDeleteMarkBookDateRecordFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showAddMarkBookTopicFormHandler = (e) => {
+        e.preventDefault();
+
+        setAddMarkBookTopicFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showDeleteMarkBookTopicFormHandler = (e) => {
+        e.preventDefault();
+
+        setDeleteMarkBookTopicFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showAddMarkBookTopicRecordFormHandler = (e) => {
+        e.preventDefault();
+
+        setAddMarkBookTopicRecordFormVisible(true);
+        setModalVisible(true);
+    }
+
+    const showDeleteMarkBookTopicRecordFormHandler = (e) => {
+        e.preventDefault();
+
+        setDeleteMarkBookTopicRecordFormVisible(true);
         setModalVisible(true);
     }
 
@@ -96,16 +137,14 @@ function TeacherMarkBook() {
         setSelectMarkBookFormVisible(false);
         setSelectMarkBookDateFormVisible(false);
         setSelectMarkBookTopicFormVisible(false);
-        setAddMarkFormVisible(false);
-        setDeleteMarkFormVisible(false);
+        setAddMarkBookDateFormVisible(false);
+        setDeleteMarkBookDateFormVisible(false);
+        setAddMarkBookTopicFormVisible(false);
+        setDeleteMarkBookTopicFormVisible(false);
     }
 
     const submitSelectMarkBookFormHandler = async(subjectId, schoolClassId, classGroupNumber) => {
         console.log(subjectId, schoolClassId, classGroupNumber);
-        setSelectedSubject(subjectId);
-        setSelectedSchoolClass(schoolClassId);
-        setSelectedClassGroup(classGroupNumber);
-
         try {
             const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, schoolClassId,
                  classGroupNumber, subjectId);
@@ -133,22 +172,6 @@ function TeacherMarkBook() {
         setSelectedDateMarkBook(selectedMarkBook.markBookDateTopics.find(topic => topic.markBookDateTopicId === markBookDateTopicId));
     }
 
-    const submitAddMarkFormHandler = async (selectedStudentId, selectedDate, studentPresent, mark, description) => {
-        // try {
-        //     await addMarkForStudent(accessToken, selectedStudentId, selectedSubject, selectedDate, studentPresent, mark, description);
-        // } catch(er) {
-        //     console.log(er);
-        // }
-    }
-
-    const submitDeleteMarkFormHandler = async (selectedMarkRecordId) => {
-        // try {
-        //     await deleteMark(accessToken, selectedMarkRecordId);
-        // } catch(er) {
-        //     console.log(er);
-        // }
-    }
-
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -158,21 +181,37 @@ function TeacherMarkBook() {
                                             schoolClasses={classesWithSubjects}
                                             onSelectMarkBook={submitSelectMarkBookFormHandler} />
                     }
-                    {selectMarkBookTopicFormVisible &&
-                        <SelectMarkBookTopicForm topics={selectedMarkBook.markBookNamedTopics}
-                                                 onSelectMarkBookTopic={submitSelectMarkBookTopicFormHandler} />
-                    }
                     {selectMarkBookDateFormVisible &&
                         <SelectMarkBookDateForm topics={selectedMarkBook.markBookDateTopics}
                                                 onSelectMarkBookDate={submitSelectMarkBookDateFormHandler} />
                     }
-                    {addMarkFormVisible &&
-                        <AddMarkForm students={[]}
-                                     onAddMark={submitAddMarkFormHandler} />
+                    {selectMarkBookTopicFormVisible &&
+                        <SelectMarkBookTopicForm topics={selectedMarkBook.markBookNamedTopics}
+                                                 onSelectMarkBookTopic={submitSelectMarkBookTopicFormHandler} />
                     }
-                    {deleteMarkFormVisible &&
-                        <DeleteMarkForm studentsMarks={[]}
-                                        onDeleteMark={submitDeleteMarkFormHandler} />
+                    {addMarkBookDateFormVisible &&
+                        <></>
+                    }
+                    {deleteMarkBookDateFormVisible &&
+                        <></>
+                    }
+                    {addMarkBookDateRecordFormVisible &&
+                        <></>
+                    }
+                    {deleteMarkBookDateRecordFormVisible &&
+                        <></>
+                    }
+                    {addMarkBookTopicFormVisible &&
+                        <></>
+                    }
+                    {deleteMarkBookTopicFormVisible &&
+                        <></>
+                    }
+                    {addMarkBookTopicRecordFormVisible &&
+                        <></>
+                    }
+                    {deleteMarkBookTopicRecordFormVisible &&
+                        <></>
                     }
                 </Modal>
             }
@@ -183,16 +222,28 @@ function TeacherMarkBook() {
                 <React.Fragment>
                     <h3>Журнал поточних оцінок</h3>
                     <button onClick={showSelectMarkBookDateFormHandler}>Обрати дату</button>
+                    <button onClick={showAddMarkBookDateFormHandler}>Додати дату</button>
+                    <button onClick={showDeleteMarkBookDateFormHandler}>Видалити дату</button>
                     {selectedDateMarkBook &&
-                        <TeacherDateMarksTable students={selectedStudents}
-                                               dateMarkRecords={selectedDateMarkBook.topicMarks} />
+                        <React.Fragment>
+                            <TeacherDateMarksTable students={selectedStudents}
+                                                dateMarkRecords={selectedDateMarkBook.topicMarks} />
+                            <button onClick={showAddMarkBookDateRecordFormHandler}>Додати поточну оцінку</button>
+                            <button onClick={showDeleteMarkBookDateRecordFormHandler}>Видалити поточну оцінку</button>
+                        </React.Fragment>
                     }
 
                     <h3>Журнал тематичних оцінок</h3>
                     <button onClick={showSelectMarkBookTopicFormHandler}>Обрати тему</button>
+                    <button onClick={showAddMarkBookTopicFormHandler}>Додати тему</button>
+                    <button onClick={showDeleteMarkBookTopicFormHandler}>Видалити тему</button>
                     {selectedTopicMarkBook &&
-                        <TeacherTopicMarksTable students={selectedStudents}
-                                                topicMarkRecords={selectedTopicMarkBook.topicMarks} />
+                        <React.Fragment>
+                            <TeacherTopicMarksTable students={selectedStudents}
+                                                    topicMarkRecords={selectedTopicMarkBook.topicMarks} />
+                            <button onClick={showAddMarkBookTopicRecordFormHandler}>Додати тематичну оцінку</button>
+                            <button onClick={showDeleteMarkBookTopicRecordFormHandler}>Видалити тематичну оцінку</button>
+                        </React.Fragment>
                     }
                 </React.Fragment>
             }
