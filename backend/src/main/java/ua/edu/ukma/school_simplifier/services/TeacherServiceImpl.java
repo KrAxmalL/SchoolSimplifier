@@ -139,6 +139,13 @@ public class TeacherServiceImpl implements TeacherService {
                 .findFirst()
                 .orElseThrow(() -> new InvalidParameterException("Searched mark book doesn't exist"));
         final TeacherMarkBookDTO teacherMarkBookDTO = new TeacherMarkBookDTO();
+        teacherMarkBookDTO.setMarkBookId(searchedMarkBook.getMarkBookId());
+        teacherMarkBookDTO.setTeacherId(searchedMarkBook.getTeacher().getTeacherId());
+        teacherMarkBookDTO.setSubjectId(searchedMarkBook.getSubject().getSubjectId());
+        teacherMarkBookDTO.setSchoolClassId(searchedMarkBook.getSchoolClass().getSchoolClassId());
+        teacherMarkBookDTO.setClassGroupId(searchedMarkBook.getClassGroup() == null
+                                                ? null
+                                                : searchedMarkBook.getClassGroup().getClassGroupId());
         final List<MarkBookNamedTopicSummaryDTO> markBookNamedTopics =
         searchedMarkBook.getMarkBookNamedTopics()
                 .stream()
