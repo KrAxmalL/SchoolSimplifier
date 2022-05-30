@@ -13,12 +13,10 @@ function SelectMarkBookForm(props) {
     const selectSubjectRef = useRef();
     const selectSchoolClassRef = useRef();
     const selectClassGroupRef = useRef();
-    const selectDateRef = useRef();
 
     const [subjectError, setSubjectError] = useState(false);
     const [schoolClassError, setSchoolClassError] = useState(false);
     const [classGroupError, setClassGroupError] = useState(false);
-    const [dateError, setDateError] = useState(false);
 
     useEffect(() => {
         selectSubjectRef.current.value = null;
@@ -90,15 +88,10 @@ function SelectMarkBookForm(props) {
         const validClassGroup = !!selectedClassGroup;
         setClassGroupError(!validClassGroup);
 
-        const selectedDate = selectDateRef.current.value;
-        const validDate = !!selectedDate;
-        setDateError(!validDate);
-
-        if(validSubject && validSchoolClass && validClassGroup && validDate) {
+        if(validSubject && validSchoolClass && validClassGroup) {
             const classGroupIdAsInt = Number.parseInt(selectedClassGroup);
             props.onSelectMarkBook(Number.parseInt(selectedSubject), Number.parseInt(selectedSchoolClass),
-                                   isNaN(classGroupIdAsInt) ? null : classGroupIdAsInt,
-                                   selectedDate);
+                                   isNaN(classGroupIdAsInt) ? null : classGroupIdAsInt);
         }
     }
 
@@ -121,11 +114,6 @@ function SelectMarkBookForm(props) {
                 {classGroupsOptions}
             </select>
             {classGroupError && <p className={classes.error}>Група має бути обрана</p>}
-
-            <label>Оберіть дату:</label>
-            <input type='date' placeholder="Дата початку" required
-                   ref={selectDateRef}></input>
-            {dateError && <p className={classes.error}>Дата має бути обрана</p>}
 
             <input type="submit" value="Обрати журнал" />
         </form>

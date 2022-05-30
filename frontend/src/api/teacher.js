@@ -61,3 +61,18 @@ export async function getClassesWithSubjectsForTeacher(accessToken) {
         throw new Error("Teacher's classes and subjects data fetching failed");
     }
 }
+
+export async function getStudentsOfClass(accessToken, schoolClassId) {
+    const response = await fetch(TEACHERS_URL + `/students?schoolClassId=${schoolClassId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    if(response.ok) {
+        return await response.json();
+    }
+    else {
+        throw new Error("Class students fetching failed");
+    }
+}
