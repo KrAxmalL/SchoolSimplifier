@@ -52,7 +52,7 @@ public class StudentController {
         final Object studentEmailObj = authentication.getPrincipal();
         if (studentEmailObj != null) {
             try {
-                final List<ClassSubjectDTO> studentSchedule = studentService.getSubjectsForStudent(studentEmailObj.toString());
+                final List<ClassSubjectDTO> studentSchedule = studentService.getSubjectsForClassOfStudent(studentEmailObj.toString());
                 return ResponseEntity.ok().body(studentSchedule);
             } catch (InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());

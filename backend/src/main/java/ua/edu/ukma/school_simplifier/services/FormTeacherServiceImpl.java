@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
@@ -62,21 +61,22 @@ public class FormTeacherServiceImpl implements FormTeacherService {
         }
 
         final List<Student> students = teacherClass.getStudents();
-        final List<MarkBookRecord> alLMarks = markBookRepository.findAll();
-        return students.stream().map(student -> {
-            StudentMarksDTO resDTO = new StudentMarksDTO();
-            resDTO.setStudent(StudentMapper.toStudentSummary(student));
-            final List<MarkBookRecord> studentMarksRecord =
-                    alLMarks.stream()
-                            .filter(markRecord -> markRecord.getStudent().getStudentId()
-                                    .compareTo(student.getStudentId()) == 0
-                            ).toList();
-            resDTO.setStudentMarks(studentMarksRecord.stream()
-                    .map(MarkRecordMapper::toTeacherMarkSummary)
-                    .collect(Collectors.toList())
-            );
-            return resDTO;
-        }).collect(Collectors.toList());
+        return new ArrayList<>();
+//        final List<MarkBookRecord> alLMarks = markBookRepository.findAll();
+//        return students.stream().map(student -> {
+//            StudentMarksDTO resDTO = new StudentMarksDTO();
+//            resDTO.setStudent(StudentMapper.toStudentSummary(student));
+//            final List<MarkBookRecord> studentMarksRecord =
+//                    alLMarks.stream()
+//                            .filter(markRecord -> markRecord.getStudent().getStudentId()
+//                                    .compareTo(student.getStudentId()) == 0
+//                            ).toList();
+//            resDTO.setStudentMarks(studentMarksRecord.stream()
+//                    .map(MarkRecordMapper::toTeacherMarkSummary)
+//                    .collect(Collectors.toList())
+//            );
+//            return resDTO;
+//        }).collect(Collectors.toList());
     }
 
     @Override

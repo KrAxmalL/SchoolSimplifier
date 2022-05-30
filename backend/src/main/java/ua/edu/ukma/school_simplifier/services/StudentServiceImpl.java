@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentDateMarkRecordSummaryDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentSubjectMarksDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentTopicMarkRecordSummary;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.StudentScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.StudentSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.student.StudentSummaryDTO;
@@ -15,12 +16,8 @@ import ua.edu.ukma.school_simplifier.domain.dto.student.UpdateStudentClassAndGro
 import ua.edu.ukma.school_simplifier.domain.dto.subject.ClassSubjectDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
-import ua.edu.ukma.school_simplifier.repositories.ScheduleRepository;
-import ua.edu.ukma.school_simplifier.repositories.SchoolClassRepository;
-import ua.edu.ukma.school_simplifier.repositories.StudentRepository;
-import ua.edu.ukma.school_simplifier.repositories.SubjectRepository;
+import ua.edu.ukma.school_simplifier.repositories.*;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +31,8 @@ public class StudentServiceImpl implements StudentService {
     private final ScheduleRepository scheduleRepository;
     private final SubjectRepository subjectRepository;
     private final SchoolClassRepository schoolClassRepository;
+    private final DateMarkRecordRepository dateMarkRecordRepository;
+    private final TopicMarkRecordRepository topicMarkRecordRepository;
 
     private final SubjectService subjectService;
 
@@ -61,13 +60,23 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<ClassSubjectDTO> getSubjectsForStudent(String studentEmail) {
-        final Optional<Student> studentOpt = studentRepository.findStudentByEmail(studentEmail);
-        if(studentOpt.isEmpty()) {
-            throw new InvalidParameterException("Student with provided email doesn't exist");
-        }
+    public List<ClassSubjectDTO> getSubjectsForClassOfStudent(String studentEmail) {
+        final Student student = studentRepository.findStudentByEmail(studentEmail)
+                .orElseThrow(() -> new InvalidParameterException("Student with provided email doesn't exist"));
+        return subjectService.getSubjectsOfClassByClassGroups(student.getSchoolClass().getSchoolClassId());
+    }
 
-        return subjectService.getSubjectsOfClassByClassGroups(studentOpt.get().getSchoolClass().getSchoolClassId());
+    private List<ClassSubjectDTO> getSubjectsOfStudent(String studentEmail) {
+        final Student student = studentRepository.findStudentByEmail(studentEmail)
+                .orElseThrow(() -> new InvalidParameterException("Student with provided email doesn't exist"));
+        return getSubjectsForClassOfStudent(studentEmail)
+                .stream()
+                .filter(classSubjectDTO ->
+                        classSubjectDTO.getClassGroupNumber() == null
+                                ||
+                                (student.getClassGroup() != null
+                                        && student.getClassGroup().getClassGroupNumber().equals(classSubjectDTO.getClassGroupNumber()))
+                ).toList();
     }
 
     @Override
@@ -105,29 +114,61 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<StudentSubjectMarksDTO> getMarksForStudent(String studentEmail) {
-        final Optional<Student> studentOpt = studentRepository.findStudentByEmail(studentEmail);
-        if(studentOpt.isEmpty()) {
-            throw new InvalidParameterException("Student with provided email doesn't exist");
+        final Student student = studentRepository.findStudentByEmail(studentEmail)
+                    .orElseThrow(() ->  new InvalidParameterException("Student with provided email doesn't exist"));
+        final List<StudentSubjectMarksDTO> studentSubjectMarksDTOS = new ArrayList<>();
+        final List<ClassSubjectDTO> subjectsOfStudent = getSubjectsOfStudent(studentEmail);
+        final List<DateMarkRecord> studentDateMarkRecords =
+                dateMarkRecordRepository.findDateMarkRecordsForStudent(student.getStudentId());
+        final List<TopicMarkRecord> studentTopicMarkRecords =
+                topicMarkRecordRepository.findTopicMarkRecordsForStudent(student.getStudentId());
+        for(ClassSubjectDTO classSubjectDTO: subjectsOfStudent) {
+            StudentSubjectMarksDTO studentSubjectMarksDTO = new StudentSubjectMarksDTO();
+            studentSubjectMarksDTO.setSubjectId(classSubjectDTO.getSubjectId());
+            studentSubjectMarksDTO.setSubjectName(classSubjectDTO.getSubjectName());
+            studentSubjectMarksDTO.setClassGroupNumber(classSubjectDTO.getClassGroupNumber());
+            List<StudentDateMarkRecordSummaryDTO> studentDateMarkRecordSummaryDTOS =
+                    studentDateMarkRecords.stream()
+                            .filter(dateMarkRecord -> {
+                                final MarkBook markRecordMarkBook = dateMarkRecord.getMarkBookDateTopic().getMarkBook();
+                                boolean sameSubject = markRecordMarkBook.getSubject().getSubjectId().equals(classSubjectDTO.getSubjectId());
+                                boolean sameGroup = markRecordMarkBook.getClassGroup() == null
+                                        ? classSubjectDTO.getClassGroupNumber() == null
+                                        : markRecordMarkBook.getClassGroup().getClassGroupNumber().equals(classSubjectDTO.getClassGroupNumber());
+                                return sameSubject && sameGroup;
+                            })
+                            .map(dateMarkRecord -> {
+                                StudentDateMarkRecordSummaryDTO resDTO = new StudentDateMarkRecordSummaryDTO();
+                                resDTO.setDateMarkRecordId(dateMarkRecord.getDateMarkRecordId());
+                                resDTO.setRecordDate(dateMarkRecord.getMarkBookDateTopic().getTopicDate());
+                                resDTO.setStudentPresent(dateMarkRecord.getStudentPresent());
+                                resDTO.setMark(dateMarkRecord.getMark());
+                                return resDTO;
+                            }).toList();
+            studentSubjectMarksDTO.setDateMarkRecords(studentDateMarkRecordSummaryDTOS);
+
+            final List<StudentTopicMarkRecordSummary> studentTopicMarkRecordSummaryDTOS =
+                   studentTopicMarkRecords.stream()
+                            .filter(topicMarkRecord -> {
+                                final MarkBook markRecordMarkBook = topicMarkRecord.getMarkBookNamedTopic().getMarkBook();
+                                boolean sameSubject = markRecordMarkBook.getSubject().getSubjectId().equals(classSubjectDTO.getSubjectId());
+                                boolean sameGroup = markRecordMarkBook.getClassGroup() == null
+                                        ? classSubjectDTO.getClassGroupNumber() == null
+                                        : markRecordMarkBook.getClassGroup().getClassGroupNumber().equals(classSubjectDTO.getClassGroupNumber());
+                                return sameSubject && sameGroup;
+                            })
+                            .map(topicMarkRecord -> {
+                                StudentTopicMarkRecordSummary resDTO = new StudentTopicMarkRecordSummary();
+                                resDTO.setTopicMarkRecordId(topicMarkRecord.getTopicMarkRecordId());
+                                resDTO.setTopicName(topicMarkRecord.getMarkBookNamedTopic().getTopicName());
+                                resDTO.setMark(topicMarkRecord.getMark());
+                                return resDTO;
+                            }).toList();
+            studentSubjectMarksDTO.setTopicMarkRecords(studentTopicMarkRecordSummaryDTOS);
+            studentSubjectMarksDTOS.add(studentSubjectMarksDTO);
         }
 
-        Student student = studentOpt.get();
-        List<MarkBookRecord> allStudentMarks = student.getMarkBookRecords();
-        List<StudentSubjectMarksDTO> marksBySubjects = new ArrayList<>();
-        allStudentMarks.stream()
-                .map(MarkBookRecord::getSubject)
-                .distinct()
-                .forEach(subject -> {
-                    StudentSubjectMarksDTO resDTO = new StudentSubjectMarksDTO();
-                    resDTO.setSubjectName(subject.getSubjectName());
-                    resDTO.setMarks(allStudentMarks.stream()
-                            .filter(mark -> mark.isStudentPresent() && mark.getMark() != null &&
-                                            mark.getSubject().getSubjectId().compareTo(subject.getSubjectId()) == 0)
-                            .map(MarkRecordMapper::toMarkSummary)
-                            .collect(Collectors.toList()));
-                    marksBySubjects.add(resDTO);
-                    }
-                );
-        return marksBySubjects;
+        return studentSubjectMarksDTOS;
     }
 
     @Override

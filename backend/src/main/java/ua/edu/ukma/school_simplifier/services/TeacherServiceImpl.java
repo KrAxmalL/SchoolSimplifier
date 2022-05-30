@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.edu.ukma.school_simplifier.domain.dto.mappers.MarkRecordMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
@@ -151,17 +150,17 @@ public class TeacherServiceImpl implements TeacherService {
             searchedStudents = searchedGroupOpt.get().getStudents();
         }
         final List<StudentMarksDTO> studentsMarks = new ArrayList<>(searchedStudents.size());
-        for(Student student: searchedStudents) {
-            final StudentMarksDTO studentMarksDTO = new StudentMarksDTO();
-            studentMarksDTO.setStudent(StudentMapper.toStudentSummary(student));
-            final List<TeacherMarkSummary> marksOfStudent =
-                    markBookRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
-                                                                         .stream()
-                                                                         .map(MarkRecordMapper::toTeacherMarkSummary)
-                                                                         .toList();
-            studentMarksDTO.setStudentMarks(marksOfStudent);
-            studentsMarks.add(studentMarksDTO);
-        }
+//        for(Student student: searchedStudents) {
+//            final StudentMarksDTO studentMarksDTO = new StudentMarksDTO();
+//            studentMarksDTO.setStudent(StudentMapper.toStudentSummary(student));
+//            final List<TeacherMarkSummary> marksOfStudent =
+//                    markBookRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
+//                                                                         .stream()
+//                                                                         .map(MarkRecordMapper::toTeacherMarkSummary)
+//                                                                         .toList();
+//            studentMarksDTO.setStudentMarks(marksOfStudent);
+//            studentsMarks.add(studentMarksDTO);
+//        }
 
         return studentsMarks;
     }
@@ -216,14 +215,14 @@ public class TeacherServiceImpl implements TeacherService {
             throw new InvalidParameterException("Provided teacher doesn't teach provided subject to provided student");
         }
 
-        final MarkBookRecord markBookRecord = new MarkBookRecord();
-        markBookRecord.setRecordDate(addMarkRecordDTO.getRecordDate());
-        markBookRecord.setStudentPresent(addMarkRecordDTO.isStudentPresent());
-        markBookRecord.setMark(addMarkRecordDTO.getMark());
-        markBookRecord.setDescription(addMarkRecordDTO.getDescription());
-        markBookRecord.setStudent(studentOpt.get());
-        markBookRecord.setSubject(subjectOpt.get());
-        markBookRepository.save(markBookRecord);
+//        final MarkBookRecord markBookRecord = new MarkBookRecord();
+//        markBookRecord.setRecordDate(addMarkRecordDTO.getRecordDate());
+//        markBookRecord.setStudentPresent(addMarkRecordDTO.isStudentPresent());
+//        markBookRecord.setMark(addMarkRecordDTO.getMark());
+//        markBookRecord.setDescription(addMarkRecordDTO.getDescription());
+//        markBookRecord.setStudent(studentOpt.get());
+//        markBookRecord.setSubject(subjectOpt.get());
+//        markBookRepository.save(markBookRecord);
     }
 
     @Override

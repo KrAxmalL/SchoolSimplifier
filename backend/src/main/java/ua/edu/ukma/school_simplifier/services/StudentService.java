@@ -12,7 +12,7 @@ public interface StudentService {
 
     List<StudentScheduleRecordDTO> getScheduleForStudent(String studentEmail);
 
-    List<ClassSubjectDTO> getSubjectsForStudent(String studentEmail);
+    List<ClassSubjectDTO> getSubjectsForClassOfStudent(String studentEmail);
 
     StudentSchoolClassDTO getClassInfoForStudent(String studentEmail);
 
