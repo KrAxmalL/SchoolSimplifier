@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkBookDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.domain.models.*;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
@@ -48,35 +49,20 @@ public class FormTeacherServiceImpl implements FormTeacherService {
     }
 
     @Override
-    public List<StudentMarksDTO> getMarksForStudentsOfClass(String teacherEmail) {
-        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
-        if(teacherOpt.isEmpty()) {
-            throw new InvalidParameterException("Teacher with provided email doesn't exist");
-        }
-
-        final Teacher teacher = teacherOpt.get();
+    public List<TeacherMarkBookDTO> getMarkBooksForClass(String teacherEmail) {
+        final Teacher teacher = teacherRepository.findTeacherByEmail(teacherEmail)
+                .orElseThrow(() -> new InvalidParameterException("Teacher with provided email doesn't exist"));
         final SchoolClass teacherClass = teacher.getSchoolClass();
         if(teacherClass == null) {
             throw new InvalidParameterException("Teacher is not a form teacher");
         }
 
-        final List<Student> students = teacherClass.getStudents();
-        return new ArrayList<>();
-//        final List<MarkBookRecord> alLMarks = markBookRepository.findAll();
-//        return students.stream().map(student -> {
-//            StudentMarksDTO resDTO = new StudentMarksDTO();
-//            resDTO.setStudent(StudentMapper.toStudentSummary(student));
-//            final List<MarkBookRecord> studentMarksRecord =
-//                    alLMarks.stream()
-//                            .filter(markRecord -> markRecord.getStudent().getStudentId()
-//                                    .compareTo(student.getStudentId()) == 0
-//                            ).toList();
-//            resDTO.setStudentMarks(studentMarksRecord.stream()
-//                    .map(MarkRecordMapper::toTeacherMarkSummary)
-//                    .collect(Collectors.toList())
-//            );
-//            return resDTO;
-//        }).collect(Collectors.toList());
+        return teacherClass.getMarkBooks()
+                .stream()
+                .map(markBook -> teacherService.getMarkBookForClassAndGroupAndSubject(markBook.getSchoolClass().getSchoolClassId(),
+                        markBook.getClassGroup() == null ? null : markBook.getClassGroup().getClassGroupId(),
+                        markBook.getSubject().getSubjectId()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -122,21 +108,5 @@ public class FormTeacherServiceImpl implements FormTeacherService {
         classGroupsSubjects.add(classGroupSubjectsDTO);
 
         return classGroupsSubjects;
-    }
-
-    @Override
-    public List<StudentMarksDTO> getMarksForTeacherClassAndGroupAndSubject(String teacherEmail, BigInteger classGroupId, BigInteger subjectId, LocalDate markDate) {
-        final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
-        if(teacherOpt.isEmpty()) {
-            throw new InvalidParameterException("Teacher with provided email doesn't exist");
-        }
-
-        final Teacher teacher = teacherOpt.get();
-        final SchoolClass teacherClass = teacher.getSchoolClass();
-        if(teacherClass == null) {
-            throw new InvalidParameterException("Teacher is not a form teacher");
-        }
-
-        return teacherService.getMarksForStudentsOfGroupAndSubjectAndDate(teacherClass.getSchoolClassId(), classGroupId, subjectId, markDate);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkBookDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.FormTeacherService;
@@ -88,18 +89,15 @@ public class FormTeacherController {
         }
     }
 
-    @GetMapping("/class/markBook")
-    public ResponseEntity<Object> getMarksForStudentOfTeacherClassAndGroupAndSubject(@RequestParam(name = "classGroupId", required = false) BigInteger classGroupId,
-                                                                                     @RequestParam(name = "subjectId") BigInteger subjectId,
-                                                                                     @RequestParam(name = "markDate") String markDate) {
+    @GetMapping("/class/markBooks")
+    public ResponseEntity<Object> getMarksForStudentOfTeacherClassAndGroupAndSubject() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final Object teacherEmailObj = authentication.getPrincipal();
         if(teacherEmailObj != null) {
             try {
-                List<StudentMarksDTO> studentsMarks =
-                        formTeacherService.getMarksForTeacherClassAndGroupAndSubject(teacherEmailObj.toString(),
-                                classGroupId, subjectId, LocalDate.parse(markDate));
-                return ResponseEntity.ok().body(studentsMarks);
+                List<TeacherMarkBookDTO> classMarkBooks =
+                        formTeacherService.getMarkBooksForClass(teacherEmailObj.toString());
+                return ResponseEntity.ok().body(classMarkBooks);
             } catch(InvalidParameterException ex) {
                 final ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

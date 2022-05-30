@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.school_simplifier.domain.dto.mappers.StudentMapper;
 import ua.edu.ukma.school_simplifier.domain.dto.mappers.TeacherMapper;
-import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
+import ua.edu.ukma.school_simplifier.domain.dto.mark.*;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.subject.TeacherSubjectDTO;
@@ -17,7 +17,6 @@ import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.*;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -124,43 +123,67 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public List<StudentMarksDTO> getMarksForStudentsOfGroupAndSubjectAndDate(BigInteger schoolClassId, BigInteger classGroupId,
-                                                                             BigInteger subjectId, LocalDate markDate) {
-        final Optional<SchoolClass> schoolClassOpt = schoolClassRepository.findById(schoolClassId);
-        if(schoolClassOpt.isEmpty()) {
-            throw new InvalidParameterException("Class with provided id doesn't exist");
-        }
+    public TeacherMarkBookDTO getMarkBookForClassAndGroupAndSubject(BigInteger schoolClassId, BigInteger classGroupId,
+                                                                    BigInteger subjectId) {
+        final SchoolClass schoolClass = schoolClassRepository.findById(schoolClassId)
+                .orElseThrow(() -> new InvalidParameterException("Class with provided id doesn't exist"));
+        final MarkBook searchedMarkBook = schoolClass.getMarkBooks()
+                .stream()
+                .filter(markBook -> {
+                    final ClassGroup markBookClassGroup = markBook.getClassGroup();
+                    final boolean validClassGroup = (markBookClassGroup == null && classGroupId == null)
+                            || (markBookClassGroup != null && markBookClassGroup.getClassGroupId().equals(classGroupId));
+                    return validClassGroup
+                            && markBook.getSubject().getSubjectId().equals(subjectId);
+                })
+                .findFirst()
+                .orElseThrow(() -> new InvalidParameterException("Searched mark book doesn't exist"));
+        final TeacherMarkBookDTO teacherMarkBookDTO = new TeacherMarkBookDTO();
+        final List<MarkBookNamedTopicSummaryDTO> markBookNamedTopics =
+        searchedMarkBook.getMarkBookNamedTopics()
+                .stream()
+                .map(namedTopic -> {
+                    MarkBookNamedTopicSummaryDTO resDTO = new MarkBookNamedTopicSummaryDTO();
+                    resDTO.setMarkBookNamedTopicId(namedTopic.getMarkBookNamedTopicId());
+                    resDTO.setTopicName(namedTopic.getTopicName());
+                    final List<TeacherTopicMarkRecordSummaryDTO> teacherTopicMarkRecordSummaryDTOS =
+                            namedTopic.getTopicMarkRecords()
+                                            .stream()
+                                            .map(topicMarkRecord -> {
+                                                TeacherTopicMarkRecordSummaryDTO markResDTO = new TeacherTopicMarkRecordSummaryDTO();
+                                                markResDTO.setTopicMarkRecordId(topicMarkRecord.getTopicMarkRecordId());
+                                                markResDTO.setMark(topicMarkRecord.getMark());
+                                                markResDTO.setStudent(StudentMapper.toStudentSummary(topicMarkRecord.getStudent()));
+                                                return markResDTO;
+                                            }).toList();
+                    resDTO.setTopicMarks(teacherTopicMarkRecordSummaryDTOS);
+                    return resDTO;
+                }).toList();
+        teacherMarkBookDTO.setMarkBookNamedTopics(markBookNamedTopics);
 
-        final SchoolClass schoolClass = schoolClassOpt.get();
-        List<Student> searchedStudents;
-        if(classGroupId == null) {
-            searchedStudents = schoolClass.getStudents();
-        }
-        else {
-            Optional<ClassGroup> searchedGroupOpt =
-                    schoolClass.getClassGroups()
-                               .stream()
-                               .filter(group -> group.getClassGroupId().compareTo(classGroupId) == 0)
-                               .findFirst();
-            if(searchedGroupOpt.isEmpty()) {
-                throw new InvalidParameterException("Class group with provided id doesn't exist");
-            }
-            searchedStudents = searchedGroupOpt.get().getStudents();
-        }
-        final List<StudentMarksDTO> studentsMarks = new ArrayList<>(searchedStudents.size());
-//        for(Student student: searchedStudents) {
-//            final StudentMarksDTO studentMarksDTO = new StudentMarksDTO();
-//            studentMarksDTO.setStudent(StudentMapper.toStudentSummary(student));
-//            final List<TeacherMarkSummary> marksOfStudent =
-//                    markBookRepository.findMarksForStudentOfSubjectAndDate(student.getStudentId(), subjectId, markDate)
-//                                                                         .stream()
-//                                                                         .map(MarkRecordMapper::toTeacherMarkSummary)
-//                                                                         .toList();
-//            studentMarksDTO.setStudentMarks(marksOfStudent);
-//            studentsMarks.add(studentMarksDTO);
-//        }
-
-        return studentsMarks;
+        final List<MarkBookDateTopicSummaryDTO> markBookDateTopics =
+                searchedMarkBook.getMarkBookDateTopics()
+                        .stream()
+                        .map(dateTopic -> {
+                            MarkBookDateTopicSummaryDTO resDTO = new MarkBookDateTopicSummaryDTO();
+                            resDTO.setMarkBookDateTopicId(dateTopic.getMarkBookDateTopicId());
+                            resDTO.setTopicDate(dateTopic.getTopicDate());
+                            final List<TeacherDateMarkRecordSummaryDTO> teacherDateMarkRecordSummaryDTOS =
+                                    dateTopic.getDateMarkRecords()
+                                            .stream()
+                                            .map(dateMarkRecord -> {
+                                                TeacherDateMarkRecordSummaryDTO  markResDTO = new TeacherDateMarkRecordSummaryDTO();
+                                                markResDTO.setDateMarkRecordId(dateMarkRecord.getDateMarkRecordId());
+                                                markResDTO.setStudentPresent(dateMarkRecord.getStudentPresent());
+                                                markResDTO.setMark(dateMarkRecord.getMark());
+                                                markResDTO.setStudent(StudentMapper.toStudentSummary(dateMarkRecord.getStudent()));
+                                                return markResDTO;
+                                            }).toList();
+                            resDTO.setTopicMarks(teacherDateMarkRecordSummaryDTOS);
+                            return resDTO;
+                        }).toList();
+        teacherMarkBookDTO.setMarkBookDateTopics(markBookDateTopics);
+        return teacherMarkBookDTO;
     }
 
     @Override
