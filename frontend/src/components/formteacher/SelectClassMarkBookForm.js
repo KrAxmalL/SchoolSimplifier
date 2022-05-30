@@ -1,19 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import classes from './ClassMarkBookSettingsForm.module.css';
+import classes from './SelectClassMarkBookForm.module.css';
 
-function ClassMarkBookSettingsForm(props) {
+function SelectClassMarkBookForm(props) {
     const subjects = props.subjects;
     const classGroups = props.classGroups;
 
     const selectSubjectRef = useRef();
     const [selectedSubject, setSelectedSubject] = useState(null);
     const selectClassGroupRef = useRef();
-    const selectDateRef = useRef();
 
     const [subjectError, setSubjectError] = useState(false);
     const [classGroupError, setClassGroupError] = useState(false);
-    const [dateError, setDateError] = useState(false);
 
     useEffect(() => {
         selectSubjectRef.current.value = null;
@@ -61,15 +59,10 @@ function ClassMarkBookSettingsForm(props) {
         const validClassGroup = !!selectedClassGroup;
         setClassGroupError(!validClassGroup);
 
-        const selectedDate = selectDateRef.current.value;
-        const validDate = !!selectedDate;
-        setDateError(!validDate);
-
-        if(validSubject && validClassGroup && validDate) {
+        if(validSubject && validClassGroup) {
             const classGroupIdAsInt = Number.parseInt(selectedClassGroup);
-            props.onSetSettings(selectedSubject,
-                                isNaN(classGroupIdAsInt) ? null : classGroupIdAsInt,
-                                selectedDate);
+            props.onSelectClassMarkBook(Number.parseInt(selectedSubject),
+                                        isNaN(classGroupIdAsInt) ? null : classGroupIdAsInt);
         }
     }
 
@@ -91,14 +84,9 @@ function ClassMarkBookSettingsForm(props) {
             </select>
             {classGroupError && <p className={classes.error}>Група має бути обрана</p>}
 
-            <label>Оберіть дату:</label>
-            <input type='date' placeholder="Дата початку" required
-                   ref={selectDateRef}></input>
-            {dateError && <p className={classes.error}>Дата має бути обрана</p>}
-
-            <input type="submit" value="Зберегти налаштування" />
+            <input type="submit" value="Обрати журнал" />
         </form>
     );
 }
 
-export default ClassMarkBookSettingsForm;
+export default SelectClassMarkBookForm;

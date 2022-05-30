@@ -47,11 +47,8 @@ export async function getClassGroupsAndSubjects(accessToken) {
     }
 }
 
-export async function getMarksForStudentOfClass(accessToken, classGroupId, subjectId, markDate) {
-    const classGroupStr = classGroupId == null
-                            ? ''
-                            : `classGroupId=${classGroupId}&`;
-    const response = await fetch(FORM_TEACHERS_URL + `/class/markBook?${classGroupStr}subjectId=${subjectId}&markDate=${markDate}`, {
+export async function getMarkBooksForClass(accessToken) {
+    const response = await fetch(FORM_TEACHERS_URL + `/class/markBooks`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -61,6 +58,6 @@ export async function getMarksForStudentOfClass(accessToken, classGroupId, subje
         return await response.json();
     }
     else {
-        throw new Error("Teacher's class mark book data fetching failed");
+        throw new Error("Teacher's class mark book fetching failed");
     }
 }

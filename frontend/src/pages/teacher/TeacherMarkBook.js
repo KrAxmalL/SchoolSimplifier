@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { addMarkForStudent, deleteMark, getMarksForStudentsOfGroupAndSubjectAndDate } from '../../api/marks';
+import { addMarkForStudent, deleteMark, getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher } from '../../api/teacher';
 import ContentTable from '../../components/table/ContentTable';
 import TeacherMarkBookTable from '../../components/table/TeacherMarkBookTable';
@@ -84,7 +84,7 @@ function TeacherMarkBook() {
         setSelectedDate(markBookDate);
 
         try {
-            const studentsMarks = await getMarksForStudentsOfGroupAndSubjectAndDate(accessToken, schoolClassId,
+            const studentsMarks = await getMarkBookForClassAndGroupAndSubject(accessToken, schoolClassId,
                  classGroupId, subjectId, markBookDate);
             setStudentsMarks(studentsMarks);
             setMarkBookSelected(true);
