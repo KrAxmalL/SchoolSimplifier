@@ -7,38 +7,28 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.time.LocalDate;
 
 @Entity
-@Table(name = "mark_book")
+@Table(name = "topic_mark_record")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class MarkBookRecord {
+public class TopicMarkRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mark_book_record_id")
-    private BigInteger markBookRecordId;
-
-    @Column(name = "record_date")
-    private LocalDate recordDate;
-
-    @Column(name = "student_present")
-    private boolean studentPresent;
+    @Column(name = "topic_mark_record_id")
+    private BigInteger topicMarkRecordId;
 
     @Column(name = "mark")
     private Integer mark;
 
-    @Column(name = "description")
-    private String description;
-
     @ManyToOne
+    @JoinColumn(name = "mark_book_named_topic_id")
+    private MarkBookNamedTopic markBookNamedTopic;
+
+    @OneToOne
     @JoinColumn(name = "student_id")
     private Student student;
-
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
 }

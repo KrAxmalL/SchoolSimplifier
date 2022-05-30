@@ -37,4 +37,7 @@ public class SchoolClass {
 
     @OneToMany(mappedBy = "schoolClass")
     private List<ScheduleRecord> scheduleRecords;
+
+    @OneToMany(mappedBy = "schoolClass")
+    private List<MarkBook> markBooks;
 }
