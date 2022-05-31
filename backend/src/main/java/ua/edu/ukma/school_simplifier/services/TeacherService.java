@@ -28,6 +28,8 @@ public interface TeacherService {
 
     void addMarkBookDateTopic(AddMarkBookDateTopicDTO addMarkBookDateTopicDTO);
 
+    void deleteMarkBookDateTopic(BigInteger markBookDateTopicId);
+
     void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO);
 
     void deleteMark(BigInteger markRecordId);

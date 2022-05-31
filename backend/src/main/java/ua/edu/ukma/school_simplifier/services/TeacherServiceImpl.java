@@ -242,6 +242,21 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public void deleteMarkBookDateTopic(BigInteger markBookDateTopicId) {
+        if(markBookDateTopicId == null) {
+            throw new InvalidParameterException("Date topic id must not be null");
+        }
+
+        final MarkBookDateTopic markBookDateTopic = markBookDateTopicRepository.findById(markBookDateTopicId)
+                .orElseThrow(() -> new InvalidParameterException("Date topic with provided id doesn't exist"));
+        if(markBookDateTopic.getDateMarkRecords().size() > 0) {
+            throw new InvalidParameterException("Can't delete date topic while it has date mark records");
+        }
+
+        markBookDateTopicRepository.deleteById(markBookDateTopicId);
+    }
+
+    @Override
     public void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO) {
         final Optional<Teacher> teacherOpt = teacherRepository.findTeacherByEmail(teacherEmail);
         if(teacherOpt.isEmpty()) {
