@@ -2,7 +2,6 @@ package ua.edu.ukma.school_simplifier.services;
 
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkBookDateMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkBookDateTopicDTO;
-import ua.edu.ukma.school_simplifier.domain.dto.mark.AddMarkRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkBookDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schedule.TeacherScheduleRecordDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.SchoolClassStudentsDTO;
@@ -32,8 +31,4 @@ public interface TeacherService {
     void deleteMarkBookDateTopic(BigInteger markBookDateTopicId);
 
     void addMarkBookDateMarkRecord(AddMarkBookDateMarkRecordDTO addMarkBookDateMarkRecordDTO);
-
-    void addMarkRecordForStudent(String teacherEmail, AddMarkRecordDTO addMarkRecordDTO);
-
-    void deleteMark(BigInteger markRecordId);
 }

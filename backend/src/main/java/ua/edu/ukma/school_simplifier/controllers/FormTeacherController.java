@@ -9,18 +9,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.school_simplifier.domain.dto.classgroup.ClassGroupSubjectsDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.error.ErrorResponse;
-import ua.edu.ukma.school_simplifier.domain.dto.mark.StudentMarksDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.mark.TeacherMarkBookDTO;
 import ua.edu.ukma.school_simplifier.domain.dto.schoolclass.TeacherSchoolClassDTO;
 import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.services.FormTeacherService;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
