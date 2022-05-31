@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { addMarkBookDateRecord, deleteMarkBookDateTopicRecord } from '../../api/markBookDateMarkRecords';
 import { addMarkBookDateTopic, deleteMarkBookDateTopic } from '../../api/markBookDateTopics';
+import { addMarkBookNamedTopic } from '../../api/markBookNamedTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
 import SelectMarkBookDateForm from '../../components/formteacher/SelectMarkBookDateForm';
@@ -10,6 +11,7 @@ import TeacherDateMarksTable from '../../components/table/TeacherDateMarksTable'
 import TeacherTopicMarksTable from '../../components/table/TeacherTopicMarksTable';
 import AddMarkBookDateRecordForm from '../../components/teacher/AddMarkBookDateRecordForm';
 import AddMarkBookDateTopicForm from '../../components/teacher/AddMarkBookDateTopicForm';
+import AddMarkBookNamedTopicForm from '../../components/teacher/AddMarkBookNamedTopicForm';
 import DeleteMarkBookDateTopicForm from '../../components/teacher/DeleteMarkBookDateTopicForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import SelectStudentToDeleteMarkRecordForm from '../../components/teacher/SelectStudentToDeleteMarkRecordForm';
@@ -39,6 +41,7 @@ function TeacherMarkBook() {
     const [addMarkBookDateRecordFormVisible, setAddMarkBookDateRecordFormVisible] = useState(false);
     const [deleteMarkBookDateRecordFormVisible, setDeleteMarkBookDateRecordFormVisible] = useState(false);
     const [addMarkBookTopicFormVisible, setAddMarkBookTopicFormVisible] = useState(false);
+    const [cantAddMarkBookNamedTopicError, setCantAddMarkBookNamedTopicError] = useState(null);
     const [deleteMarkBookTopicFormVisible, setDeleteMarkBookTopicFormVisible] = useState(false);
     const [addMarkBookTopicRecordFormVisible, setAddMarkBookTopicRecordFormVisible] = useState(false);
     const [deleteMarkBookTopicRecordFormVisible, setDeleteMarkBookTopicRecordFormVisible] = useState(false);
@@ -293,6 +296,26 @@ function TeacherMarkBook() {
         }
     }
 
+    const submitAddMarkBookNamedTopicFormHandler = async (topicName) => {
+        const topicWithName = selectedMarkBook.markBookNamedTopics.find(namedTopic =>
+            namedTopic.topicName.localeCompare(topicName) === 0);
+        if(topicWithName) {
+            setCantAddMarkBookNamedTopicError('Тема із такою назвою уже існує в журналі');
+            return;
+        }
+        else {
+            setCantAddMarkBookNamedTopicError(null);
+            try {
+                await addMarkBookNamedTopic(accessToken, topicName, selectedMarkBook.markBookId);
+                const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                    selectedClassGroupNumber, selectedSubjectId);
+                setSelectedMarkBook(markBook);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -329,7 +352,8 @@ function TeacherMarkBook() {
                                     onSelectStudentToDeleteMarkRecord={submitDeleteMarkBookDateRecordFormHandler} />
                     }
                     {addMarkBookTopicFormVisible &&
-                        <></>
+                        <AddMarkBookNamedTopicForm onAddMarkBookNamedTopic={submitAddMarkBookNamedTopicFormHandler}
+                                                   cantAddMarkBookNamedTopicError={cantAddMarkBookNamedTopicError} />
                     }
                     {deleteMarkBookTopicFormVisible &&
                         <></>
