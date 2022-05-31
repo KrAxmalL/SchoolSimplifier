@@ -20,6 +20,7 @@ import ua.edu.ukma.school_simplifier.exceptions.InvalidParameterException;
 import ua.edu.ukma.school_simplifier.repositories.*;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class TeacherServiceImpl implements TeacherService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final ClassGroupRepository classGroupRepository;
+    private final MarkBookDateTopicRepository markBookDateTopicRepository;
 
     private final SchoolClassService schoolClassService;
 
@@ -211,6 +213,32 @@ public class TeacherServiceImpl implements TeacherService {
         schoolClassStudentsDTO.setGroupStudents(teacherSchoolClassDTO.getGroupStudents());
 
         return schoolClassStudentsDTO;
+    }
+
+    @Override
+    public void addMarkBookDateTopic(AddMarkBookDateTopicDTO addMarkBookDateTopicDTO) {
+        final LocalDate topicDate = addMarkBookDateTopicDTO.getTopicDate();
+        final BigInteger markBookId = addMarkBookDateTopicDTO.getMarkBookId();
+        if(topicDate == null) {
+            throw new InvalidParameterException("Topic date must not be null");
+        }
+        if(markBookId == null) {
+            throw new InvalidParameterException("Mark book id must not be null");
+        }
+        final MarkBook markBook = markBookRepository.findById(markBookId)
+                .orElseThrow(() -> new InvalidParameterException("Mark book with provided id must doesn't exist"));
+        final boolean topicWithDateExists = markBook.getMarkBookDateTopics()
+                .stream()
+                .anyMatch(dateTopic -> dateTopic.getTopicDate().compareTo(topicDate) == 0);
+        if(topicWithDateExists) {
+            throw new InvalidParameterException("Date topic with provided date already exists");
+        }
+
+        final MarkBookDateTopic markBookDateTopic = new MarkBookDateTopic();
+        markBookDateTopic.setTopicDate(topicDate);
+        markBookDateTopic.setMarkBook(markBook);
+        markBookDateTopic.setDateMarkRecords(Collections.emptyList());
+        markBookDateTopicRepository.save(markBookDateTopic);
     }
 
     @Override
