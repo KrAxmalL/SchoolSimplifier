@@ -19,3 +19,15 @@ export async function addMarkBookNamedRecord(accessToken, studentId, markBookNam
         throw new Error("Mark book named mark record adding failed");
     }
 }
+
+export async function deleteMarkBookNamedTopicRecord(accessToken, markBookNamedTopicRecordId) {
+    const response = await fetch(MARK_BOOK_NAMED_MARK_RECORDS + `/${markBookNamedTopicRecordId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Mark book named mark record deletion failed");
+    }
+}

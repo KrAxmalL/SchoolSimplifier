@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { addMarkBookDateRecord, deleteMarkBookDateTopicRecord } from '../../api/markBookDateMarkRecords';
 import { addMarkBookDateTopic, deleteMarkBookDateTopic } from '../../api/markBookDateTopics';
-import { addMarkBookNamedRecord } from '../../api/markBookNamedMarkRecords';
+import { addMarkBookNamedRecord, deleteMarkBookNamedTopicRecord } from '../../api/markBookNamedMarkRecords';
 import { addMarkBookNamedTopic, deleteMarkBookNamedTopic } from '../../api/markBookNamedTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
@@ -86,6 +86,19 @@ function TeacherMarkBook() {
         if(selectedStudents && selectedTopicMarkBook) {
             return selectedStudents.filter(student =>
                 !selectedTopicMarkBook.topicMarks.some(studentTopicMarkRecord =>
+                    student.studentId === studentTopicMarkRecord.student.studentId
+                )
+            );
+        }
+        else {
+            return [];
+        }
+    }, [selectedStudents, selectedTopicMarkBook]);
+
+    const studentsWithNamedMarkRecords = useMemo(() => {
+        if(selectedStudents && selectedTopicMarkBook) {
+            return selectedStudents.filter(student =>
+                selectedTopicMarkBook.topicMarks.some(studentTopicMarkRecord =>
                     student.studentId === studentTopicMarkRecord.student.studentId
                 )
             );
@@ -366,6 +379,19 @@ function TeacherMarkBook() {
         }
     }
 
+    const submitDeleteMarkBookNamedRecordFormHandler = async (studentId) => {
+        const namedMarkRecordToDelete =
+            selectedTopicMarkBook.topicMarks.find(namedMarkRecord => namedMarkRecord.student.studentId === studentId);
+        try {
+            await deleteMarkBookNamedTopicRecord(accessToken, namedMarkRecordToDelete.topicMarkRecordId);
+            const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                                                                         selectedClassGroupNumber, selectedSubjectId);
+            setSelectedMarkBook(markBook);
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -415,7 +441,9 @@ function TeacherMarkBook() {
                                                     onAddMarkBookNamedRecord={submitAddMarkBookNamedRecordFormHandler} />
                     }
                     {deleteMarkBookTopicRecordFormVisible &&
-                        <></>
+                        <SelectStudentToDeleteMarkRecordForm
+                                    students={studentsWithNamedMarkRecords}
+                                     onSelectStudentToDeleteMarkRecord={submitDeleteMarkBookNamedRecordFormHandler} />
                     }
                 </Modal>
             }
