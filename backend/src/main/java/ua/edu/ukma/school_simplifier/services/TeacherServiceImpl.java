@@ -38,6 +38,7 @@ public class TeacherServiceImpl implements TeacherService {
     private final MarkBookRepository markBookRepository;
     private final MarkBookDateTopicRepository markBookDateTopicRepository;
     private final DateMarkRecordRepository dateMarkRecordRepository;
+    private final MarkBookNamedTopicRepository markBookNamedTopicRepository;
 
     private final SchoolClassService schoolClassService;
 
@@ -313,5 +314,37 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         dateMarkRecordRepository.deleteById(markBookDateTopicRecordId);
+    }
+
+    @Override
+    public void addMarkBookNamedTopic(AddMarkBookNamedTopicDTO addMarkBookNamedTopicDTO) {
+        final String topicName = addMarkBookNamedTopicDTO.getTopicName();
+        if(topicName == null) {
+            throw new InvalidParameterException("Topic name must not be null");
+        }
+        final String topicNameTrimmed = topicName.trim();
+        if(topicNameTrimmed.isBlank()) {
+            throw new InvalidParameterException("Topic name must not be empty");
+        }
+
+        final BigInteger markBookId = addMarkBookNamedTopicDTO.getMarkBookId();
+        if(markBookId == null) {
+            throw new InvalidParameterException("Mark book id must not be null");
+        }
+
+        final MarkBook markBook = markBookRepository.findById(markBookId)
+                .orElseThrow(() -> new InvalidParameterException("Mark book with provided id must doesn't exist"));
+        final boolean topicWithNameExists = markBook.getMarkBookNamedTopics()
+                .stream()
+                .anyMatch(namedTopic -> namedTopic.getTopicName().equals(topicNameTrimmed));
+        if(topicWithNameExists) {
+            throw new InvalidParameterException("Named topic with provided name already exists");
+        }
+
+        final MarkBookNamedTopic markBookNamedTopic = new MarkBookNamedTopic();
+        markBookNamedTopic.setTopicName(topicNameTrimmed);
+        markBookNamedTopic.setMarkBook(markBook);
+        markBookNamedTopic.setTopicMarkRecords(Collections.emptyList());
+        markBookNamedTopicRepository.save(markBookNamedTopic);
     }
 }
