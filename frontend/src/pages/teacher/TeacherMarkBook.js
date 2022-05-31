@@ -76,6 +76,19 @@ function TeacherMarkBook() {
     }, [selectedStudents, selectedDateMarkBook]);
 
     useEffect(() => {
+        if(selectedDateMarkBook !== null) {
+            setSelectedDateMarkBook(selectedMarkBook.markBookDateTopics.find(topic =>
+                topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
+            );
+        }
+       if(selectedTopicMarkBook !== null) {
+           setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
+               topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
+           );
+       }
+    }, [selectedMarkBook, setSelectedDateMarkBook, setSelectedTopicMarkBook]);
+
+    useEffect(() => {
         const fetchData = async() => {
             try {
                 const classesWithSubjects = await getClassesWithSubjectsForTeacher(accessToken);
@@ -229,17 +242,6 @@ function TeacherMarkBook() {
                 const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                     selectedClassGroupNumber, selectedSubjectId);
                 setSelectedMarkBook(markBook);
-                if(selectedDateMarkBook !== null) {
-                    setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
-                        topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
-                    );
-                }
-               if(selectedTopicMarkBook !== null) {
-                   setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
-                       topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
-                   );
-               }
-
             } catch(er) {
                 console.log(er);
             }
@@ -260,16 +262,6 @@ function TeacherMarkBook() {
                 const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                     selectedClassGroupNumber, selectedSubjectId);
                 setSelectedMarkBook(markBook);
-                if(selectedDateMarkBook !== null) {
-                    setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
-                        topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
-                    );
-                }
-               if(selectedTopicMarkBook !== null) {
-                   setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
-                       topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
-                   );
-               }
             } catch(er) {
                 console.log(er);
             }
@@ -283,14 +275,6 @@ function TeacherMarkBook() {
             const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                                                                          selectedClassGroupNumber, selectedSubjectId);
             setSelectedMarkBook(markBook);
-            setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
-                 topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
-            );
-            if(selectedTopicMarkBook !== null) {
-                setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
-                    topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
-                );
-            }
         } catch(er) {
             console.log(er);
         }
@@ -304,14 +288,6 @@ function TeacherMarkBook() {
             const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                                                                          selectedClassGroupNumber, selectedSubjectId);
             setSelectedMarkBook(markBook);
-            setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
-                 topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
-            );
-            if(selectedTopicMarkBook !== null) {
-                setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
-                    topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
-                );
-            }
         } catch(er) {
             console.log(er);
         }
