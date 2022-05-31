@@ -32,11 +32,12 @@ public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final SchoolClassRepository schoolClassRepository;
-    private final MarkBookRepository markBookRepository;
+    private final ClassGroupRepository classGroupRepository;
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
-    private final ClassGroupRepository classGroupRepository;
+    private final MarkBookRepository markBookRepository;
     private final MarkBookDateTopicRepository markBookDateTopicRepository;
+    private final DateMarkRecordRepository dateMarkRecordRepository;
 
     private final SchoolClassService schoolClassService;
 
@@ -254,6 +255,52 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         markBookDateTopicRepository.deleteById(markBookDateTopicId);
+    }
+
+    @Override
+    public void addMarkBookDateMarkRecord(AddMarkBookDateMarkRecordDTO addMarkBookDateMarkRecordDTO) {
+        final BigInteger studentId = addMarkBookDateMarkRecordDTO.getStudentId();
+        if(studentId == null) {
+            throw new InvalidParameterException("Student id must not be null");
+        }
+        final Student student = studentRepository.findById(studentId)
+                .orElseThrow(() ->  new InvalidParameterException("Student with provided id doesn't exist"));
+
+        final BigInteger markBookDateTopicId = addMarkBookDateMarkRecordDTO.getMarkBookDateTopicId();
+        if(markBookDateTopicId == null) {
+            throw new InvalidParameterException("Mark book date topic id must not be null");
+        }
+        final MarkBookDateTopic markBookDateTopic = markBookDateTopicRepository.findById(markBookDateTopicId)
+                .orElseThrow(() -> new InvalidParameterException("Mark book date topic with provided id doesn't exist"));
+
+        boolean studentHasMark = markBookDateTopic.getDateMarkRecords()
+                .stream()
+                .anyMatch(dateMarkRecord -> dateMarkRecord.getStudent().getStudentId().compareTo(studentId) == 0);
+        if(studentHasMark) {
+            throw new InvalidParameterException("Student already has a mark record in provided mark book date topic");
+        }
+
+        final Boolean studentPresent = addMarkBookDateMarkRecordDTO.getStudentPresent();
+        final Integer mark = addMarkBookDateMarkRecordDTO.getMark();
+
+        if(studentPresent == null) {
+            throw new InvalidParameterException("Student present field must not be null");
+        }
+
+        if(!studentPresent && mark != null) {
+            throw new InvalidParameterException("Mark field must be null if student present is false");
+        }
+
+        if(mark != null && (mark < 1 || mark > 12)) {
+            throw new InvalidParameterException("Mark value must be between 1 and 12");
+        }
+
+        final DateMarkRecord dateMarkRecord = new DateMarkRecord();
+        dateMarkRecord.setStudentPresent(studentPresent);
+        dateMarkRecord.setMark(mark);
+        dateMarkRecord.setStudent(student);
+        dateMarkRecord.setMarkBookDateTopic(markBookDateTopic);
+        dateMarkRecordRepository.save(dateMarkRecord);
     }
 
     @Override
