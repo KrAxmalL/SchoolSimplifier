@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { addMarkBookDateRecord } from '../../api/markBookDateMarkRecords';
+import { addMarkBookDateRecord, deleteMarkBookDateTopicRecord } from '../../api/markBookDateMarkRecords';
 import { addMarkBookDateTopic, deleteMarkBookDateTopic } from '../../api/markBookDateTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
@@ -12,6 +12,7 @@ import AddMarkBookDateRecordForm from '../../components/teacher/AddMarkBookDateR
 import AddMarkBookDateTopicForm from '../../components/teacher/AddMarkBookDateTopicForm';
 import DeleteMarkBookDateTopicForm from '../../components/teacher/DeleteMarkBookDateTopicForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
+import SelectStudentToDeleteMarkRecordForm from '../../components/teacher/SelectStudentToDeleteMarkRecordForm';
 import Modal from '../../layout/Modal';
 import classes from './TeacherMarkBook.module.css';
 
@@ -52,6 +53,19 @@ function TeacherMarkBook() {
         if(selectedStudents && selectedDateMarkBook) {
             return selectedStudents.filter(student =>
                 !selectedDateMarkBook.topicMarks.some(studentDateMarkRecord => 
+                    student.studentId === studentDateMarkRecord.student.studentId
+                )
+            );
+        }
+        else {
+            return [];
+        }
+    }, [selectedStudents, selectedDateMarkBook]);
+
+    const studentsWithDateMarkRecords = useMemo(() => {
+        if(selectedStudents && selectedDateMarkBook) {
+            return selectedStudents.filter(student =>
+                selectedDateMarkBook.topicMarks.some(studentDateMarkRecord =>
                     student.studentId === studentDateMarkRecord.student.studentId
                 )
             );
@@ -215,6 +229,16 @@ function TeacherMarkBook() {
                 const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                     selectedClassGroupNumber, selectedSubjectId);
                 setSelectedMarkBook(markBook);
+                if(selectedDateMarkBook !== null) {
+                    setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
+                        topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
+                    );
+                }
+               if(selectedTopicMarkBook !== null) {
+                   setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
+                       topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
+                   );
+               }
 
             } catch(er) {
                 console.log(er);
@@ -236,6 +260,16 @@ function TeacherMarkBook() {
                 const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                     selectedClassGroupNumber, selectedSubjectId);
                 setSelectedMarkBook(markBook);
+                if(selectedDateMarkBook !== null) {
+                    setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
+                        topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
+                    );
+                }
+               if(selectedTopicMarkBook !== null) {
+                   setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
+                       topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
+                   );
+               }
             } catch(er) {
                 console.log(er);
             }
@@ -252,9 +286,32 @@ function TeacherMarkBook() {
             setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
                  topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
             );
-            setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
-                topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
+            if(selectedTopicMarkBook !== null) {
+                setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
+                    topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
+                );
+            }
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
+    const submitDeleteMarkBookDateRecordFormHandler = async (studentId) => {
+        const dateMarkRecordToDelete =
+            selectedDateMarkBook.topicMarks.find(dateMarkRecord => dateMarkRecord.student.studentId === studentId);
+        try {
+            await deleteMarkBookDateTopicRecord(accessToken, dateMarkRecordToDelete.dateMarkRecordId);
+            const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                                                                         selectedClassGroupNumber, selectedSubjectId);
+            setSelectedMarkBook(markBook);
+            setSelectedDateMarkBook(markBook.markBookDateTopics.find(topic =>
+                 topic.markBookDateTopicId === selectedDateMarkBook.markBookDateTopicId)
             );
+            if(selectedTopicMarkBook !== null) {
+                setSelectedTopicMarkBook(selectedMarkBook.markBookNamedTopics.find(topic =>
+                    topic.markBookNamedTopicId === selectedTopicMarkBook.markBookNamedTopicId)
+                );
+            }
         } catch(er) {
             console.log(er);
         }
@@ -291,7 +348,9 @@ function TeacherMarkBook() {
                                                    onAddMarkBookDateRecord={submitAddMarkBookDateRecordFormHandler} />
                     }
                     {deleteMarkBookDateRecordFormVisible &&
-                        <></>
+                        <SelectStudentToDeleteMarkRecordForm
+                                    students={studentsWithDateMarkRecords}
+                                    onSelectStudentToDeleteMarkRecord={submitDeleteMarkBookDateRecordFormHandler} />
                     }
                     {addMarkBookTopicFormVisible &&
                         <></>

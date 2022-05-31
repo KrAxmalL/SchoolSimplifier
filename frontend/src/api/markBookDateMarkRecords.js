@@ -20,3 +20,15 @@ export async function addMarkBookDateRecord(accessToken, studentId, markBookDate
         throw new Error("Mark book date mark record adding failed");
     }
 }
+
+export async function deleteMarkBookDateTopicRecord(accessToken, markBookDateTopicRecordId) {
+    const response = await fetch(MARK_BOOK_DATE_MARK_RECORDS + `/${markBookDateTopicRecordId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Mark book date mark record deletion failed");
+    }
+}
