@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { addMarkBookDateTopic } from '../../api/markBookDateTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
 import SelectMarkBookDateForm from '../../components/formteacher/SelectMarkBookDateForm';
 import SelectMarkBookTopicForm from '../../components/formteacher/SelectMarkBookTopicForm';
 import TeacherDateMarksTable from '../../components/table/TeacherDateMarksTable';
 import TeacherTopicMarksTable from '../../components/table/TeacherTopicMarksTable';
+import AddMarkBookDateTopicForm from '../../components/teacher/AddMarkBookDateTopicForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import Modal from '../../layout/Modal';
 import classes from './TeacherMarkBook.module.css';
@@ -18,12 +20,16 @@ function TeacherMarkBook() {
     const [selectedMarkBook, setSelectedMarkBook] = useState(null);
     const [selectedTopicMarkBook, setSelectedTopicMarkBook] = useState(null);
     const [selectedDateMarkBook, setSelectedDateMarkBook] = useState(null);
+    const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+    const [selectedSchoolClassId, setSelectedSchoolClassId] = useState(null);
+    const [selectedClassGroupNumber, setSelectedClassGroupNumber] = useState(null);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectMarkBookFormVisible, setSelectMarkBookFormVisible] = useState(false);
     const [selectMarkBookTopicFormVisible, setSelectMarkBookTopicFormVisible] = useState(false);
     const [selectMarkBookDateFormVisible, setSelectMarkBookDateFormVisible] = useState(false);
     const [addMarkBookDateFormVisible, setAddMarkBookDateFormVisible] = useState(false);
+    const [cantAddMarkBookDateTopicError, setCantAddMarkBookDateTopicError] = useState(false);
     const [deleteMarkBookDateFormVisible, setDeleteMarkBookDateFormVisible] = useState(false);
     const [addMarkBookDateRecordFormVisible, setAddMarkBookDateRecordFormVisible] = useState(false);
     const [deleteMarkBookDateRecordFormVisible, setDeleteMarkBookDateRecordFormVisible] = useState(false);
@@ -153,6 +159,9 @@ function TeacherMarkBook() {
             setSelectedStudents(classGroupNumber === null
                                     ? studentsOfClass.classStudents
                                     : studentsOfClass.groupStudents[`${classGroupNumber}`]);
+            setSelectedSubjectId(subjectId);
+            setSelectedSchoolClassId(schoolClassId);
+            setSelectedClassGroupNumber(classGroupNumber);
             console.log(JSON.stringify(markBook));
         }
         catch(er) {
@@ -170,6 +179,26 @@ function TeacherMarkBook() {
         console.log(markBookDateTopicId);
 
         setSelectedDateMarkBook(selectedMarkBook.markBookDateTopics.find(topic => topic.markBookDateTopicId === markBookDateTopicId));
+    }
+
+    const submitAddMarkBookDateTopicFormHandler = async (topicDate) => {
+        const topicWithDate = selectedMarkBook.markBookDateTopics.find(dateTopic => dateTopic.topicDate.localeCompare(topicDate) === 0);
+        if(topicWithDate) {
+            setCantAddMarkBookDateTopicError('Обрана дата уже існує в журналі');
+            return;
+        }
+        else {
+            setCantAddMarkBookDateTopicError(false);
+            try {
+                await addMarkBookDateTopic(accessToken, topicDate, selectedMarkBook.markBookId);
+                const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                    selectedClassGroupNumber, selectedSubjectId);
+                setSelectedMarkBook(markBook);
+
+            } catch(er) {
+                console.log(er);
+            }
+        }
     }
 
     return (
@@ -190,7 +219,8 @@ function TeacherMarkBook() {
                                                  onSelectMarkBookTopic={submitSelectMarkBookTopicFormHandler} />
                     }
                     {addMarkBookDateFormVisible &&
-                        <></>
+                        <AddMarkBookDateTopicForm onAddMarkBookDateTopic={submitAddMarkBookDateTopicFormHandler}
+                                                  cantAddMarkBookDateTopicError={cantAddMarkBookDateTopicError} />
                     }
                     {deleteMarkBookDateFormVisible &&
                         <></>
