@@ -302,4 +302,16 @@ public class TeacherServiceImpl implements TeacherService {
         dateMarkRecord.setMarkBookDateTopic(markBookDateTopic);
         dateMarkRecordRepository.save(dateMarkRecord);
     }
+
+    @Override
+    public void deleteMarkBookDateTopicRecord(BigInteger markBookDateTopicRecordId) {
+        if(markBookDateTopicRecordId == null) {
+            throw new InvalidParameterException("Date topic mark record id must not be null");
+        }
+        if(!dateMarkRecordRepository.existsById(markBookDateTopicRecordId)) {
+            throw new InvalidParameterException("Date topic mark record with provided id doesn't exist");
+        }
+
+        dateMarkRecordRepository.deleteById(markBookDateTopicRecordId);
+    }
 }

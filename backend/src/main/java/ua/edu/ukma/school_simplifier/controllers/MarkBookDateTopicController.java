@@ -33,7 +33,7 @@ public class MarkBookDateTopicController {
     }
 
     @DeleteMapping("/{markBookDateTopicId}")
-    public ResponseEntity<Object> addMarkBookDateTopic(@PathVariable(name = "markBookDateTopicId") BigInteger markBookDateTopicId) {
+    public ResponseEntity<Object> deleteMarkBookDateTopic(@PathVariable(name = "markBookDateTopicId") BigInteger markBookDateTopicId) {
         try {
             teacherService.deleteMarkBookDateTopic(markBookDateTopicId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
