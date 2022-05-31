@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { addMarkBookDateRecord, deleteMarkBookDateTopicRecord } from '../../api/markBookDateMarkRecords';
 import { addMarkBookDateTopic, deleteMarkBookDateTopic } from '../../api/markBookDateTopics';
+import { addMarkBookNamedRecord } from '../../api/markBookNamedMarkRecords';
 import { addMarkBookNamedTopic, deleteMarkBookNamedTopic } from '../../api/markBookNamedTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
@@ -11,6 +12,7 @@ import TeacherDateMarksTable from '../../components/table/TeacherDateMarksTable'
 import TeacherTopicMarksTable from '../../components/table/TeacherTopicMarksTable';
 import AddMarkBookDateRecordForm from '../../components/teacher/AddMarkBookDateRecordForm';
 import AddMarkBookDateTopicForm from '../../components/teacher/AddMarkBookDateTopicForm';
+import AddMarkBookNamedRecordForm from '../../components/teacher/AddMarkBookNamedRecordForm';
 import AddMarkBookNamedTopicForm from '../../components/teacher/AddMarkBookNamedTopicForm';
 import DeleteMarkBookDateTopicForm from '../../components/teacher/DeleteMarkBookDateTopicForm';
 import DeleteMarkBookNamedTopicForm from '../../components/teacher/DeleteMarkBookNamedTopicForm';
@@ -79,6 +81,19 @@ function TeacherMarkBook() {
             return [];
         }
     }, [selectedStudents, selectedDateMarkBook]);
+
+    const studentsWithoutNamedMarkRecords = useMemo(() => {
+        if(selectedStudents && selectedTopicMarkBook) {
+            return selectedStudents.filter(student =>
+                !selectedTopicMarkBook.topicMarks.some(studentTopicMarkRecord =>
+                    student.studentId === studentTopicMarkRecord.student.studentId
+                )
+            );
+        }
+        else {
+            return [];
+        }
+    }, [selectedStudents, selectedTopicMarkBook]);
 
     useEffect(() => {
         if(selectedDateMarkBook !== null) {
@@ -339,6 +354,18 @@ function TeacherMarkBook() {
         }
     }
 
+    const submitAddMarkBookNamedRecordFormHandler = async (studentId, mark) => {
+        try {
+            await addMarkBookNamedRecord(accessToken, studentId, selectedTopicMarkBook.markBookNamedTopicId,
+                                         mark);
+            const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                                                                         selectedClassGroupNumber, selectedSubjectId);
+            setSelectedMarkBook(markBook);
+        } catch(er) {
+            console.log(er);
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -384,7 +411,8 @@ function TeacherMarkBook() {
                                                       cantDeleteMarkBookNamedTopicError={cantDeleteMarkBookNamedTopicError} />
                     }
                     {addMarkBookTopicRecordFormVisible &&
-                        <></>
+                        <AddMarkBookNamedRecordForm students={studentsWithoutNamedMarkRecords}
+                                                    onAddMarkBookNamedRecord={submitAddMarkBookNamedRecordFormHandler} />
                     }
                     {deleteMarkBookTopicRecordFormVisible &&
                         <></>
