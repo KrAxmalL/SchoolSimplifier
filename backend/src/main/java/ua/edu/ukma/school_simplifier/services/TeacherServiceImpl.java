@@ -39,6 +39,7 @@ public class TeacherServiceImpl implements TeacherService {
     private final MarkBookDateTopicRepository markBookDateTopicRepository;
     private final DateMarkRecordRepository dateMarkRecordRepository;
     private final MarkBookNamedTopicRepository markBookNamedTopicRepository;
+    private final TopicMarkRecordRepository topicMarkRecordRepository;
 
     private final SchoolClassService schoolClassService;
 
@@ -361,5 +362,43 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         markBookNamedTopicRepository.deleteById(markBookNamedTopicId);
+    }
+
+    @Override
+    public void addMarkBookNamedMarkRecord(AddMarkBookNamedMarkRecordDTO addMarkBookNamedMarkRecordDTO) {
+        final BigInteger studentId = addMarkBookNamedMarkRecordDTO.getStudentId();
+        if(studentId == null) {
+            throw new InvalidParameterException("Student id must not be null");
+        }
+        final Student student = studentRepository.findById(studentId)
+                .orElseThrow(() ->  new InvalidParameterException("Student with provided id doesn't exist"));
+
+        final BigInteger markBookNamedTopicId = addMarkBookNamedMarkRecordDTO.getMarkBookNamedTopicId();
+        if(markBookNamedTopicId == null) {
+            throw new InvalidParameterException("Mark book named topic id must not be null");
+        }
+        final MarkBookNamedTopic markBookNamedTopic = markBookNamedTopicRepository.findById(markBookNamedTopicId)
+                .orElseThrow(() -> new InvalidParameterException("Mark book named topic with provided id doesn't exist"));
+
+        boolean studentHasMark = markBookNamedTopic.getTopicMarkRecords()
+                .stream()
+                .anyMatch(namedMarkRecord -> namedMarkRecord.getStudent().getStudentId().compareTo(studentId) == 0);
+        if(studentHasMark) {
+            throw new InvalidParameterException("Student already has a mark record in provided mark book named topic");
+        }
+
+        final Integer mark = addMarkBookNamedMarkRecordDTO.getMark();
+        if(mark == null) {
+            throw new InvalidParameterException("Mark field must not be null");
+        }
+        if(mark < 1 || mark > 12) {
+            throw new InvalidParameterException("Mark value must be between 1 and 12");
+        }
+
+        final TopicMarkRecord topicMarkRecord = new TopicMarkRecord();
+        topicMarkRecord.setMark(mark);
+        topicMarkRecord.setStudent(student);
+        topicMarkRecord.setMarkBookNamedTopic(markBookNamedTopic);
+        topicMarkRecordRepository.save(topicMarkRecord);
     }
 }
