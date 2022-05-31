@@ -227,7 +227,10 @@ function TeacherMarkBook() {
         setDeleteMarkBookTopicFormVisible(false);
         setAddMarkBookTopicRecordFormVisible(false);
         setDeleteMarkBookTopicRecordFormVisible(false);
-        //todo: set form errors to null
+        setCantAddMarkBookDateTopicError(null);
+        setCantDeleteMarkBookDateTopicError(null);
+        setCantAddMarkBookNamedTopicError(null);
+        setCantDeleteMarkBookNamedTopicError(null);
     }
 
     const submitSelectMarkBookFormHandler = async(subjectId, schoolClassId, classGroupNumber) => {
