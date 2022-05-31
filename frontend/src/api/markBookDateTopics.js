@@ -18,3 +18,15 @@ export async function addMarkBookDateTopic(accessToken, topicDate, markBookId) {
         throw new Error("Mark book date topic adding failed");
     }
 }
+
+export async function deleteMarkBookDateTopic(accessToken, dateTopicId) {
+    const response = await fetch(MARK_BOOK_DATE_TOPICS_URL + `/${dateTopicId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Mark book date topic deletion failed");
+    }
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { addMarkBookDateTopic } from '../../api/markBookDateTopics';
+import { addMarkBookDateTopic, deleteMarkBookDateTopic } from '../../api/markBookDateTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
 import SelectMarkBookDateForm from '../../components/formteacher/SelectMarkBookDateForm';
@@ -8,6 +8,7 @@ import SelectMarkBookTopicForm from '../../components/formteacher/SelectMarkBook
 import TeacherDateMarksTable from '../../components/table/TeacherDateMarksTable';
 import TeacherTopicMarksTable from '../../components/table/TeacherTopicMarksTable';
 import AddMarkBookDateTopicForm from '../../components/teacher/AddMarkBookDateTopicForm';
+import DeleteMarkBookDateTopicForm from '../../components/teacher/DeleteMarkBookDateTopicForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import Modal from '../../layout/Modal';
 import classes from './TeacherMarkBook.module.css';
@@ -29,8 +30,9 @@ function TeacherMarkBook() {
     const [selectMarkBookTopicFormVisible, setSelectMarkBookTopicFormVisible] = useState(false);
     const [selectMarkBookDateFormVisible, setSelectMarkBookDateFormVisible] = useState(false);
     const [addMarkBookDateFormVisible, setAddMarkBookDateFormVisible] = useState(false);
-    const [cantAddMarkBookDateTopicError, setCantAddMarkBookDateTopicError] = useState(false);
+    const [cantAddMarkBookDateTopicError, setCantAddMarkBookDateTopicError] = useState(null);
     const [deleteMarkBookDateFormVisible, setDeleteMarkBookDateFormVisible] = useState(false);
+    const [cantDeleteMarkBookDateTopicError, setCantDeleteMarkBookDateTopicError] = useState(null);
     const [addMarkBookDateRecordFormVisible, setAddMarkBookDateRecordFormVisible] = useState(false);
     const [deleteMarkBookDateRecordFormVisible, setDeleteMarkBookDateRecordFormVisible] = useState(false);
     const [addMarkBookTopicFormVisible, setAddMarkBookTopicFormVisible] = useState(false);
@@ -188,9 +190,30 @@ function TeacherMarkBook() {
             return;
         }
         else {
-            setCantAddMarkBookDateTopicError(false);
+            setCantAddMarkBookDateTopicError(null);
             try {
                 await addMarkBookDateTopic(accessToken, topicDate, selectedMarkBook.markBookId);
+                const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                    selectedClassGroupNumber, selectedSubjectId);
+                setSelectedMarkBook(markBook);
+
+            } catch(er) {
+                console.log(er);
+            }
+        }
+    }
+
+    const submitDeleteMarkBookDateTopicFormHandler = async (dateTopicId) => {
+        const dateTopicToDelete = selectedMarkBook.markBookDateTopics.find(dateTopic => dateTopic.markBookDateTopicId === dateTopicId);
+        const dateMarkRecordNumber = dateTopicToDelete.topicMarks.length;
+        if(dateMarkRecordNumber > 0) {
+            setCantDeleteMarkBookDateTopicError(`Існує ${dateMarkRecordNumber} оцінок за обрану дату, не можна видалити`);
+            return;
+        }
+        else {
+            setCantDeleteMarkBookDateTopicError(null);
+            try {
+                await deleteMarkBookDateTopic(accessToken, dateTopicId);
                 const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
                     selectedClassGroupNumber, selectedSubjectId);
                 setSelectedMarkBook(markBook);
@@ -223,7 +246,9 @@ function TeacherMarkBook() {
                                                   cantAddMarkBookDateTopicError={cantAddMarkBookDateTopicError} />
                     }
                     {deleteMarkBookDateFormVisible &&
-                        <></>
+                        <DeleteMarkBookDateTopicForm topics={selectedMarkBook.markBookDateTopics} 
+                                                     onDeleteMarkBookDateTopic={submitDeleteMarkBookDateTopicFormHandler}
+                                                     cantDeleteMarkBookDateTopicError={cantDeleteMarkBookDateTopicError} />
                     }
                     {addMarkBookDateRecordFormVisible &&
                         <></>
