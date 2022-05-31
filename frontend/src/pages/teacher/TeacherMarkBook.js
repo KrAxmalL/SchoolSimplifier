@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { addMarkBookDateRecord, deleteMarkBookDateTopicRecord } from '../../api/markBookDateMarkRecords';
 import { addMarkBookDateTopic, deleteMarkBookDateTopic } from '../../api/markBookDateTopics';
-import { addMarkBookNamedTopic } from '../../api/markBookNamedTopics';
+import { addMarkBookNamedTopic, deleteMarkBookNamedTopic } from '../../api/markBookNamedTopics';
 import { getMarkBookForClassAndGroupAndSubject } from '../../api/markBooks';
 import { getClassesWithSubjectsForTeacher, getStudentsOfClass } from '../../api/teacher';
 import SelectMarkBookDateForm from '../../components/formteacher/SelectMarkBookDateForm';
@@ -13,6 +13,7 @@ import AddMarkBookDateRecordForm from '../../components/teacher/AddMarkBookDateR
 import AddMarkBookDateTopicForm from '../../components/teacher/AddMarkBookDateTopicForm';
 import AddMarkBookNamedTopicForm from '../../components/teacher/AddMarkBookNamedTopicForm';
 import DeleteMarkBookDateTopicForm from '../../components/teacher/DeleteMarkBookDateTopicForm';
+import DeleteMarkBookNamedTopicForm from '../../components/teacher/DeleteMarkBookNamedTopicForm';
 import SelectMarkBookForm from '../../components/teacher/SelectMarkBookForm';
 import SelectStudentToDeleteMarkRecordForm from '../../components/teacher/SelectStudentToDeleteMarkRecordForm';
 import Modal from '../../layout/Modal';
@@ -43,6 +44,7 @@ function TeacherMarkBook() {
     const [addMarkBookTopicFormVisible, setAddMarkBookTopicFormVisible] = useState(false);
     const [cantAddMarkBookNamedTopicError, setCantAddMarkBookNamedTopicError] = useState(null);
     const [deleteMarkBookTopicFormVisible, setDeleteMarkBookTopicFormVisible] = useState(false);
+    const [cantDeleteMarkBookNamedTopicError, setCantDeleteMarkBookNamedTopicError] = useState(null);
     const [addMarkBookTopicRecordFormVisible, setAddMarkBookTopicRecordFormVisible] = useState(false);
     const [deleteMarkBookTopicRecordFormVisible, setDeleteMarkBookTopicRecordFormVisible] = useState(false);
 
@@ -316,6 +318,27 @@ function TeacherMarkBook() {
         }
     }
 
+    const submitDeleteMarkBookNamedTopicFormHandler = async (namedTopicId) => {
+        const namedTopicToDelete = selectedMarkBook.markBookNamedTopics.find(namedTopic =>
+            namedTopic.markBookNamedTopicId === namedTopicId);
+        const namedMarkRecordNumber = namedTopicToDelete.topicMarks.length;
+        if(namedMarkRecordNumber > 0) {
+            setCantDeleteMarkBookNamedTopicError(`Існує ${namedMarkRecordNumber} оцінок за обрану тему, не можна видалити`);
+            return;
+        }
+        else {
+            setCantDeleteMarkBookNamedTopicError(null);
+            try {
+                await deleteMarkBookNamedTopic(accessToken, namedTopicId);
+                const markBook = await getMarkBookForClassAndGroupAndSubject(accessToken, selectedSchoolClassId,
+                    selectedClassGroupNumber, selectedSubjectId);
+                setSelectedMarkBook(markBook);
+            } catch(er) {
+                console.log(er);
+            }
+        }
+    }
+
     return (
         <div className={classes['page-container']}>
             {modalVisible &&
@@ -356,7 +379,9 @@ function TeacherMarkBook() {
                                                    cantAddMarkBookNamedTopicError={cantAddMarkBookNamedTopicError} />
                     }
                     {deleteMarkBookTopicFormVisible &&
-                        <></>
+                        <DeleteMarkBookNamedTopicForm topics={selectedMarkBook.markBookNamedTopics}
+                                                      onDeleteMarkBookNamedTopic={submitDeleteMarkBookNamedTopicFormHandler}
+                                                      cantDeleteMarkBookNamedTopicError={cantDeleteMarkBookNamedTopicError} />
                     }
                     {addMarkBookTopicRecordFormVisible &&
                         <></>

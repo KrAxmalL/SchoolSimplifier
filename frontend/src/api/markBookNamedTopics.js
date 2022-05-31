@@ -18,3 +18,15 @@ export async function addMarkBookNamedTopic(accessToken, topicName, markBookId) 
         throw new Error("Mark book named topic adding failed");
     }
 }
+
+export async function deleteMarkBookNamedTopic(accessToken, namedTopicId) {
+    const response = await fetch(MARK_BOOK_NAMED_TOPICS_URL + `/${namedTopicId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        },
+    });
+    if(!response.ok) {
+        throw new Error("Mark book named topic deletion failed");
+    }
+}
