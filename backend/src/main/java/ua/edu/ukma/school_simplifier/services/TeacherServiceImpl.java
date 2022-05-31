@@ -401,4 +401,16 @@ public class TeacherServiceImpl implements TeacherService {
         topicMarkRecord.setMarkBookNamedTopic(markBookNamedTopic);
         topicMarkRecordRepository.save(topicMarkRecord);
     }
+
+    @Override
+    public void deleteMarkBookNamedTopicRecord(BigInteger markBookNamedTopicRecordId) {
+        if(markBookNamedTopicRecordId == null) {
+            throw new InvalidParameterException("Named topic mark record id must not be null");
+        }
+        if(!topicMarkRecordRepository.existsById(markBookNamedTopicRecordId)) {
+            throw new InvalidParameterException("Named topic mark record with provided id doesn't exist");
+        }
+
+        topicMarkRecordRepository.deleteById(markBookNamedTopicRecordId);
+    }
 }

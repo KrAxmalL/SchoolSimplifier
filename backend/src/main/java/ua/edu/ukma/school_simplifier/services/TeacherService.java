@@ -37,4 +37,6 @@ public interface TeacherService {
     void deleteMarkBookNamedTopic(BigInteger markBookNamedTopicId);
 
     void addMarkBookNamedMarkRecord(AddMarkBookNamedMarkRecordDTO addMarkBookNamedMarkRecordDTO);
+
+    void deleteMarkBookNamedTopicRecord(BigInteger markBookNamedTopicRecordId);
 }
