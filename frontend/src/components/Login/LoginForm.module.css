@@ -1,7 +1,32 @@
-.login-form {
-    width: 50%;
+.login-form-container {
+    width: 30%;
     height: fit-content;
     display: flex;
     flex-direction: column;
+    align-self: center;
+    background-color: snow;
     color: #484043;
+
+    border: #484043 2px solid;
+    border-radius: 10px;
+}
+
+.login-form {
+    width: 90%;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-form > h3 {
+    font-size: 1.5rem;
+}
+
+.login-form > input {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.login-form-submit-btn  {
+    border-radius: 10px;
 }

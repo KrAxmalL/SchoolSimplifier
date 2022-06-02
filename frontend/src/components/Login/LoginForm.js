@@ -16,14 +16,16 @@ function LoginForm(props) {
   }
 
     return (
+      <div className={classes['login-form-container']}>
         <form onSubmit={submitFormHandler} className={classes['login-form']}>
             <h3>Будь ласка, авторизуйтесь</h3>
             <label htmlFor="email">Ваш e-mail</label>
             <input type='email' id='email' placeholder="Ваш e-mail" ref={emailInputRef}></input>
             <label htmlFor="password">Ваш пароль</label>
             <input type='password' id='password' placeholder="Ваш пароль" ref={passwordInputRef}></input>
-            <input type='submit' value='Увійти в систему'></input>
+            <input className={classes['login-form-submit-btn']} type='submit' value='Увійти в систему'></input>
         </form>
+      </div>
     );
 }
 
