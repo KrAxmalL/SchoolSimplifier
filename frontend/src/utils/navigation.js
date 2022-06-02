@@ -41,7 +41,7 @@ const formTeacherMenus = [
   },
   {
       link: '/formteacher/classMarkBook',
-      title: 'Журнал оцінок мого класу'
+      title: 'Класний журнал оцінок'
   },
 ];
 

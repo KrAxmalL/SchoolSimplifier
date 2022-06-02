@@ -18,7 +18,7 @@ function LoginForm(props) {
     return (
       <div className={classes['login-form-container']}>
         <form onSubmit={submitFormHandler} className={classes['login-form']}>
-            <h3>Будь ласка, авторизуйтесь</h3>
+            <h3>Будь ласка, увійдіть до системи</h3>
             <label htmlFor="email">Ваш e-mail</label>
             <input type='email' id='email' placeholder="Ваш e-mail" ref={emailInputRef}></input>
             <label htmlFor="password">Ваш пароль</label>

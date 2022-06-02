@@ -8,7 +8,7 @@ const menus = [
     },
     {
         link: '/login',
-        title: 'Авторизація'
+        title: 'Увійти в систему'
     }
 ];
 
