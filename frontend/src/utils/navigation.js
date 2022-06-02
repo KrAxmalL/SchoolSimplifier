@@ -81,11 +81,14 @@ export const getHomePageForUser = (roles) => {
     else if(roles.includes(Roles.STUDENT)) {
       return '/student/schedule';
     }
-    else if(roles.includes(Roles.TEACHER)) {
-      return '/teacher/schedule';
-    }
     else if(roles.includes(Roles.HEADTEACHER)) {
       return '/headteacher/schedule';
+    }
+    else if(roles.includes(Roles.FORMTEACHER)) {
+      return '/formteacher/class';
+    }
+    else if(roles.includes(Roles.TEACHER)) {
+      return '/teacher/schedule';
     }
     else {
       throw new Error('Invalid role!');
