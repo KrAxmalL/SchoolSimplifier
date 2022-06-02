@@ -4,11 +4,11 @@ import Layout from "./Layout";
 const menus = [
     {
         link: '/home',
-        title: 'Home'
+        title: 'Домашня сторінка'
     },
     {
         link: '/login',
-        title: 'Login'
+        title: 'Авторизація'
     }
 ];
 

@@ -29,7 +29,7 @@ function Header({menus, needLogout}) {
                 {needLogout &&
                     <NavLink className={classes['navbar-link']}
                          to='../login' onClick={logoutClickHandler}>
-                        Logout
+                        Вийти
                     </NavLink>
                 }
             </div>

@@ -1,15 +1,6 @@
-import React from "react";
-
-import jwtDecode from 'jwt-decode';
-
-import { useRef } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { authActions } from '../../store/auth-slice';
-
-import {login, refreshTokens} from '../../api/authentication';
+import React, { useRef } from "react";
 
 import classes from './LoginForm.module.css';
-import { Navigate } from "react-router-dom";
 
 function LoginForm(props) {
   const emailInputRef = useRef();
@@ -26,12 +17,12 @@ function LoginForm(props) {
 
     return (
         <form onSubmit={submitFormHandler} className={classes['login-form']}>
-            <h3>Login</h3>
-            <label htmlFor="email">Your email</label>
-            <input type='email' id='email' placeholder="Please, enter your email" ref={emailInputRef}></input>
-            <label htmlFor="password">Your password</label>
-            <input type='password' id='password' placeholder="Please, enter your password" ref={passwordInputRef}></input>
-            <input type='submit' value='Login'></input>
+            <h3>Будь ласка, авторизуйтесь</h3>
+            <label htmlFor="email">Ваш e-mail</label>
+            <input type='email' id='email' placeholder="Ваш e-mail" ref={emailInputRef}></input>
+            <label htmlFor="password">Ваш пароль</label>
+            <input type='password' id='password' placeholder="Ваш пароль" ref={passwordInputRef}></input>
+            <input type='submit' value='Увійти в систему'></input>
         </form>
     );
 }
