@@ -3,56 +3,56 @@ import { Roles } from "../domain/constants";
 const studentMenus = [
   {
       link: '/student/schedule',
-      title: 'Schedule'
+      title: 'Розклад'
   },
   {
       link: '/student/subjects',
-      title: 'Subjects'
+      title: 'Предмети'
   },
   {
       link: '/student/class',
-      title: 'Class'
+      title: 'Клас'
   },
   {
       link: '/student/marks',
-      title: 'Marks'
+      title: 'Оцінки'
   }
 ];
 
 const teacherMenus = [
   {
       link: '/teacher/schedule',
-      title: 'Schedule'
+      title: 'Розклад'
   },
   {
       link: '/teacher/subjects',
-      title: 'Subjects'
+      title: 'Предмети'
   },
   {
       link: '/teacher/markBook',
-      title: 'Mark Book'
+      title: 'Журнал оцінок'
   },
 ];
 
 const formTeacherMenus = [
   {
       link: '/formteacher/class',
-      title: 'My Class'
+      title: 'Мій клас'
   },
   {
       link: '/formteacher/classMarkBook',
-      title: 'My Class Mark Book'
+      title: 'Журнал оцінок мого класу'
   },
 ];
 
 const headTeacherMenus = [
   {
       link: '/headteacher/class',
-      title: 'Classes'
+      title: 'Шкільні класи'
   },
   {
       link: '/headteacher/schedule',
-      title: 'General Schedule'
+      title: 'Шкільний розклад'
   },
 ];
 
@@ -75,7 +75,7 @@ export const getMenusForRole = (role) => {
 }
 
 export const getHomePageForUser = (roles) => {
-    if(!roles) {
+    if(!roles || roles.length === 0) {
       return '/login';
     }
     else if(roles.includes(Roles.STUDENT)) {
@@ -88,6 +88,6 @@ export const getHomePageForUser = (roles) => {
       return '/headteacher/schedule';
     }
     else {
-      return '/unauthorized';
+      throw new Error('Invalid role!');
     }
 }
