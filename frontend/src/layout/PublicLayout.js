@@ -1,6 +1,4 @@
-import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-import { getMenusForRole } from "../utils/navigation";
 import Layout from "./Layout";
 
 const menus = [
