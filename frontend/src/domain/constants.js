@@ -1,4 +1,6 @@
 
+export const DOMAIN_URL = 'http://localhost:8000/api';
+
 export const Roles = {
     STUDENT: "STUDENT",
     TEACHER: "TEACHER",

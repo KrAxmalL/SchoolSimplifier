@@ -1,4 +1,4 @@
-import { DOMAIN_URL } from "../config/config";
+import { DOMAIN_URL } from "../domain/constants";
 
 const MARK_BOOK_DATE_MARK_RECORDS = DOMAIN_URL + '/dateMarkRecords';
 

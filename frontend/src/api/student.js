@@ -1,4 +1,4 @@
-import { DOMAIN_URL } from "../config/config";
+import { DOMAIN_URL } from "../domain/constants";
 
 const STUDENTS_URL = DOMAIN_URL + '/students';
 

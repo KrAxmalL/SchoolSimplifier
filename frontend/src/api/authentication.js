@@ -1,4 +1,4 @@
-import { DOMAIN_URL } from "../config/config";
+import { DOMAIN_URL } from "../domain/constants";
 
 const AUTHENTICATION_URL = DOMAIN_URL + '/authentication'
 const LOGIN_URL = AUTHENTICATION_URL + '/login';
