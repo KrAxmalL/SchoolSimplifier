@@ -21,11 +21,8 @@ import ua.edu.ukma.school_simplifier.exceptions.InvalidTokenException;
 import ua.edu.ukma.school_simplifier.exceptions.TokenNotFoundException;
 import ua.edu.ukma.school_simplifier.security.filter.JwtAuthorizationFilter;
 import ua.edu.ukma.school_simplifier.services.JwtTokenService;
-import ua.edu.ukma.school_simplifier.utils.Pair;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/authentication")
