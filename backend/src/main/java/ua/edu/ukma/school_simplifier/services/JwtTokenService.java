@@ -3,7 +3,6 @@ package ua.edu.ukma.school_simplifier.services;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import ua.edu.ukma.school_simplifier.domain.security.Principal;
 import ua.edu.ukma.school_simplifier.domain.security.TokenPair;
-import ua.edu.ukma.school_simplifier.utils.Pair;
 
 import java.util.List;
 
