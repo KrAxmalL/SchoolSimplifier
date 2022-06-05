@@ -12,8 +12,8 @@ const authSlice = createSlice({
         setAccessToken(state, action) {
             const newToken = action.payload.accessToken;
             state.accessToken = newToken;
-            localStorage.setItem('accessToken', newToken);
             state.roles = jwtDecode(newToken).roles;
+            localStorage.setItem('accessToken', newToken);
         },
 
         setRefreshToken(state, action) {

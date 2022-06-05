@@ -21,6 +21,7 @@ import PublicLayout from './layout/PublicLayout';
 import Home from './pages/public/Home';
 import HeadTeacherClass from './pages/headteacher/HeadTeacherClass';
 import HeadTeacherSchedule from './pages/headteacher/HeadTeacherSchedule';
+import PersistentLogin from './components/security/PersistentLogin';
 
 function App() {
   const roles = useSelector(state => state.auth.roles);
@@ -35,28 +36,30 @@ function App() {
           <Route path='*' element={<NotFound />}></Route>
         </Route>
 
-        <Route element={<AuthLayout />}>
-          <Route path='/student' element={<RequireAuth allowedRoles={[Roles.STUDENT]} />}>
-              <Route path='schedule' element={<StudentSchedule />}></Route>
-              <Route path='subjects' element={<StudentSubjects />}></Route>
-              <Route path='class' element={<StudentClass />}></Route>
-              <Route path='marks' element={<StudentMarks />}></Route>
-          </Route>
-
-          <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER]} />}>
-              <Route path='schedule' element={<TeacherSchedule />}></Route>
-              <Route path='subjects' element={<TeacherSubjects />}></Route>
-              <Route path='markBook' element={<TeacherMarkBook />}></Route>
+        <Route element={<PersistentLogin />}>
+          <Route element={<AuthLayout />}>
+            <Route path='/student' element={<RequireAuth allowedRoles={[Roles.STUDENT]} />}>
+                <Route path='schedule' element={<StudentSchedule />}></Route>
+                <Route path='subjects' element={<StudentSubjects />}></Route>
+                <Route path='class' element={<StudentClass />}></Route>
+                <Route path='marks' element={<StudentMarks />}></Route>
             </Route>
 
-          <Route path='/formteacher' element={<RequireAuth allowedRoles={[Roles.FORMTEACHER]} />}>
-              <Route path='class' element={<FormTeacherClass />}></Route>
-              <Route path='classMarkBook' element={<FormTeacherClassMarkBook />}></Route>
-          </Route>
+            <Route path='/teacher' element={<RequireAuth allowedRoles={[Roles.TEACHER]} />}>
+                <Route path='schedule' element={<TeacherSchedule />}></Route>
+                <Route path='subjects' element={<TeacherSubjects />}></Route>
+                <Route path='markBook' element={<TeacherMarkBook />}></Route>
+              </Route>
 
-          <Route path='/headteacher' element={<RequireAuth allowedRoles={[Roles.HEADTEACHER]} />}>
-              <Route path='class' element={<HeadTeacherClass />}></Route>
-              <Route path='schedule' element={<HeadTeacherSchedule />}></Route>
+            <Route path='/formteacher' element={<RequireAuth allowedRoles={[Roles.FORMTEACHER]} />}>
+                <Route path='class' element={<FormTeacherClass />}></Route>
+                <Route path='classMarkBook' element={<FormTeacherClassMarkBook />}></Route>
+            </Route>
+
+            <Route path='/headteacher' element={<RequireAuth allowedRoles={[Roles.HEADTEACHER]} />}>
+                <Route path='class' element={<HeadTeacherClass />}></Route>
+                <Route path='schedule' element={<HeadTeacherSchedule />}></Route>
+            </Route>
           </Route>
         </Route>
       </Routes>
